@@ -1,0 +1,34 @@
+version: '3.5'
+services:
+  homeassistant:
+    restart: unless-stopped
+    image: ghcr.io/home-assistant/home-assistant:stable
+    privileged: true
+    network_mode: host
+    environment:
+      - TZ=Europe/Rome
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./home-assistant/data:/config
+    depends_on:
+      - mosquitto
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  grafana:
+    build: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    environment:
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: ammpio-mqtt-datasource
