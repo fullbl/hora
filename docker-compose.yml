@@ -17,12 +17,6 @@ services:
   ewpe:
     image: demydiuk/ewpe-smart-mqtt:1.0.5
     network_mode: host
-    environment:
-      - "MQTT_SERVER=mqtt://mosquitto"
-      - "MQTT_BASE_TOPIC=ewpe-smart"
-      - "NETWORK=192.168.1.255"
-      - "DEVICE_POLL_INTERVAL=5000"
-    
 
   mosquitto:
     image: eclipse-mosquitto:2.0.15
