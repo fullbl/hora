@@ -1,5 +1,0 @@
-2023-01-10 12:34:09.494 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-10 12:34:09.495 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration localtuya which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2023-01-10 12:34:10.471 WARNING (Recorder) [homeassistant.components.recorder.util] The system could not validate that the sqlite3 database at //config/home-assistant_v2.db was shutdown cleanly
-2023-01-10 12:34:12.545 ERROR (MainThread) [homeassistant.components.mqtt.client] Failed to connect to MQTT server due to exception: [Errno 111] Connection refused
-2023-01-10 12:34:22.686 WARNING (MainThread) [homeassistant.config_entries] Config entry 'Huawei IGD' for upnp integration not ready yet: Device not discovered: uuid:00e0fc37-2525-2828-2500-C0FFA84EF9E3::urn:schemas-upnp-org:device:InternetGatewayDevice:1; Retrying in background
