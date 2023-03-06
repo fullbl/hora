@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "core.config_entries",
+  "data": {
+    "entries": [
+      {
+        "entry_id": "ed63921de41228d776edc297bb6ff236",
+        "version": 1,
+        "domain": "sun",
+        "title": "Sun",
+        "data": {},
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "import",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "5af485009cb374cfec50990ac3bb813e",
+        "version": 1,
+        "domain": "radio_browser",
+        "title": "Radio Browser",
+        "data": {},
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "onboarding",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "81c4b8a183fe2a26d5e156c3961a2694",
+        "version": 1,
+        "domain": "met",
+        "title": "Home",
+        "data": {
+          "track_home": true
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "onboarding",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "1f8fc66991be9d06b3f43c36f5244e9e",
+        "version": 1,
+        "domain": "upnp",
+        "title": "Huawei IGD",
+        "data": {
+          "udn": "uuid:00e0fc37-2525-2828-2500-C0FFA84EF9E3",
+          "st": "urn:schemas-upnp-org:device:InternetGatewayDevice:1",
+          "original_udn": "uuid:00e0fc37-2525-2828-2500-C0FFA84EF9E3",
+          "location": "http://192.168.1.254:49652/49652gatedesc.xml",
+          "mac_address": "c0:ff:a8:4e:f9:e3",
+          "host": "192.168.1.254"
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "ssdp",
+        "unique_id": "uuid:00e0fc37-2525-2828-2500-C0FFA84EF9E3::urn:schemas-upnp-org:device:InternetGatewayDevice:1",
+        "disabled_by": null
+      },
+      {
+        "entry_id": "9bdb2ab0c044a9325c67a1ae4336f7d6",
+        "version": 1,
+        "domain": "mqtt",
+        "title": "172.22.0.2",
+        "data": {
+          "broker": "172.22.0.2",
+          "port": 1883,
+          "keepalive": 60,
+          "tls_insecure": false,
+          "protocol": "3.1.1",
+          "discovery": true,
+          "discovery_prefix": "homeassistant",
+          "birth_message": {
+            "topic": "homeassistant/status",
+            "payload": "online",
+            "qos": 0,
+            "retain": false
+          },
+          "will_message": {
+            "topic": "homeassistant/status",
+            "payload": "offline",
+            "qos": 0,
+            "retain": false
+          }
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "2c2bc067984c5de9f82ea8cd57a3e384",
+        "version": 1,
+        "domain": "gree",
+        "title": "Gree Climate",
+        "data": {},
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": "gree",
+        "disabled_by": null
+      },
+      {
+        "entry_id": "507aa40e5f25cdb1e1c6a11b7eacefab",
+        "version": 1,
+        "domain": "hacs",
+        "title": "",
+        "data": {
+          "token": "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"
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "52f1cbbd83155daf4a4f8b833215fb2e",
+        "version": 2,
+        "domain": "localtuya",
+        "title": "localtuya",
+        "data": {
+          "region": "us",
+          "username": "Tuya",
+          "no_cloud": false,
+          "user_id": "az1671804263939Ftr55",
+          "client_id": "pxwn9y7dsrx3gkd9uwtn",
+          "client_secret": "6eed06096acd42109c4e028e43bf8c77",
+          "devices": {},
+          "updated_at": "1671810790656"
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": "az1671804263939Ftr55",
+        "disabled_by": null
+      }
+    ]
+  }
+}

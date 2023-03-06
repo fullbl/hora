@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "minor_version": 3,
+  "key": "core.device_registry",
+  "data": {
+    "devices": [
+      {
+        "area_id": null,
+        "config_entries": [
+          "81c4b8a183fe2a26d5e156c3961a2694"
+        ],
+        "configuration_url": "https://www.met.no/en",
+        "connections": [],
+        "disabled_by": null,
+        "entry_type": "service",
+        "hw_version": null,
+        "id": "693631e4a92593fcc4b195b83e32bc31",
+        "identifiers": [
+          [
+            "met"
+          ]
+        ],
+        "manufacturer": "Met.no",
+        "model": "Forecast",
+        "name_by_user": null,
+        "name": "Forecast",
+        "sw_version": null,
+        "via_device_id": null
+      },
+      {
+        "area_id": null,
+        "config_entries": [
+          "1f8fc66991be9d06b3f43c36f5244e9e"
+        ],
+        "configuration_url": null,
+        "connections": [
+          [
+            "mac",
+            "c0:ff:a8:4e:f9:e3"
+          ],
+          [
+            "upnp",
+            "uuid:00e0fc37-2525-2828-2500-C0FFA84EF9E3"
+          ]
+        ],
+        "disabled_by": null,
+        "entry_type": null,
+        "hw_version": null,
+        "id": "6783b83d8eba882f2553e28d501a7d96",
+        "identifiers": [
+          [
+            "upnp",
+            "uuid:00e0fc37-2525-2828-2500-C0FFA84EF9E3::urn:schemas-upnp-org:device:InternetGatewayDevice:1"
+          ],
+          [
+            "upnp_host",
+            "192.168.1.254"
+          ],
+          [
+            "upnp_serial_number",
+            "2153036844LDM5007756"
+          ]
+        ],
+        "manufacturer": "Huawei",
+        "model": "Huawei EchoLife Series",
+        "name_by_user": null,
+        "name": "Huawei IGD",
+        "sw_version": null,
+        "via_device_id": null
+      },
+      {
+        "area_id": null,
+        "config_entries": [
+          "2c2bc067984c5de9f82ea8cd57a3e384"
+        ],
+        "configuration_url": null,
+        "connections": [
+          [
+            "mac",
+            "50:2c:c6:34:e4:d5"
+          ]
+        ],
+        "disabled_by": null,
+        "entry_type": null,
+        "hw_version": null,
+        "id": "c0ad237ebdbb83512cffb83320a6a434",
+        "identifiers": [
+          [
+            "gree",
+            "502cc634e4d5"
+          ]
+        ],
+        "manufacturer": "Gree",
+        "model": null,
+        "name_by_user": null,
+        "name": "c634e4d5",
+        "sw_version": null,
+        "via_device_id": null
+      },
+      {
+        "area_id": null,
+        "config_entries": [
+          "507aa40e5f25cdb1e1c6a11b7eacefab"
+        ],
+        "configuration_url": "homeassistant://hacs",
+        "connections": [],
+        "disabled_by": null,
+        "entry_type": "service",
+        "hw_version": null,
+        "id": "11071ebf3ec7d158bde175e1dde21930",
+        "identifiers": [
+          [
+            "hacs",
+            "0717a0cd-745c-48fd-9b16-c8534c9704f9-bc944b0f-fd42-4a58-a072-ade38d1444cd"
+          ]
+        ],
+        "manufacturer": "hacs.xyz",
+        "model": "",
+        "name_by_user": null,
+        "name": "HACS",
+        "sw_version": "1.29.0",
+        "via_device_id": null
+      }
+    ],
+    "deleted_devices": []
+  }
+}
