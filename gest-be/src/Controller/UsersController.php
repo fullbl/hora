@@ -20,13 +20,13 @@ class UsersController extends AbstractController
     {
     }
 
-    #[Route('/users', methods: ['GET'], name: 'customers_list')]
+    #[Route('/users', methods: ['GET'], name: 'users_list')]
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll());
     }
 
-    #[Route('/users', methods: ['POST'], name: 'customer_create')]
+    #[Route('/users', methods: ['POST'], name: 'user_create')]
     public function create(Request $request): JsonResponse
     {
         $user = UserMapper::fromRequest($request);
@@ -50,7 +50,7 @@ class UsersController extends AbstractController
         return $this->json($user);
     }
 
-    #[Route('/users/{id}', methods: ['GET'], name: 'customers_show')]
+    #[Route('/users/{id}', methods: ['GET'], name: 'users_show')]
     public function show(int $id): JsonResponse
     {
         $user = $this->repo->find($id);
@@ -62,7 +62,7 @@ class UsersController extends AbstractController
         return $this->json($user);
     }
 
-    #[Route('/users/{id}', methods: ['PUT'], name: 'customer_update')]
+    #[Route('/users/{id}', methods: ['PUT'], name: 'user_update')]
     public function update(int $id, Request $request): JsonResponse
     {
         $user = $this->repo->find($id);
@@ -94,7 +94,7 @@ class UsersController extends AbstractController
         return $this->json($user);
     }
 
-    #[Route('/users/{id}', methods: ['DELETE'], name: 'customer_delete')]
+    #[Route('/users/{id}', methods: ['DELETE'], name: 'user_delete')]
     public function delete(int $id, Request $request): JsonResponse
     {
         $user = $this->repo->find($id);

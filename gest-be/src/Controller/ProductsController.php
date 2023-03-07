@@ -20,13 +20,13 @@ class ProductsController extends AbstractController
     {
     }
 
-    #[Route('/products', methods: ['GET'], name: 'customers_list')]
+    #[Route('/products', methods: ['GET'], name: 'products_list')]
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll());
     }
 
-    #[Route('/products', methods: ['POST'], name: 'customer_create')]
+    #[Route('/products', methods: ['POST'], name: 'product_create')]
     public function create(Request $request): JsonResponse
     {
         $product = ProductMapper::fromRequest($request);
@@ -50,7 +50,7 @@ class ProductsController extends AbstractController
         return $this->json($product);
     }
 
-    #[Route('/products/{id}', methods: ['GET'], name: 'customers_show')]
+    #[Route('/products/{id}', methods: ['GET'], name: 'products_show')]
     public function show(int $id): JsonResponse
     {
         $product = $this->repo->find($id);
@@ -62,7 +62,7 @@ class ProductsController extends AbstractController
         return $this->json($product);
     }
 
-    #[Route('/products/{id}', methods: ['PUT'], name: 'customer_update')]
+    #[Route('/products/{id}', methods: ['PUT'], name: 'product_update')]
     public function update(int $id, Request $request): JsonResponse
     {
         $product = $this->repo->find($id);
@@ -94,7 +94,7 @@ class ProductsController extends AbstractController
         return $this->json($product);
     }
 
-    #[Route('/products/{id}', methods: ['DELETE'], name: 'customer_delete')]
+    #[Route('/products/{id}', methods: ['DELETE'], name: 'product_delete')]
     public function delete(int $id, Request $request): JsonResponse
     {
         $product = $this->repo->find($id);

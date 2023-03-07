@@ -20,13 +20,13 @@ class HordersController extends AbstractController
     {
     }
 
-    #[Route('/horders', methods: ['GET'], name: 'customers_list')]
+    #[Route('/horders', methods: ['GET'], name: 'horders_list')]
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll());
     }
 
-    #[Route('/horders', methods: ['POST'], name: 'customer_create')]
+    #[Route('/horders', methods: ['POST'], name: 'horder_create')]
     public function create(Request $request): JsonResponse
     {
         $horder = HorderMapper::fromRequest($request);
@@ -50,7 +50,7 @@ class HordersController extends AbstractController
         return $this->json($horder);
     }
 
-    #[Route('/horders/{id}', methods: ['GET'], name: 'customers_show')]
+    #[Route('/horders/{id}', methods: ['GET'], name: 'horders_show')]
     public function show(int $id): JsonResponse
     {
         $horder = $this->repo->find($id);
@@ -62,7 +62,7 @@ class HordersController extends AbstractController
         return $horder;
     }
 
-    #[Route('/horders/{id}', methods: ['PUT'], name: 'customer_update')]
+    #[Route('/horders/{id}', methods: ['PUT'], name: 'horder_update')]
     public function update(int $id, Request $request): JsonResponse
     {
         $horder = $this->repo->find($id);
@@ -94,7 +94,7 @@ class HordersController extends AbstractController
         return $this->json($horder);
     }
 
-    #[Route('/horders/{id}', methods: ['DELETE'], name: 'customer_delete')]
+    #[Route('/horders/{id}', methods: ['DELETE'], name: 'horder_delete')]
     public function delete(int $id, Request $request): JsonResponse
     {
         $horder = $this->repo->find($id);
