@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OrderRowRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRowRepository::class)]
 class OrderRow
@@ -16,13 +17,18 @@ class OrderRow
 
     #[ORM\ManyToOne(inversedBy: 'orderRows')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Horder $horder = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Product $product = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive]
+    #[Assert\NotNull]
+    #[Assert\Type('integer')]
     private ?int $quantity = null;
 
     public function getId(): ?int

@@ -5,10 +5,24 @@ namespace App\Entity;
 use App\Repository\ActivityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
 {
+    private const STATUS_PLANNED = 'planned';
+    private const STATUS_WORKING = 'working';
+    private const STATUS_DONE = 'done';
+    private const STATUS_CANCELED = 'canceled';
+    private const STATUS_ERROR = 'error';
+    private const STATUSES = [
+        self::STATUS_PLANNED,
+        self::STATUS_WORKING,
+        self::STATUS_DONE,
+        self::STATUS_CANCELED,
+        self::STATUS_ERROR,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -16,32 +30,45 @@ class Activity
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Delivery $delivery = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Range(min: 1, max: 52)]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
     private ?int $week = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Step $step = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\DateTime]
     private ?\DateTimeImmutable $workableFrom = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\DateTime]
     private ?\DateTimeImmutable $workableUntil = null;
 
     #[ORM\Column(length: 10)]
+    #[Assert\Choice(self::STATUSES)]
+    #[Assert\NotNull]
     private ?string $status = null;
-
+    
     #[ORM\Column]
+    #[Assert\Json]
+    #[Assert\NotNull]
     private array $data = [];
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?User $executer = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\DateTime]
     private ?\DateTimeImmutable $executionTime = null;
 
     public function getId(): ?int

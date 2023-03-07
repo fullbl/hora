@@ -5,7 +5,12 @@ namespace App\Entity;
 use App\Repository\StepRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
+
+#[UniqueEntity(['name', 'product'])]
+#[ORM\UniqueConstraint('step_name_product', ['name', 'product'])]
 #[ORM\Entity(repositoryClass: StepRepository::class)]
 class Step
 {
@@ -16,18 +21,28 @@ class Step
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?Product $product = null;
 
     #[ORM\Column(length: 10)]
+    #[Assert\Length(max: 10)]
+    #[Assert\NotNull]
     private ?string $name = null;
-
+    
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
     private ?int $minutes = null;
-
+    
     #[ORM\Column]
+    #[Assert\Json]
     private array $params = [];
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
     private ?int $sort = null;
 
     public function getId(): ?int

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\SuspensionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SuspensionRepository::class)]
 class Suspension
@@ -14,13 +15,16 @@ class Suspension
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\DateTime]
     private ?\DateTimeImmutable $start = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\DateTime]
     private ?\DateTimeImmutable $stop = null;
 
     #[ORM\ManyToOne(inversedBy: 'suspensions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
     private ?User $prisoner = null;
 
     public function getId(): ?int

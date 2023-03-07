@@ -4,7 +4,11 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[UniqueEntity(['name', 'type'])]
+#[ORM\UniqueConstraint('product_name_type', ['name', 'type'])]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
@@ -14,12 +18,19 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\Length(max: 100)]
+    #[Assert\NotNull]
     private ?string $name = null;
-
+    
     #[ORM\Column(length: 10)]
+    #[Assert\Length(max: 10)]
+    #[Assert\NotNull]
     private ?string $type = null;
-
+    
     #[ORM\Column]
+    #[Assert\Positive]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
     private ?int $grams = null;
 
     public function getId(): ?int
