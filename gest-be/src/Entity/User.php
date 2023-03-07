@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    private const STATUS_ACTIVE = 'active';
+    public const STATUS_ACTIVE = 'active';
     private const STATUS_INACTIVE = 'inactive';
     private const STATUSES = [
         self::STATUS_ACTIVE,
@@ -115,8 +115,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }

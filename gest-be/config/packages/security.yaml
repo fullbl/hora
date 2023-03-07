@@ -28,6 +28,12 @@ security:
         - { path: ^/,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
+    role_hierarchy:
+        ROLE_OPERATOR:       ROLE_USER
+        ROLE_CUSTOMER:       ROLE_USER
+        ROLE_ADMIN:          [ROLE_OPERATOR, ROLE_CUSTOMER]
+        ROLE_SYSTEM:         ROLE_ADMIN
+
 when@test:
     security:
         password_hashers:
