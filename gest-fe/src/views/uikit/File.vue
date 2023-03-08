@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();

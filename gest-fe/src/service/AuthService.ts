@@ -4,13 +4,13 @@ interface User {
     id: bigint;
 }
 
-const service: { user: User, login: (userrname: string, password: string) => Promise<boolean> } = {
+const service: { user: null|User, login: (userrname: string, password: string) => Promise<boolean> } = {
     user: null,
     async login(username: string, password: string): Promise<boolean> {
         let data: User;
         try {
             data = await dataService.post<User>(
-                import.meta.env.BASE_URL + '/login',
+                import.meta.env.BASE_URL + 'login',
                 { username, password }
             )
         }

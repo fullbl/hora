@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import NodeService from '@/service/NodeService';
 import { onMounted, ref } from 'vue';
 

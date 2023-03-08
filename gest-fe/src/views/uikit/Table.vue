@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/service/CustomerService';
 import ProductService from '@/service/ProductService';

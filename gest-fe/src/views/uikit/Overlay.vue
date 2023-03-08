@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ProductService from '@/service/ProductService';
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';

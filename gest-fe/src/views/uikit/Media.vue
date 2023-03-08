@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ProductService from '@/service/ProductService';
 import PhotoService from '@/service/PhotoService';
 import { ref, onMounted } from 'vue';

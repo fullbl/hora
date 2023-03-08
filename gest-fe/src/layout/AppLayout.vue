@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, watch, ref } from 'vue';
 import AppTopbar from './AppTopbar.vue';
 import AppFooter from './AppFooter.vue';
@@ -17,19 +17,6 @@ watch(isSidebarActive, (newVal) => {
     }
 });
 
-const containerClass = computed(() => {
-    return {
-        'layout-theme-light': layoutConfig.darkTheme.value === 'light',
-        'layout-theme-dark': layoutConfig.darkTheme.value === 'dark',
-        'layout-overlay': layoutConfig.menuMode.value === 'overlay',
-        'layout-static': layoutConfig.menuMode.value === 'static',
-        'layout-static-inactive': layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static',
-        'layout-overlay-active': layoutState.overlayMenuActive.value,
-        'layout-mobile-active': layoutState.staticMenuMobileActive.value,
-        'p-input-filled': layoutConfig.inputStyle.value === 'filled',
-        'p-ripple-disabled': !layoutConfig.ripple.value
-    };
-});
 const bindOutsideClickListener = () => {
     if (!outsideClickListener.value) {
         outsideClickListener.value = (event) => {
@@ -57,7 +44,7 @@ const isOutsideClicked = (event) => {
 </script>
 
 <template>
-    <div class="layout-wrapper" :class="containerClass">
+    <div class="layout-wrapper layout-static">
         <app-topbar></app-topbar>
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
