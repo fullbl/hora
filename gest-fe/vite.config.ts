@@ -1,17 +1,19 @@
-import { fileURLToPath, URL } from 'node:url';
+import { fileURLToPath, URL } from 'url';
 
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
     return {
-        plugins: [vue()],
+        plugins: [tsconfigPaths(), vue()],
         base: command === 'serve' ? '' : '/dist/',
         resolve: {
             alias: {
-                '@': fileURLToPath(new URL('./src', import.meta.url))
+                '@': fileURLToPath(new URL('./src', import.meta.url)),
             }
-        }
+        },
+        
     };
 });
