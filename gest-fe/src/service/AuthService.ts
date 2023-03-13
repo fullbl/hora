@@ -3,9 +3,9 @@ import VueJwtDecode from 'vue-jwt-decode'
 
 
 interface User {
-    id: bigint,
     roles: Array<string>,
-    token: string
+    token: string,
+    username: string
 }
 interface AuthService {
     user: null | User
@@ -17,34 +17,34 @@ interface AuthService {
 const service: AuthService = {
     user: null,
     load() {
-        const user = localStorage.getItem('user')
-        if (null === user) {
+        const token = localStorage.getItem('token')
+        if (null === token) {
             return false
         }
         try {
-            this.user = JSON.parse(user)
+            this.user = VueJwtDecode.decode(token)
         }
         catch (e) {
             return false
         }
 
+        dataService.token = token
         return true
     },
     async login(username, password) {
-        let user: User;
         try {
             const data = await dataService.post<{ token: string }>(
                 import.meta.env.VITE_API_URL + 'login',
                 { username, password }
             )
 
-            user = VueJwtDecode.decode(data.token)
+            this.user = VueJwtDecode.decode(data.token)
+            localStorage.setItem('token', data.token)
         }
         catch (e) {
             return false
         }
 
-        this.user = user;
         return true
     },
     isGranted(role) {

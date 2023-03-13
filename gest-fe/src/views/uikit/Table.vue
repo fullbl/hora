@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import CustomerService from '@/service/CustomerService';
-import ProductService from '@/service/ProductService';
+import ProductService from '@/service/UserService';
 import { ref, onBeforeMount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 
@@ -373,7 +373,6 @@ const calculateCustomerTotal = (name) => {
 </template>
 
 <style scoped lang="scss">
-@import '@/assets/demo/styles/badges.scss';
 
 ::v-deep(.p-datatable-frozen-tbody) {
     font-weight: bold;

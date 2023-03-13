@@ -23,6 +23,14 @@ const router = createRouter({
                     meta: { auth: 'ROLE_ADMIN' }
                 },
                 {
+                    path: '/users',
+                    name: 'users',
+                    component: () => import('@/views/Users.vue'),
+                    meta: { auth: 'ROLE_ADMIN' }
+                },
+
+
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')

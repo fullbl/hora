@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProductService from '@/service/ProductService';
+import ProductService from '@/service/UserService';
 import PhotoService from '@/service/PhotoService';
 import { ref, onMounted } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
