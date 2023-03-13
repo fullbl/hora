@@ -1,25 +1,58 @@
 import dataService from './DataService'
+import VueJwtDecode from 'vue-jwt-decode'
+
 
 interface User {
-    id: bigint;
+    id: bigint,
+    roles: Array<string>,
+    token: string
+}
+interface AuthService {
+    user: null | User
+    load: () => boolean
+    login: (username: string, password: string) => Promise<boolean>
+    isGranted: (role: string) => boolean
 }
 
-const service: { user: null|User, login: (userrname: string, password: string) => Promise<boolean> } = {
+const service: AuthService = {
     user: null,
-    async login(username: string, password: string): Promise<boolean> {
-        let data: User;
+    load() {
+        const user = localStorage.getItem('user')
+        if (null === user) {
+            return false
+        }
         try {
-            data = await dataService.post<User>(
-                import.meta.env.BASE_URL + 'login',
-                { username, password }
-            )
+            this.user = JSON.parse(user)
         }
         catch (e) {
             return false
         }
 
-        this.user = data;
         return true
+    },
+    async login(username, password) {
+        let user: User;
+        try {
+            const data = await dataService.post<{ token: string }>(
+                import.meta.env.VITE_API_URL + 'login',
+                { username, password }
+            )
+
+            user = VueJwtDecode.decode(data.token)
+        }
+        catch (e) {
+            return false
+        }
+
+        this.user = user;
+        return true
+    },
+    isGranted(role) {
+        if (null === this.user) {
+            return false
+        }
+
+        return this.user.roles.includes('ROLE_ADMIN') || this.user.roles.includes(role)
     }
 }
 

@@ -1,4 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
+import authService from '@/service/AuthService';
+
+declare module 'vue-router' {
+    interface RouteMeta {
+        auth?: 'ROLE_CUSTOMER' | 'ROLE_ADMIN' | 'ROLE_OPERATOR'
+    }
+}
+
 import AppLayout from '@/layout/AppLayout.vue';
 
 const router = createRouter({
@@ -11,7 +19,8 @@ const router = createRouter({
                 {
                     path: '/',
                     name: 'dashboard',
-                    component: () => import('@/views/Dashboard.vue')
+                    component: () => import('@/views/Dashboard.vue'),
+                    meta: { auth: 'ROLE_ADMIN' }
                 },
                 {
                     path: '/uikit/formlayout',
@@ -172,20 +181,10 @@ const router = createRouter({
     ]
 });
 
-router.beforeResolve(async to => {
-    if (to.meta.requiresCamera) {
-      try {
-        await askForCameraPermission()
-      } catch (error) {
-        if (error instanceof NotAllowedError) {
-          // ... handle the error and then cancel the navigation
-          return false
-        } else {
-          // unexpected error, cancel the navigation and pass the error to the global handler
-          throw error
-        }
-      }
+router.beforeEach(async to => {
+    if ('undefined' !== typeof to.meta.auth && !authService.isGranted(to.meta.auth)) {
+        return { name: 'login' }
     }
-  })
+})
 
 export default router;

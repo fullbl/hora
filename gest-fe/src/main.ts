@@ -2,6 +2,8 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 
+import authService from '@/service/AuthService'
+
 import PrimeVue from 'primevue/config';
 import AutoComplete from 'primevue/autocomplete';
 import Accordion from 'primevue/accordion';
@@ -105,8 +107,8 @@ import BlockViewer from '@/components/BlockViewer.vue';
 
 import '@/assets/styles.scss';
 
+authService.load();
 const app = createApp(App);
-
 app.use(router);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);

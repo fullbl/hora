@@ -43,6 +43,8 @@
             "ES2016",
             "DOM",
             "DOM.Iterable"
-        ]
+        ],
+        "sourceMap": true,
+        "allowJs": true
     }
 }

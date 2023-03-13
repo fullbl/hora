@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[UniqueEntity(['product'])]
-#[ORM\UniqueConstraint('storage_product', ['product'])]
+#[ORM\UniqueConstraint('storage_product', ['product_id'])]
 #[ORM\Entity(repositoryClass: StorageRepository::class)]
 class Storage
 {

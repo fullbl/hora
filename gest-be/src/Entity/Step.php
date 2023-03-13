@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[UniqueEntity(['name', 'product'])]
-#[ORM\UniqueConstraint('step_name_product', ['name', 'product'])]
+#[ORM\UniqueConstraint('step_name_product', ['name', 'product_id'])]
 #[ORM\Entity(repositoryClass: StepRepository::class)]
 class Step
 {

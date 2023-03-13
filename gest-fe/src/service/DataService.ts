@@ -3,7 +3,10 @@ export default {
     async post<T>(url: string, postData: object): Promise<T> {
         const res: Response = await fetch(url, {
             method: 'POST',
-            body: JSON.stringify(postData)
+            body: JSON.stringify(postData),
+            headers: {
+                "Content-Type": "application/json"
+            }
         })
         const data: object = await res.json()   
         if(!res.ok){

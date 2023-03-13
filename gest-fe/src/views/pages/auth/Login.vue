@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import type { Ref } from 'vue'
 import authService from '@/service/AuthService';
+import { useRouter } from 'vue-router'
 
 let
     loading: boolean = false
@@ -10,12 +11,15 @@ let
 const
     username: Ref<string> = ref(''),
     password: Ref<string> = ref(''),
+    router = useRouter(),
     login: () => void = async function () {
         loading = true
-        if(!await authService.login(username.value, password.value)){
+        if (!await authService.login(username.value, password.value)) {
             alert('Error, retry.');
+            return;
         }
         loading = false
+        router.push({ name: 'dashboard' })
     }
     ;
 </script>
@@ -32,17 +36,19 @@ const
                         <span class="text-600 font-medium">Sign in to continue</span>
                     </div>
 
-                    <div>
-                        <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
-                        <InputText id="username" type="text" placeholder="Username" class="w-full md:w-30rem mb-5"
-                            style="padding: 1rem" v-model="username" />
+                    <form @submit.prevent="login">
+                        <fieldset :disable="loading">
+                            <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
+                            <InputText id="username" type="text" placeholder="Username" class="w-full md:w-30rem mb-5"
+                                style="padding: 1rem" v-model="username" />
 
-                        <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
-                        <Password id="password" v-model="password" placeholder="Password" class="w-full mb-3"
-                            inputClass="w-full" inputStyle="padding:1rem"></Password>
+                            <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
+                            <Password id="password" v-model="password" placeholder="Password" class="w-full mb-3"
+                                inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
 
-                        <Button @click="login()" :disable="loading" label="Sign In" class="w-full p-3 text-xl"></Button>
-                    </div>
+                            <Button type="submit" label="Sign In" class="w-full p-3 text-xl"></Button>
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         </div>

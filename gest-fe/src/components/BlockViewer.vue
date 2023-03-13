@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import CodeHighlight from './CodeHighlight.vue';
 
 export default {
