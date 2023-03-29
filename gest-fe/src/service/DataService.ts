@@ -1,9 +1,13 @@
+import authService from "./AuthService";
+
 interface DataService {
     post<T>(url: string, postData: object): Promise<T>
     get<T>(url: string): Promise<T>
     getHeaders(): HeadersInit
     token: string|null
 }
+
+
 
 const service: DataService = {
     getHeaders() {
@@ -36,6 +40,10 @@ const service: DataService = {
         })
         const data: object = await res.json()
         if (!res.ok) {
+            console.log(data)
+            if(data.hasOwnProperty('message') && 'Expired JWT Token' === data.message ){
+                authService.logout()
+            }
             throw data as object
         }
 

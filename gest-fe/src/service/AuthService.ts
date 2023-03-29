@@ -1,12 +1,8 @@
 import dataService from './DataService'
 import VueJwtDecode from 'vue-jwt-decode'
+import type User from '../interfaces/user'
 
 
-interface User {
-    roles: Array<string>,
-    token: string,
-    username: string
-}
 interface AuthService {
     user: null | User
     load: () => boolean
@@ -30,6 +26,10 @@ const service: AuthService = {
 
         dataService.token = token
         return true
+    },
+    async logout() {
+        localStorage.removeItem('token')
+        this.user = null
     },
     async login(username, password) {
         try {

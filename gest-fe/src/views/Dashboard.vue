@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue';
-import ProductService from '@/service/UserService';
 import { useLayout } from '@/layout/composables/layout';
 
 const { isDarkTheme, contextPath } = useLayout();
@@ -32,11 +31,6 @@ const items = ref([
     { label: 'Remove', icon: 'pi pi-fw pi-minus' }
 ]);
 const lineOptions = ref(null);
-const productService = new ProductService();
-
-onMounted(() => {
-    productService.getProductsSmall().then((data) => (products.value = data));
-});
 
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
