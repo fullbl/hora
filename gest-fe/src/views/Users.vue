@@ -5,24 +5,26 @@ import { ref, onMounted, onBeforeMount } from 'vue';
 import userService from '@/service/UserService';
 import { useToast } from 'primevue/usetoast';
 import { useLayout } from '@/layout/composables/layout';
+import MultiSelect from 'primevue/multiselect';
 
 const toast = useToast();
-const { contextPath } = useLayout();
 
 const data = ref<Array<User>>([]);
 const dialog = ref(false);
 const deleteDialog = ref(false);
-const deleteDatasDialog = ref(false);
-const single = ref<User | null>(null);
-const selectedData = ref<Array<User>>([]);
+const single = ref<User>(userService.getNewUser());
 const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
-const statuses = ref([
-    { label: 'INSTOCK', value: 'instock' },
-    { label: 'LOWSTOCK', value: 'lowstock' },
-    { label: 'OUTOFSTOCK', value: 'outofstock' }
-]);
+const roles = [
+    { label: 'Admin', value: 'ROLE_ADMIN' },
+    { label: 'Operator', value: 'ROLE_OPERATOR' },
+    { label: 'Customer', value: 'ROLE_CUSTOMER' }
+];
+const statuses = [
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
+];
 
 
 onBeforeMount(() => {
@@ -33,7 +35,7 @@ onMounted(async () => {
 });
 
 const openNew = () => {
-    single.value = null;
+    single.value = userService.getNewUser();
     submitted.value = false;
     dialog.value = true;
 };
@@ -43,20 +45,22 @@ const hideDialog = () => {
     submitted.value = false;
 };
 
-const saveSingle = () => {
+const saveSingle = async () => {
     if (null === single.value) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
         return
     }
     submitted.value = true;
-    if (single.value.id) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'User Updated', life: 3000 });
+    if (await userService.save(single.value)){
+        if(single.value.id){
+            data.value.push(single.value);
+        }
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'User Updated/Created', life: 3000 });
+        single.value = userService.getNewUser();
+        dialog.value = false;
     } else {
-        data.value.push(single.value);
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'User Created', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating user', life: 3000 });
     }
-    dialog.value = false;
-    single.value = null;
 };
 
 const editData = (data: User) => {
@@ -69,43 +73,19 @@ const confirmDelete = (data: User) => {
     deleteDialog.value = true;
 };
 
-const deleteData = () => {
+const deleteData = async () => {
     if (null === single.value) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
         return
     }
-    data.value = data.value.filter((val) => val.id !== single.value.id);
+    if (await userService.save(single.value)){
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
+    }
+    else{
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting user', life: 3000 });
+    }
     deleteDialog.value = false;
-    single.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Single Deleted', life: 3000 });
-};
-
-const findIndexById = (id: bigint) => {
-    let index = -1;
-    for (let i = 0; i < data.value.length; i++) {
-        if (data.value[i].id === id) {
-            return index;
-        }
-    }
-};
-
-const createId = () => {
-    let id = '';
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 5; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-};
-
-const confirmDeleteSelected = () => {
-    deleteDatasDialog.value = true;
-};
-const deleteSelectedData = () => {
-    data.value = data.value.filter((val) => !selectedData.value.includes(val));
-    deleteDatasDialog.value = false;
-    selectedData.value = [];
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Data Deleted', life: 3000 });
+    single.value = userService.getNewUser();
 };
 
 const initFilters = () => {
@@ -124,13 +104,11 @@ const initFilters = () => {
                     <template v-slot:start>
                         <div class="my-2">
                             <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
-                            <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected"
-                                :disabled="!selectedData || !selectedData.length" />
                         </div>
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="data" v-model:selection="selectedData" dataKey="id" :paginator="true" :rows="10"
+                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10"
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
@@ -145,7 +123,6 @@ const initFilters = () => {
                         </div>
                     </template>
 
-                    <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                     <Column field="id" header="Id" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Id</span>
@@ -201,73 +178,61 @@ const initFilters = () => {
 
                 <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Single Details" :modal="true"
                     class="p-fluid">
-                    <img :src="contextPath + 'demo/images/single/' + single.image" :alt="single.image" v-if="single.image"
-                        width="150" class="mt-0 mx-auto mb-5 block shadow-2" />
+
                     <div class="field">
-                        <label for="name">Name</label>
-                        <InputText id="name" v-model.trim="single.name" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.name }" />
-                        <small class="p-invalid" v-if="submitted && !single.name">Name is required.</small>
-                    </div>
-                    <div class="field">
-                        <label for="description">Description</label>
-                        <Textarea id="description" v-model="single.description" required="true" rows="3" cols="20" />
+                        <label for="username">Username</label>
+                        <InputText id="username" v-model.trim="single.username" required="true" autofocus
+                            :class="{ 'p-invalid': submitted && !single.username }" />
+                        <small class="p-invalid" v-if="submitted && !single.username">Username is required.</small>
                     </div>
 
                     <div class="field">
-                        <label for="inventoryStatus" class="mb-3">Inventory Status</label>
-                        <Dropdown id="inventoryStatus" v-model="single.inventoryStatus" :options="statuses"
-                            optionLabel="label" placeholder="Select a Status">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value && slotProps.value.value">
-                                    <span :class="'single-badge status-' + slotProps.value.value">{{ slotProps.value.label
-                                    }}</span>
-                                </div>
-                                <div v-else-if="slotProps.value && !slotProps.value.value">
-                                    <span :class="'single-badge status-' + slotProps.value.toLowerCase()">{{ slotProps.value
-                                    }}</span>
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span>
-                            </template>
+                        <label for="fullName">FullName</label>
+                        <InputText id="fullName" v-model.trim="single.fullName" required="true" autofocus
+                            :class="{ 'p-invalid': submitted && !single.fullName }" />
+                        <small class="p-invalid" v-if="submitted && !single.fullName">FullName is required.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="vatNumber">VAT Number</label>
+                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required="true" autofocus
+                            :class="{ 'p-invalid': submitted && !single.vatNumber }" />
+                        <small class="p-invalid" v-if="submitted && !single.vatNumber">VAT Number is required.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">E-mail</label>
+                        <InputText type="email" id="email" v-model.trim="single.email" required="true" autofocus
+                            :class="{ 'p-invalid': submitted && !single.email }" />
+                        <small class="p-invalid" v-if="submitted && !single.email">E-mail is required.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="address">Address</label>
+                        <InputText type="address" id="address" v-model.trim="single.address" required="true" autofocus
+                            :class="{ 'p-invalid': submitted && !single.address }" />
+                        <small class="p-invalid" v-if="submitted && !single.address">Address is required.</small>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <Password id="password" v-model="single.password" rows="3" cols="20" />
+                    </div>
+
+                    <div class="field">
+                        <label for="roles" class="mb-3">Roles</label>
+                        <MultiSelect id="roles" v-model="single.roles" :options="roles" optionLabel="label"
+                            optionValue="value" placeholder="Select a Role">
+                        </MultiSelect>
+                    </div>
+
+                    <div class="field">
+                        <label for="status" class="mb-3">Status</label>
+                        <Dropdown id="status" v-model="single.status" :options="statuses" optionLabel="label"
+                            optionValue="value" placeholder="Select a Status">
                         </Dropdown>
                     </div>
 
-                    <div class="field">
-                        <label class="mb-3">Category</label>
-                        <div class="formgrid grid">
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category1" name="category" value="Accessories" v-model="single.category" />
-                                <label for="category1">Accessories</label>
-                            </div>
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category2" name="category" value="Clothing" v-model="single.category" />
-                                <label for="category2">Clothing</label>
-                            </div>
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category3" name="category" value="Electronics" v-model="single.category" />
-                                <label for="category3">Electronics</label>
-                            </div>
-                            <div class="field-radiobutton col-6">
-                                <RadioButton id="category4" name="category" value="Fitness" v-model="single.category" />
-                                <label for="category4">Fitness</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="formgrid grid">
-                        <div class="field col">
-                            <label for="price">Price</label>
-                            <InputNumber id="price" v-model="single.price" mode="currency" currency="USD" locale="en-US"
-                                :class="{ 'p-invalid': submitted && !single.price }" :required="true" />
-                            <small class="p-invalid" v-if="submitted && !single.price">Price is required.</small>
-                        </div>
-                        <div class="field col">
-                            <label for="quantity">Quantity</label>
-                            <InputNumber id="quantity" v-model="single.quantity" integeronly />
-                        </div>
-                    </div>
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
                         <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveSingle" />
@@ -277,7 +242,7 @@ const initFilters = () => {
                 <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="single">Are you sure you want to delete <b>{{ single.name }}</b>?</span>
+                        <span v-if="single">Are you sure you want to delete <b>{{ single.username }}</b>?</span>
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
@@ -285,16 +250,6 @@ const initFilters = () => {
                     </template>
                 </Dialog>
 
-                <Dialog v-model:visible="deleteDatasDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
-                    <div class="flex align-items-center justify-content-center">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="single">Are you sure you want to delete the selected data?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDatasDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedData" />
-                    </template>
-                </Dialog>
             </div>
         </div>
     </div>

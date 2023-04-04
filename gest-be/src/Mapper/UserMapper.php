@@ -9,23 +9,20 @@ class UserMapper
 {
     public static function fromRequest(Request $request): User
     {
-        return (new User())
-            ->setAddress($request->get('address'))
-            ->setEmail($request->get('email'))
-            ->setFullName($request->get('full_name'))
-            ->setPassword($request->get('password'))
-            ->setRoles([$request->get('role')])
-            ->setStatus($request->get('status'));
+        return static::fill(new User(), $request);
     }
 
     public static function fill(User $user, Request $request): User
     {
+        $data = $request->toArray();
         return $user
-            ->setAddress($request->get('address'))
-            ->setEmail($request->get('email'))
-            ->setFullName($request->get('full_name'))
-            ->setPassword($request->get('password'))
-            ->setRoles([$request->get('role')])
-            ->setStatus($request->get('status'));
+            ->setUsername($data['username'])
+            ->setVatNumber($data['vatNumber'])
+            ->setAddress($data['address'])
+            ->setEmail($data['email'])
+            ->setFullName($data['fullName'])
+            ->setPassword($data['password'])
+            ->setRoles($data['roles'])
+            ->setStatus($data['status']);
     }
 }
