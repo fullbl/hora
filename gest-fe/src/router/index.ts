@@ -28,6 +28,12 @@ const router = createRouter({
                     component: () => import('@/views/Users.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
+                {
+                    path: '/products',
+                    name: 'products',
+                    component: () => import('@/views/Products.vue'),
+                    meta: { auth: 'ROLE_ADMIN' }
+                },
 
 
                 {

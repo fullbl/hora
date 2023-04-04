@@ -4,7 +4,6 @@ import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
 import userService from '@/service/UserService';
 import { useToast } from 'primevue/usetoast';
-import { useLayout } from '@/layout/composables/layout';
 import MultiSelect from 'primevue/multiselect';
 
 const toast = useToast();

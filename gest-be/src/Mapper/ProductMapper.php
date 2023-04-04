@@ -9,17 +9,15 @@ class ProductMapper
 {
     public static function fromRequest(Request $request): Product
     {
-        return (new Product())
-            ->setName($request->get('name'))
-            ->setType($request->get('type'))
-            ->setGrams($request->get('grams'));
+        return self::fill(new Product(), $request);
     }
 
     public static function fill(Product $product, Request $request): Product
     {
+        $data = $request->toArray();
         return $product
-            ->setName($request->get('name'))
-            ->setType($request->get('type'))
-            ->setGrams($request->get('grams'));
+            ->setName($data['name'])
+            ->setType($data['type'])
+            ->setGrams($data['grams']);
     }
 }
