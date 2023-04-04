@@ -14,7 +14,7 @@ class Horder
     private const STATUS_ORDERED = 'ordered';
     private const STATUS_ARRIVED = 'arrived';
     private const STATUS_STORED = 'stored';
-    private const STATUS_CANCELED = '”canceled”';
+    private const STATUS_CANCELED = 'canceled';
     private const STATUSES = [
         self::STATUS_DRAFT,
         self::STATUS_ORDERED,

@@ -16,8 +16,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[IsGranted('ROLE_ADMIN')]
 class UsersController extends AbstractController
 {
-    public function __construct(private UserRepository $repo, private ValidatorInterface $validator)
-    {
+    public function __construct(
+        private UserRepository $repo,
+        private UserMapper $mapper,
+        private ValidatorInterface $validator
+    ) {
     }
 
     #[Route('users', methods: ['GET'], name: 'users_list')]
@@ -29,7 +32,7 @@ class UsersController extends AbstractController
     #[Route('users', methods: ['POST'], name: 'user_create')]
     public function create(Request $request): JsonResponse
     {
-        $user = UserMapper::fromRequest($request);
+        $user = $this->mapper->fromRequest($request);
         $errors = $this->validator->validate($user);
         if ($errors->count() > 0) {
 
@@ -73,7 +76,7 @@ class UsersController extends AbstractController
                 Response::HTTP_NOT_FOUND,
             );
         }
-        $user = UserMapper::fill($user, $request);
+        $user = $this->mapper->fill($user, $request);
         $errors = $this->validator->validate($user);
         if ($errors->count() > 0) {
 

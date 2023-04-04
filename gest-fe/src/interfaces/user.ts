@@ -1,5 +1,5 @@
 export default interface User {
-    id?: bigint,
+    id?: number,
     roles: Array<string>,
     token?: string,
     password?: string,

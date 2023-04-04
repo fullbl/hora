@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Mapper\HorderMapper;
 use App\Repository\HorderRepository;
+use App\Repository\ProductRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,20 +17,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[IsGranted('ROLE_OPERATOR')]
 class HordersController extends AbstractController
 {
-    public function __construct(private HorderRepository $repo, private ValidatorInterface $validator)
-    {
+    public function __construct(
+        private HorderRepository $repo,
+        private HorderMapper $mapper,
+        private ValidatorInterface $validator
+    ) {
     }
 
-    #[Route('/horders', methods: ['GET'], name: 'horders_list')]
+    #[Route('/orders', methods: ['GET'], name: 'horders_list')]
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll());
     }
 
-    #[Route('/horders', methods: ['POST'], name: 'horder_create')]
+    #[Route('/orders', methods: ['POST'], name: 'horder_create')]
     public function create(Request $request): JsonResponse
     {
-        $horder = HorderMapper::fromRequest($request);
+        $horder = $this->mapper->fromRequest($request);
         $errors = $this->validator->validate($horder);
         if ($errors->count() > 0) {
 
@@ -50,7 +54,7 @@ class HordersController extends AbstractController
         return $this->json($horder);
     }
 
-    #[Route('/horders/{id}', methods: ['GET'], name: 'horders_show')]
+    #[Route('/orders/{id}', methods: ['GET'], name: 'horders_show')]
     public function show(int $id): JsonResponse
     {
         $horder = $this->repo->find($id);
@@ -62,7 +66,7 @@ class HordersController extends AbstractController
         return $horder;
     }
 
-    #[Route('/horders/{id}', methods: ['PUT'], name: 'horder_update')]
+    #[Route('/orders/{id}', methods: ['PUT'], name: 'horder_update')]
     public function update(int $id, Request $request): JsonResponse
     {
         $horder = $this->repo->find($id);
@@ -73,7 +77,9 @@ class HordersController extends AbstractController
                 Response::HTTP_NOT_FOUND,
             );
         }
-        $horder = HorderMapper::fill($horder, $request);
+
+        $horder = $this->mapper->fill($horder, $request);
+
         $errors = $this->validator->validate($horder);
         if ($errors->count() > 0) {
 
@@ -94,7 +100,7 @@ class HordersController extends AbstractController
         return $this->json($horder);
     }
 
-    #[Route('/horders/{id}', methods: ['DELETE'], name: 'horder_delete')]
+    #[Route('/orders/{id}', methods: ['DELETE'], name: 'horder_delete')]
     public function delete(int $id, Request $request): JsonResponse
     {
         $horder = $this->repo->find($id);

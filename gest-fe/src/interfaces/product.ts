@@ -1,6 +1,6 @@
 export default interface Product {
-    id?: bigint,
+    id?: number,
     name: string,
     type: string,
-    grams: bigint,
+    grams: number,
 }

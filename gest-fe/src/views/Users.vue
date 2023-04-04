@@ -175,7 +175,7 @@ const initFilters = () => {
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Single Details" :modal="true"
+                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="User Details" :modal="true"
                     class="p-fluid">
 
                     <div class="field">

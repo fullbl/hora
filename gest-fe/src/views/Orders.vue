@@ -1,30 +1,41 @@
 <script setup lang="ts">
-import type Product from '@/interfaces/product';
+import type Order from '@/interfaces/order';
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
+import orderService from '@/service/OrderService';
 import productService from '@/service/ProductService';
 import { useToast } from 'primevue/usetoast';
 import InputNumber from 'primevue/inputnumber';
+import type Product from '@/interfaces/product';
 
 const toast = useToast();
 
-const data = ref<Array<Product>>([]);
+const data = ref<Array<Order>>([]);
 const dialog = ref(false);
 const deleteDialog = ref(false);
-const single = ref<Product>(productService.getNewProduct());
+const single = ref<Order>(orderService.getNewOrder());
 const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
+const statuses = [
+    { label: 'Draft', value: 'draft' },
+    { label: 'Ordered', value: 'ordered' },
+    { label: 'Arrived', value: 'arrived' },
+    { label: 'Stored', value: 'stored' },
+    { label: 'Canceled', value: 'canceled' },
+];
+const products = ref<Array<Product>>([])
 
 onBeforeMount(() => {
     initFilters();
 });
 onMounted(async () => {
-    data.value = await productService.getProducts()
+    data.value = await orderService.getOrders()
+    products.value = await productService.getProducts()
 });
 
 const openNew = () => {
-    single.value = productService.getNewProduct();
+    single.value = orderService.getNewOrder()
     submitted.value = false;
     dialog.value = true;
 };
@@ -40,24 +51,24 @@ const saveSingle = async () => {
         return
     }
     submitted.value = true;
-    if (await productService.save(single.value)){
-        if(single.value.id){
+    if (await orderService.save(single.value)) {
+        if (single.value.id) {
             data.value.push(single.value);
         }
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated/Created', life: 3000 });
-        single.value = productService.getNewProduct();
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Order Updated/Created', life: 3000 });
+        single.value = orderService.getNewOrder();
         dialog.value = false;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating product', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating order', life: 3000 });
     }
 };
 
-const editData = (data: Product) => {
+const editData = (data: Order) => {
     single.value = { ...data };
     dialog.value = true;
 };
 
-const confirmDelete = (data: Product) => {
+const confirmDelete = (data: Order) => {
     single.value = data;
     deleteDialog.value = true;
 };
@@ -67,14 +78,14 @@ const deleteData = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
         return
     }
-    if (await productService.save(single.value)){
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+    if (await orderService.save(single.value)) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Order Deleted', life: 3000 });
     }
-    else{
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting product', life: 3000 });
+    else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting order', life: 3000 });
     }
     deleteDialog.value = false;
-    single.value = productService.getNewProduct();
+    single.value = orderService.getNewOrder();
 };
 
 const initFilters = () => {
@@ -97,14 +108,13 @@ const initFilters = () => {
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10"
-                    :filters="filters"
+                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data" responsiveLayout="scroll">
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">Manage Products</h5>
+                            <h5 class="m-0">Manage Orders</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText v-model="filters['global'].value" placeholder="Search..." />
@@ -118,22 +128,22 @@ const initFilters = () => {
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="name" header="Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="product" header="Product" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Name</span>
-                            {{ slotProps.data.name }}
+                            <span class="p-column-title">Product</span>
+                            {{ slotProps.data.product.name }}
                         </template>
                     </Column>
-                    <Column field="type" header="Type" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                    <Column field="status" header="Status" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Type</span>
-                            {{ slotProps.data.type }}
+                            <span class="p-column-title">Status</span>
+                            {{ slotProps.data.status }}
                         </template>
                     </Column>
-                    <Column field="grams" header="Grams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="quantity" header="Quantity" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">E-mail</span>
-                            {{ slotProps.data.grams }}
+                            <span class="p-column-title">Quantity</span>
+                            {{ slotProps.data.quantity }}
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;">
@@ -146,28 +156,28 @@ const initFilters = () => {
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Product Details" :modal="true"
+                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Single Details" :modal="true"
                     class="p-fluid">
 
                     <div class="field">
-                        <label for="name">Name</label>
-                        <InputText id="name" v-model.trim="single.name" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.name }" />
-                        <small class="p-invalid" v-if="submitted && !single.name">Name is required.</small>
+                        <label for="product" class="mb-3">Product</label>
+                        <Dropdown id="product" v-model="single.product.id" :options="products" optionLabel="name"
+                            optionValue="id" placeholder="Select a Product">
+                        </Dropdown>
                     </div>
 
                     <div class="field">
-                        <label for="type">Type</label>
-                        <InputText id="type" v-model.trim="single.type" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.type }" />
-                        <small class="p-invalid" v-if="submitted && !single.type">Type is required.</small>
+                        <label for="status" class="mb-3">Status</label>
+                        <Dropdown id="status" v-model="single.status" :options="statuses" optionLabel="label"
+                            optionValue="value" placeholder="Select a Status">
+                        </Dropdown>
                     </div>
 
                     <div class="field">
-                        <label for="grams">Grams</label>
-                        <InputNumber type="number" id="grams" v-model="single.grams" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.grams }" />
-                        <small class="p-invalid" v-if="submitted && !single.grams">Grams is required.</small>
+                        <label for="vatNumber">Quantity</label>
+                        <InputNumber type="number" id="vatNumber" v-model="single.quantity" required="true" autofocus
+                            :class="{ 'p-invalid': submitted && !single.quantity }" />
+                        <small class="p-invalid" v-if="submitted && !single.quantity">Quantity is required.</small>
                     </div>
 
                     <template #footer>
@@ -179,7 +189,7 @@ const initFilters = () => {
                 <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="single">Are you sure you want to delete <b>{{ single.name }}</b>?</span>
+                        <span v-if="single">Are you sure you want to delete this order?</span>
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />

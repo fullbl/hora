@@ -7,7 +7,8 @@ interface AuthService {
     user: null | User
     load: () => boolean
     login: (username: string, password: string) => Promise<boolean>
-    isGranted: (role: string) => boolean
+    isGranted: (role: string) => boolean,
+    logout(): void
 }
 
 const service: AuthService = {
@@ -27,9 +28,10 @@ const service: AuthService = {
         dataService.token = token
         return true
     },
-    async logout() {
+    logout() {
         localStorage.removeItem('token')
         this.user = null
+
     },
     async login(username, password) {
         try {

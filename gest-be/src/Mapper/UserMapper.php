@@ -4,17 +4,24 @@ namespace App\Mapper;
 
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 
 class UserMapper
 {
-    public static function fromRequest(Request $request): User
+    public function __construct(private UserPasswordHasher $hasher)
     {
-        return static::fill(new User(), $request);
     }
 
-    public static function fill(User $user, Request $request): User
+    public function fromRequest(Request $request): User
+    {
+        return $this->fill(new User(), $request);
+    }
+
+    public function fill(User $user, Request $request): User
     {
         $data = $request->toArray();
+        $data['password'] = $this->hasher->hashPassword($user, $data['password']);
+
         return $user
             ->setUsername($data['username'])
             ->setVatNumber($data['vatNumber'])
