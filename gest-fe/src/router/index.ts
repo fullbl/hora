@@ -17,12 +17,6 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
-                    path: '/',
-                    name: 'dashboard',
-                    component: () => import('@/views/Dashboard.vue'),
-                    meta: { auth: 'ROLE_ADMIN' }
-                },
-                {
                     path: '/users',
                     name: 'users',
                     component: () => import('@/views/Users.vue'),
@@ -40,8 +34,20 @@ const router = createRouter({
                     component: () => import('@/views/Orders.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
+                {
+                    path: '/dashboards/storage',
+                    name: 'storage-dashboard',
+                    component: () => import('@/views/StorageDashboard.vue'),
+                    meta: { auth: 'ROLE_OPERATOR' }
+                },
 
 
+                {
+                    path: '/',
+                    name: 'dashboard',
+                    component: () => import('@/views/Dashboard.vue'),
+                    meta: { auth: 'ROLE_ADMIN' }
+                },
                 {
                     path: '/uikit/formlayout',
                     name: 'formlayout',

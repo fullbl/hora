@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Mapper\ProductMapper;
-use App\Repository\ProductRepository;
+use App\Mapper\StorageMapper;
+use App\Repository\StorageRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,27 +13,24 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[IsGranted('ROLE_ADMIN')]
-class ProductsController extends AbstractController
+#[IsGranted('ROLE_OPERATOR')]
+class StoragesController extends AbstractController
 {
-    public function __construct(
-        private ProductRepository $repo, 
-        private ProductMapper $mapper,
-        private ValidatorInterface $validator)
+    public function __construct(private StorageRepository $repo, private ValidatorInterface $validator)
     {
     }
 
-    #[Route('/products', methods: ['GET'], name: 'products_list')]
+    #[Route('/storages', methods: ['GET'], name: 'storages_list')]
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll());
     }
 
-    #[Route('/products', methods: ['POST'], name: 'product_create')]
+    #[Route('/storages', methods: ['POST'], name: 'storage_create')]
     public function create(Request $request): JsonResponse
     {
-        $product = $this->mapper->fromRequest($request);
-        $errors = $this->validator->validate($product);
+        $storage = StorageMapper::fromRequest($request);
+        $errors = $this->validator->validate($storage);
         if ($errors->count() > 0) {
 
             return $this->json(
@@ -42,7 +39,7 @@ class ProductsController extends AbstractController
             );
         }
         try {
-            $this->repo->save($product, true);
+            $this->repo->save($storage, true);
         } catch (Exception $e) {
 
             return $this->json(
@@ -50,34 +47,34 @@ class ProductsController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($product);
+        return $this->json($storage);
     }
 
-    #[Route('/products/{id}', methods: ['GET'], name: 'products_show')]
+    #[Route('/storages/{id}', methods: ['GET'], name: 'storages_show')]
     public function show(int $id): JsonResponse
     {
-        $product = $this->repo->find($id);
-        if (null === $product) {
+        $storage = $this->repo->find($id);
+        if (null === $storage) {
 
             return $this->json('', Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($product);
+        return $this->json($storage);
     }
 
-    #[Route('/products/{id}', methods: ['PUT'], name: 'product_update')]
+    #[Route('/storages/{id}', methods: ['PUT'], name: 'storage_update')]
     public function update(int $id, Request $request): JsonResponse
     {
-        $product = $this->repo->find($id);
-        if (null === $product) {
+        $storage = $this->repo->find($id);
+        if (null === $storage) {
 
             return $this->json(
                 ['error' => 'not found'],
                 Response::HTTP_NOT_FOUND,
             );
         }
-        $product = $this->mapper->fill($product, $request);
-        $errors = $this->validator->validate($product);
+        $storage = StorageMapper::fill($storage, $request);
+        $errors = $this->validator->validate($storage);
         if ($errors->count() > 0) {
 
             return $this->json(
@@ -86,7 +83,7 @@ class ProductsController extends AbstractController
             );
         }
         try {
-            $this->repo->save($product, true);
+            $this->repo->save($storage, true);
         } catch (Exception $e) {
 
             return $this->json(
@@ -94,14 +91,14 @@ class ProductsController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($product);
+        return $this->json($storage);
     }
 
-    #[Route('/products/{id}', methods: ['DELETE'], name: 'product_delete')]
+    #[Route('/storages/{id}', methods: ['DELETE'], name: 'storage_delete')]
     public function delete(int $id, Request $request): JsonResponse
     {
-        $product = $this->repo->find($id);
-        if (null === $product) {
+        $storage = $this->repo->find($id);
+        if (null === $storage) {
 
             return $this->json(
                 ['error' => 'not found'],
@@ -110,7 +107,7 @@ class ProductsController extends AbstractController
         }
 
         try {
-            $this->repo->remove($product, true);
+            $this->repo->remove($storage, true);
         } catch (Exception $e) {
 
             return $this->json(

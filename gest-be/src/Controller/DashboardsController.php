@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_OPERATOR')]
-class DashboardController extends AbstractController
+class DashboardsController extends AbstractController
 {
     public function __construct()
     {

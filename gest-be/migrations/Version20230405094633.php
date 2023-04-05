@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230313204929 extends AbstractMigration
+final class Version20230405094633 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -39,13 +39,13 @@ final class Version20230313204929 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_3781EC109395C3F3 ON delivery (customer_id)');
         $this->addSql('CREATE TABLE horder (id INT NOT NULL, product_id INT NOT NULL, status VARCHAR(10) NOT NULL, quantity SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_666E48114584665A ON horder (product_id)');
-        $this->addSql('CREATE TABLE product (id INT NOT NULL, name VARCHAR(100) NOT NULL, type VARCHAR(10) NOT NULL, grams INT NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE UNIQUE INDEX product_name_type ON product (name, type)');
+        $this->addSql('CREATE TABLE product (id INT NOT NULL, storage_id INT NOT NULL, name VARCHAR(100) NOT NULL, grams INT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_D34A04AD5CC5DB90 ON product (storage_id)');
         $this->addSql('CREATE TABLE step (id INT NOT NULL, product_id INT NOT NULL, name VARCHAR(10) NOT NULL, minutes SMALLINT NOT NULL, params JSON NOT NULL, sort SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_43B9FE3C4584665A ON step (product_id)');
         $this->addSql('CREATE UNIQUE INDEX step_name_product ON step (name, product_id)');
-        $this->addSql('CREATE TABLE storage (id INT NOT NULL, product_id INT NOT NULL, grams SMALLINT NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE UNIQUE INDEX storage_product ON storage (product_id)');
+        $this->addSql('CREATE TABLE storage (id INT NOT NULL, type VARCHAR(15) NOT NULL, grams SMALLINT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX storage_type ON storage (type)');
         $this->addSql('CREATE TABLE suspension (id INT NOT NULL, prisoner_id INT NOT NULL, start TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, stop TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_82AF0500F3E2C918 ON suspension (prisoner_id)');
         $this->addSql('COMMENT ON COLUMN suspension.start IS \'(DC2Type:datetime_immutable)\'');
@@ -57,15 +57,14 @@ final class Version20230313204929 extends AbstractMigration
         $this->addSql('ALTER TABLE activity ADD CONSTRAINT FK_AC74095AC00D111A FOREIGN KEY (executer_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC109395C3F3 FOREIGN KEY (customer_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE horder ADD CONSTRAINT FK_666E48114584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD5CC5DB90 FOREIGN KEY (storage_id) REFERENCES storage (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE step ADD CONSTRAINT FK_43B9FE3C4584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE storage ADD CONSTRAINT FK_547A1B344584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE suspension ADD CONSTRAINT FK_82AF0500F3E2C918 FOREIGN KEY (prisoner_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SCHEMA public');
         $this->addSql('DROP SEQUENCE activity_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE delivery_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE horder_id_seq CASCADE');
@@ -79,8 +78,8 @@ final class Version20230313204929 extends AbstractMigration
         $this->addSql('ALTER TABLE activity DROP CONSTRAINT FK_AC74095AC00D111A');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC109395C3F3');
         $this->addSql('ALTER TABLE horder DROP CONSTRAINT FK_666E48114584665A');
+        $this->addSql('ALTER TABLE product DROP CONSTRAINT FK_D34A04AD5CC5DB90');
         $this->addSql('ALTER TABLE step DROP CONSTRAINT FK_43B9FE3C4584665A');
-        $this->addSql('ALTER TABLE storage DROP CONSTRAINT FK_547A1B344584665A');
         $this->addSql('ALTER TABLE suspension DROP CONSTRAINT FK_82AF0500F3E2C918');
         $this->addSql('DROP TABLE activity');
         $this->addSql('DROP TABLE delivery');

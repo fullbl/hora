@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type Product from '@/interfaces/product';
+import type Storage from '@/interfaces/storage';
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
 import productService from '@/service/ProductService';
+import storageService from '@/service/StorageService';
 import { useToast } from 'primevue/usetoast';
 import InputNumber from 'primevue/inputnumber';
 
 const toast = useToast();
 
 const data = ref<Array<Product>>([]);
+const storages = ref<Array<Storage>>([]);
 const dialog = ref(false);
 const deleteDialog = ref(false);
 const single = ref<Product>(productService.getNewProduct());
@@ -21,6 +24,7 @@ onBeforeMount(() => {
 });
 onMounted(async () => {
     data.value = await productService.getProducts()
+    storages.value = await storageService.getStorages()
 });
 
 const openNew = () => {
@@ -82,6 +86,7 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
+
 </script>
 
 <template>
@@ -127,7 +132,7 @@ const initFilters = () => {
                     <Column field="type" header="Type" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Type</span>
-                            {{ slotProps.data.type }}
+                            {{ slotProps.data.storage.type }}
                         </template>
                     </Column>
                     <Column field="grams" header="Grams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
@@ -157,10 +162,10 @@ const initFilters = () => {
                     </div>
 
                     <div class="field">
-                        <label for="type">Type</label>
-                        <InputText id="type" v-model.trim="single.type" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.type }" />
-                        <small class="p-invalid" v-if="submitted && !single.type">Type is required.</small>
+                        <label for="storage" class="mb-3">Type</label>
+                        <Dropdown id="storage" v-model="single.storage.id" :options="storages" optionLabel="type"
+                            optionValue="id" placeholder="Select a Type">
+                        </Dropdown>
                     </div>
 
                     <div class="field">

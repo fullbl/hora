@@ -4,11 +4,11 @@ namespace App\Mapper;
 
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserMapper
 {
-    public function __construct(private UserPasswordHasher $hasher)
+    public function __construct(private UserPasswordHasherInterface $hasher)
     {
     }
 

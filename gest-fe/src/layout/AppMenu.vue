@@ -7,16 +7,17 @@ const model = ref([
     {
         label: 'HORA',
         items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
             { label: 'Users', icon: 'pi pi-fw pi-user', to: '/users' },
             { label: 'Products', icon: 'pi pi-fw pi-list', to: '/products' },
-            { label: 'Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/orders' }
+            { label: 'Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/orders' },
+            { label: 'Storage Dashboard', icon: 'pi pi-fw pi-chart-bar', to: '/dashboards/storage' },
         ]
     },
 
     {
         label: 'UI Components',
         items: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
             { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
             { label: 'Input', icon: 'pi pi-fw pi-check-square', to: '/uikit/input' },
             { label: 'Float Label', icon: 'pi pi-fw pi-bookmark', to: '/uikit/floatlabel' },

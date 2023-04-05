@@ -4,11 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(['name', 'type'])]
-#[ORM\UniqueConstraint('product_name_type', ['name', 'type'])]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
@@ -22,10 +19,10 @@ class Product
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[ORM\Column(length: 10)]
-    #[Assert\Length(max: 10)]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
-    private ?string $type = null;
+    private ?Storage $storage = null;
     
     #[ORM\Column]
     #[Assert\Positive]
@@ -50,14 +47,14 @@ class Product
         return $this;
     }
 
-    public function getType(): ?string
+    public function getStorage(): ?Storage
     {
-        return $this->type;
+        return $this->storage;
     }
 
-    public function setType(string $type): self
+    public function setStorage(Storage $storage): self
     {
-        $this->type = $type;
+        $this->storage = $storage;
 
         return $this;
     }
