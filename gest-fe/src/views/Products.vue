@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import type Product from '@/interfaces/product';
-import type Storage from '@/interfaces/storage';
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount } from 'vue';
 import productService from '@/service/ProductService';
-import storageService from '@/service/StorageService';
 import { useToast } from 'primevue/usetoast';
 import InputNumber from 'primevue/inputnumber';
 
 const toast = useToast();
 
 const data = ref<Array<Product>>([]);
-const storages = ref<Array<Storage>>([]);
+const types = [
+    {label: 'Ground', value: 'ground'},
+    {label: 'Seeds', value: 'seeds'},
+    {label: 'Seeds box', value: 'seeds_box'},
+    {label: 'Water box', value: 'water_box'},
+    {label: 'Blackout box', value: 'blackout_box'},
+    {label: 'Light box', value: 'light_box'},
+    {label: 'Shipping box', value: 'shipping_box'},
+];
+
 const dialog = ref(false);
 const deleteDialog = ref(false);
 const single = ref<Product>(productService.getNewProduct());
@@ -24,7 +31,6 @@ onBeforeMount(() => {
 });
 onMounted(async () => {
     data.value = await productService.getProducts()
-    storages.value = await storageService.getStorages()
 });
 
 const openNew = () => {
@@ -132,7 +138,7 @@ const initFilters = () => {
                     <Column field="type" header="Type" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Type</span>
-                            {{ slotProps.data.storage.type }}
+                            {{ slotProps.data.type }}
                         </template>
                     </Column>
                     <Column field="grams" header="Grams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
@@ -162,9 +168,9 @@ const initFilters = () => {
                     </div>
 
                     <div class="field">
-                        <label for="storage" class="mb-3">Type</label>
-                        <Dropdown id="storage" v-model="single.storage.id" :options="storages" optionLabel="type"
-                            optionValue="id" placeholder="Select a Type">
+                        <label for="type" class="mb-3">Type</label>
+                        <Dropdown id="type" v-model="single.type" :options="types" optionLabel="label"
+                            optionValue="value" placeholder="Select a Type">
                         </Dropdown>
                     </div>
 

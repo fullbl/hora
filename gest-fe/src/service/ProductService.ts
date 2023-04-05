@@ -29,10 +29,7 @@ const service: ProductService = {
     getNewProduct() {
         return {
             name: '',
-            storage: {
-                type: '',
-                grams: 0
-            },
+            type: '',
             grams: 0,
         }
     }

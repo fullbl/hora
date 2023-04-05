@@ -40,9 +40,9 @@ class Horder
 
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
-    #[Assert\NotNull]
     #[Assert\Type('integer')]
-    private ?int $quantity = null;
+    #[Assert\NotNull]
+    private ?int $grams = null;
 
     public function getId(): ?int
     {
@@ -73,14 +73,14 @@ class Horder
         return $this;
     }
 
-    public function getQuantity(): ?int
+    public function getGrams(): ?int
     {
-        return $this->quantity;
+        return $this->grams;
     }
 
-    public function setQuantity(int $quantity): self
+    public function setGrams(int $grams): self
     {
-        $this->quantity = $quantity;
+        $this->grams = $grams;
 
         return $this;
     }
