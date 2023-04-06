@@ -4,7 +4,8 @@ import type Order from '@/interfaces/order'
 
 const service: Service<Order> = {
     async delete(order) {
-        return await dataService.get(import.meta.env.VITE_API_URL + 'orders/' + order.id);
+        await dataService.delete(import.meta.env.VITE_API_URL + 'orders/' + order.id);
+        return true
     },
     async getAll() {
         return await dataService.get(import.meta.env.VITE_API_URL + 'orders');

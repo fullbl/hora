@@ -1,15 +1,14 @@
+import type Service from "@/interfaces/service";
 import dataService from "./DataService";
 import userService from "./UserService";
 import type Delivery from '@/interfaces/delivery'
 
-interface DeliveryService {
-    getDeliverys(): Promise<Array<Delivery>>,
-    getNewDelivery(): Delivery,
-    save(delivery: Delivery): Promise<boolean>
-}
-
-const service: DeliveryService = {
-    async getDeliverys() {
+const service: Service<Delivery> = {
+    async delete(delivery) {
+        await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
+        return true
+    },
+    async getAll() {
         return await dataService.get(import.meta.env.VITE_API_URL + 'deliveries');
     },
     async save(delivery) {
@@ -27,10 +26,10 @@ const service: DeliveryService = {
             return false
         }
     },
-    getNewDelivery() {
+    getNew() {
         return {
             weekDay: 1,
-            customer: userService.getNewUser(),
+            customer: userService.getNew(),
             deliveryProducts: [],
         }
     }

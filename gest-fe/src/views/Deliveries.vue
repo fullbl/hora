@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import type Delivery from '@/interfaces/delivery';
-import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount } from 'vue';
 import deliveryService from '@/service/DeliveryService';
+import { useDataView } from './features/dataView'
+import type User from '@/interfaces/user';
+import type DeliveryProduct from '@/interfaces/deliveryProduct';
+import { onMounted, ref } from 'vue';
 import userService from '@/service/UserService';
 import productService from '@/service/ProductService';
-import { useToast } from 'primevue/usetoast';
-import InputNumber from 'primevue/inputnumber';
-import type DeliveryProduct from '@/interfaces/deliveryProduct';
-import type Product from '@/interfaces/product';
-import type User from '@/interfaces/user';
-
-const toast = useToast();
-
-const data = ref<Array<Delivery>>([]);
+const {
+    filters, 
+    data, single, save, 
+    openNew, editData, 
+    dialog, hideDialog, 
+    deleteDialog, confirmDelete, deleteData
+} = useDataView(deliveryService)
 
 const weekDays = [
     { label: 'Monday', value: 1 },
@@ -25,86 +24,15 @@ const weekDays = [
     { label: 'Sunday', value: 7 },
 ];
 
-const dialog = ref(false);
-const deleteDialog = ref(false);
-const single = ref<Delivery>(deliveryService.getNewDelivery());
-const dt = ref(null);
-const filters = ref({});
-const submitted = ref(false);
 const customers = ref<Array<User>>([])
 const products = ref<Array<DeliveryProduct>>([])
 
-onBeforeMount(() => {
-    initFilters();
-});
 onMounted(async () => {
-    data.value = await deliveryService.getDeliverys()
-    customers.value = (await userService.getUsers())
+    customers.value = (await userService.getAll())
         .filter(u => u.roles.includes('ROLE_CUSTOMER'))
-    products.value = (await productService.getProducts())
+    products.value = (await productService.getAll())
         .map(p => ({ product: p, qty: 0 }))
-
 });
-
-const openNew = () => {
-    single.value = deliveryService.getNewDelivery();
-    submitted.value = false;
-    dialog.value = true;
-};
-
-const hideDialog = () => {
-    dialog.value = false;
-    submitted.value = false;
-};
-
-const saveSingle = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    submitted.value = true;
-    if (await deliveryService.save(single.value)) {
-        if (single.value.id) {
-            data.value.push(single.value);
-        }
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Delivery Updated/Created', life: 3000 });
-        single.value = deliveryService.getNewDelivery();
-        dialog.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating delivery', life: 3000 });
-    }
-};
-
-const editData = (data: Delivery) => {
-    single.value = { ...data };
-    dialog.value = true;
-};
-
-const confirmDelete = (data: Delivery) => {
-    single.value = data;
-    deleteDialog.value = true;
-};
-
-const deleteData = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    if (await deliveryService.save(single.value)) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Delivery Deleted', life: 3000 });
-    }
-    else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting delivery', life: 3000 });
-    }
-    deleteDialog.value = false;
-    single.value = deliveryService.getNewDelivery();
-};
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
 
 </script>
 
