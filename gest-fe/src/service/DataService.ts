@@ -4,13 +4,11 @@ interface DataService {
     post<T>(url: string, postData: object): Promise<T>
     put<T>(url: string, postData: object): Promise<T>
     get<T>(url: string): Promise<T>
-    getHeaders(): HeadersInit
-    token: string|null
+    delete(url: string): Promise<boolean>
+    token: string | null
 }
 
-
-
-const service: DataService = {
+const helper = {
     getHeaders() {
         const headers: HeadersInit = {
             "Content-Type": "application/json",
@@ -21,47 +19,42 @@ const service: DataService = {
         }
         return headers
     },
-    async post<T>(url: string, postData: object): Promise<T> {
-        const res: Response = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify(postData),
-            headers: this.getHeaders()
-        })
-        const data: object = await res.json()
-        if (!res.ok) {
-            throw data as object
+    async call<T>(url: string, method: string, postData?: object): Promise<T> {
+        const options = {
+            method: method,
+            headers: this.getHeaders(),
+            body: null as string|null
+        };
+        if (postData) {
+            options.body = JSON.stringify(postData)
         }
-
-        return data as T;
-    },
-    async put<T>(url: string, postData: object): Promise<T> {
-        const res: Response = await fetch(url, {
-            method: 'PUT',
-            body: JSON.stringify(postData),
-            headers: this.getHeaders()
-        })
+        const res: Response = await fetch(url, options)
         const data: object = await res.json()
         if (!res.ok) {
-            throw data as object
-        }
-
-        return data as T;
-    },
-    async get<T>(url: string): Promise<T> {
-        const res: Response = await fetch(url, {
-            method: 'GET',
-            headers: this.getHeaders()
-        })
-        const data: object = await res.json()
-        if (!res.ok) {
-            console.log(data)
-            if(data.hasOwnProperty('message') && 'Expired JWT Token' === data.message ){
+            if (data.hasOwnProperty('message') && 'Expired JWT Token' === data.message) {
                 authService.logout()
             }
             throw data as object
         }
 
         return data as T;
+    }
+}
+
+
+const service: DataService = {
+    async post<T>(url: string, postData: object): Promise<T> {
+        return helper.call(url, 'POST', postData);
+    },
+    async put<T>(url: string, postData: object): Promise<T> {
+        return helper.call(url, 'PUT', postData);
+    },
+    async get<T>(url: string): Promise<T> {
+        return helper.call(url, 'GET');
+    },
+    async delete(url: string): Promise<boolean> {
+        await helper.call(url, 'DELETE');
+        return true;
     },
     token: null
 }

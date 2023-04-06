@@ -20,7 +20,9 @@ class UserMapper
     public function fill(User $user, Request $request): User
     {
         $data = $request->toArray();
-        $data['password'] = $this->hasher->hashPassword($user, $data['password']);
+        if (isset($data['password'])) {
+            $user->setPassword($this->hasher->hashPassword($user, $data['password']));
+        }
 
         return $user
             ->setUsername($data['username'])
@@ -28,7 +30,6 @@ class UserMapper
             ->setAddress($data['address'])
             ->setEmail($data['email'])
             ->setFullName($data['fullName'])
-            ->setPassword($data['password'])
             ->setRoles($data['roles'])
             ->setStatus($data['status']);
     }

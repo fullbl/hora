@@ -9,12 +9,13 @@ import MultiSelect from 'primevue/multiselect';
 const toast = useToast();
 
 const data = ref<Array<User>>([]);
+
 const dialog = ref(false);
 const deleteDialog = ref(false);
 const single = ref<User>(userService.getNewUser());
-const dt = ref(null);
-const filters = ref({});
-const submitted = ref(false);
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+});
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Operator', value: 'ROLE_OPERATOR' },
@@ -26,36 +27,28 @@ const statuses = [
 ];
 
 
-onBeforeMount(() => {
-    initFilters();
-});
 onMounted(async () => {
     data.value = await userService.getUsers()
 });
 
 const openNew = () => {
     single.value = userService.getNewUser();
-    submitted.value = false;
     dialog.value = true;
 };
 
 const hideDialog = () => {
     dialog.value = false;
-    submitted.value = false;
 };
 
-const saveSingle = async () => {
+const save = async () => {
     if (null === single.value) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
         return
     }
-    submitted.value = true;
     if (await userService.save(single.value)){
-        if(single.value.id){
-            data.value.push(single.value);
-        }
         toast.add({ severity: 'success', summary: 'Successful', detail: 'User Updated/Created', life: 3000 });
         single.value = userService.getNewUser();
+        data.value = await userService.getUsers();
         dialog.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating user', life: 3000 });
@@ -77,8 +70,9 @@ const deleteData = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
         return
     }
-    if (await userService.save(single.value)){
+    if (await userService.delete(single.value)){
         toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
+        data.value = await userService.getUsers()
     }
     else{
         toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting user', life: 3000 });
@@ -87,11 +81,6 @@ const deleteData = async () => {
     single.value = userService.getNewUser();
 };
 
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
 </script>
 
 <template>
@@ -107,7 +96,7 @@ const initFilters = () => {
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10"
+                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10"
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
@@ -117,7 +106,7 @@ const initFilters = () => {
                             <h5 class="m-0">Manage Users</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                <InputText v-model="filters.global.value" placeholder="Search..." />
                             </span>
                         </div>
                     </template>
@@ -180,37 +169,27 @@ const initFilters = () => {
 
                     <div class="field">
                         <label for="username">Username</label>
-                        <InputText id="username" v-model.trim="single.username" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.username }" />
-                        <small class="p-invalid" v-if="submitted && !single.username">Username is required.</small>
+                        <InputText id="username" v-model.trim="single.username" required="true" autofocus />
                     </div>
 
                     <div class="field">
                         <label for="fullName">FullName</label>
-                        <InputText id="fullName" v-model.trim="single.fullName" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.fullName }" />
-                        <small class="p-invalid" v-if="submitted && !single.fullName">FullName is required.</small>
+                        <InputText id="fullName" v-model.trim="single.fullName" required="true" autofocus />
                     </div>
 
                     <div class="field">
                         <label for="vatNumber">VAT Number</label>
-                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.vatNumber }" />
-                        <small class="p-invalid" v-if="submitted && !single.vatNumber">VAT Number is required.</small>
+                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required="true" autofocus />
                     </div>
 
                     <div class="field">
                         <label for="email">E-mail</label>
-                        <InputText type="email" id="email" v-model.trim="single.email" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.email }" />
-                        <small class="p-invalid" v-if="submitted && !single.email">E-mail is required.</small>
+                        <InputText type="email" id="email" v-model.trim="single.email" required="true" autofocus />
                     </div>
 
                     <div class="field">
                         <label for="address">Address</label>
-                        <InputText type="address" id="address" v-model.trim="single.address" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.address }" />
-                        <small class="p-invalid" v-if="submitted && !single.address">Address is required.</small>
+                        <InputText type="address" id="address" v-model.trim="single.address" required="true" autofocus />
                     </div>
 
                     <div class="field">
@@ -234,7 +213,7 @@ const initFilters = () => {
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveSingle" />
+                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
                     </template>
                 </Dialog>
 
