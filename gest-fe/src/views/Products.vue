@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type Product from '@/interfaces/product';
-import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount } from 'vue';
 import productService from '@/service/ProductService';
-import { useToast } from 'primevue/usetoast';
-import InputNumber from 'primevue/inputnumber';
+import { useDataView } from './features/dataView'
+const {
+    filters, 
+    data, single, save, 
+    openNew, editData, 
+    dialog, hideDialog, 
+    deleteDialog, confirmDelete, deleteData
+} = useDataView(productService)
 
-const toast = useToast();
-
-const data = ref<Array<Product>>([]);
 const types = [
     {label: 'Ground', value: 'ground'},
     {label: 'Seeds', value: 'seeds'},
@@ -18,81 +18,6 @@ const types = [
     {label: 'Light box', value: 'light_box'},
     {label: 'Shipping box', value: 'shipping_box'},
 ];
-
-const dialog = ref(false);
-const deleteDialog = ref(false);
-const single = ref<Product>(productService.getNewProduct());
-const dt = ref(null);
-const filters = ref({});
-const submitted = ref(false);
-
-onBeforeMount(() => {
-    initFilters();
-});
-onMounted(async () => {
-    data.value = await productService.getProducts()
-});
-
-const openNew = () => {
-    single.value = productService.getNewProduct();
-    submitted.value = false;
-    dialog.value = true;
-};
-
-const hideDialog = () => {
-    dialog.value = false;
-    submitted.value = false;
-};
-
-const saveSingle = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    submitted.value = true;
-    if (await productService.save(single.value)){
-        if(single.value.id){
-            data.value.push(single.value);
-        }
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated/Created', life: 3000 });
-        single.value = productService.getNewProduct();
-        dialog.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating product', life: 3000 });
-    }
-};
-
-const editData = (data: Product) => {
-    single.value = { ...data };
-    dialog.value = true;
-};
-
-const confirmDelete = (data: Product) => {
-    single.value = data;
-    deleteDialog.value = true;
-};
-
-const deleteData = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    if (await productService.save(single.value)){
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
-    }
-    else{
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting product', life: 3000 });
-    }
-    deleteDialog.value = false;
-    single.value = productService.getNewProduct();
-};
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
-
 </script>
 
 <template>
@@ -162,9 +87,7 @@ const initFilters = () => {
 
                     <div class="field">
                         <label for="name">Name</label>
-                        <InputText id="name" v-model.trim="single.name" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.name }" />
-                        <small class="p-invalid" v-if="submitted && !single.name">Name is required.</small>
+                        <InputText id="name" v-model.trim="single.name" required="true" autofocus />
                     </div>
 
                     <div class="field">
@@ -176,14 +99,12 @@ const initFilters = () => {
 
                     <div class="field">
                         <label for="grams">Grams</label>
-                        <InputNumber type="number" id="grams" v-model="single.grams" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.grams }" />
-                        <small class="p-invalid" v-if="submitted && !single.grams">Grams is required.</small>
+                        <InputNumber type="number" id="grams" v-model="single.grams" required="true" autofocus />
                     </div>
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveSingle" />
+                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
                     </template>
                 </Dialog>
 
