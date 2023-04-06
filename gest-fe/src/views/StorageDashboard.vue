@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import productService from '@/service/ProductService';
 import type Product from '@/interfaces/product';
 
 const productGroups = ref<{[key:string]: Array<Product>}>({});
 
 onMounted(async () => {
-    productGroups.value = (await productService.getProducts())
+    productGroups.value = (await productService.getAll())
         .reduce(function (x, p) {
             if(!x.hasOwnProperty(p.type)){
                 x[p.type] = [];
