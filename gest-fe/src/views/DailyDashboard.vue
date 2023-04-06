@@ -40,7 +40,7 @@ const deliveryGroups = computed(() => {
         <Calendar v-model="date" />
     </div>
     <div class="card">
-        <table class="p-datatable-table">
+        <table>
             <tr>
                 <th>Product</th>
                 <th>Qty</th>
@@ -54,3 +54,9 @@ const deliveryGroups = computed(() => {
         </table>
     </div>
 </template>
+
+<style scoped lang="scss">
+td, th{
+    padding: 4px
+}
+</style>
