@@ -40,10 +40,17 @@ const router = createRouter({
                     component: () => import('@/views/Deliveries.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
+
                 {
                     path: '/dashboards/storage',
                     name: 'storage-dashboard',
                     component: () => import('@/views/StorageDashboard.vue'),
+                    meta: { auth: 'ROLE_OPERATOR' }
+                },
+                {
+                    path: '/dashboards/delivery',
+                    name: 'delivery-dashboard',
+                    component: () => import('@/views/DeliveryDashboard.vue'),
                     meta: { auth: 'ROLE_OPERATOR' }
                 },
 

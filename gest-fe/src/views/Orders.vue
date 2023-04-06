@@ -41,7 +41,7 @@ onMounted(async () => {
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
+                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data" responsiveLayout="scroll">

@@ -49,7 +49,7 @@ onMounted(async () => {
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
+                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data" responsiveLayout="scroll">
@@ -135,14 +135,14 @@ onMounted(async () => {
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveSingle" />
+                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
                     </template>
                 </Dialog>
 
                 <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="single">Are you sure you want to delete <b>{{ single.name }}</b>?</span>
+                        <span v-if="single">Are you sure you want to delete this?</span>
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />

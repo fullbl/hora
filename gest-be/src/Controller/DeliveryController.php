@@ -50,7 +50,8 @@ class DeliveryController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($delivery);
+
+        return $this->json('');
     }
 
     #[Route('/deliveries/{id}', methods: ['GET'], name: 'deliveries_show')]
@@ -94,7 +95,8 @@ class DeliveryController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($delivery);
+        
+        return $this->json('');
     }
 
     #[Route('/deliveries/{id}', methods: ['DELETE'], name: 'delivery_delete')]

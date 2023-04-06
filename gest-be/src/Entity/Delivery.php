@@ -11,8 +11,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(['weekday', 'customer'])]
-#[ORM\UniqueConstraint('weekday_customer', ['weekday', 'customer_id'])]
+#[UniqueEntity(['weekDay', 'customer'])]
+#[ORM\UniqueConstraint('weekday_customer', ['weekDay', 'customer_id'])]
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
 {

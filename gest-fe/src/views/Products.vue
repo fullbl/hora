@@ -33,7 +33,7 @@ const types = [
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="data" dataKey="id" :paginator="true" :rows="10"
+                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10"
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
