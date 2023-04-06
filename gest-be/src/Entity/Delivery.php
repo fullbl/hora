@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[UniqueEntity(['weekDay', 'customer'])]
-#[ORM\UniqueConstraint('weekday_customer', ['weekDay', 'customer_id'])]
+#[ORM\UniqueConstraint('weekday_customer', ['week_day', 'customer_id'])]
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
 {
@@ -24,7 +24,7 @@ class Delivery
     
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Assert\Range(min: 1, max: 7)]
+    #[Assert\Range(min: 0, max: 6)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $weekDay = null;

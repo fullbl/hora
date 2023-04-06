@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -45,11 +46,19 @@ class Product
     #[Assert\NotNull]
     private ?string $type = null;
     
-    #[ORM\Column]
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $grams = null;
+    
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
+    private ?int $days = null;
 
     public function getId(): ?int
     {
@@ -88,6 +97,18 @@ class Product
     public function setType(string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getDays(): ?int
+    {
+        return $this->days;
+    }
+
+    public function setDays(int $days): self
+    {
+        $this->days = $days;
 
         return $this;
     }

@@ -10,7 +10,7 @@ const weekDays = [
     { label: 'Thursday', value: 4 },
     { label: 'Friday', value: 5 },
     { label: 'Saturday', value: 6 },
-    { label: 'Sunday', value: 7 },
+    { label: 'Sunday', value: 0 },
 ];
 onMounted(async () => {
     deliveryGroups.value = (await deliveryService.getAll())
@@ -31,12 +31,13 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="grid">
-
-        <div class="col-1" v-for="weekDay of weekDays">
-            <h5>{{ weekDay.label }}</h5>
-            <div class="col-12" v-for="[product, qty] in deliveryGroups.get(weekDay.value)">
-                {{ product }}: {{ qty }}
+    <div class="card">
+        <div class="grid">
+            <div class="col-1" v-for="weekDay of weekDays">
+                <h5>{{ weekDay.label }}</h5>
+                <div class="col-12" v-for="[product, qty] in deliveryGroups.get(weekDay.value)">
+                    {{ product }}: {{ qty }}
+                </div>
             </div>
         </div>
     </div>

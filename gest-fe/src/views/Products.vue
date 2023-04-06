@@ -68,8 +68,14 @@ const types = [
                     </Column>
                     <Column field="grams" header="Grams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">E-mail</span>
+                            <span class="p-column-title">Grams</span>
                             {{ slotProps.data.grams }}
+                        </template>
+                    </Column>
+                    <Column field="days" header="Days" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Days</span>
+                            {{ slotProps.data.days }}
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;">
@@ -100,6 +106,11 @@ const types = [
                     <div class="field">
                         <label for="grams">Grams</label>
                         <InputNumber type="number" id="grams" v-model="single.grams" required="true" autofocus />
+                    </div>
+
+                    <div class="field">
+                        <label for="grams">Days</label>
+                        <InputNumber type="number" id="days" v-model="single.days" required="true" autofocus />
                     </div>
 
                     <template #footer>

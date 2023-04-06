@@ -3,4 +3,5 @@ export default interface Product {
     name: string,
     type: string,
     grams: number,
+    days: number,
 }

@@ -53,6 +53,12 @@ const router = createRouter({
                     component: () => import('@/views/DeliveryDashboard.vue'),
                     meta: { auth: 'ROLE_OPERATOR' }
                 },
+                {
+                    path: '/dashboards/daily',
+                    name: 'daily-dashboard',
+                    component: () => import('@/views/DailyDashboard.vue'),
+                    meta: { auth: 'ROLE_OPERATOR' }
+                },
 
 
                 {
