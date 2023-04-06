@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,6 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         self::STATUS_INACTIVE
     ];
 
+    #[Groups(['delivery-list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -48,6 +50,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private ?string $status = null;
     
+    #[Groups(['delivery-list'])]
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
     #[Assert\NotNull]
@@ -68,6 +71,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private ?string $address = null;
 
+    #[Ignore]
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Delivery::class)]
     private Collection $deliveries;
 

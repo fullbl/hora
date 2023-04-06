@@ -9,7 +9,7 @@ class ProductMapper
 {
     public function fromRequest(Request $request): Product
     {
-        return self::fill(new Product(), $request);
+        return $this->fill(new Product(), $request);
     }
 
     public function fill(Product $product, Request $request): Product

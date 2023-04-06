@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
     public const TYPE_GROUND = 'ground';
-    public const TYPE_SEED = 'seed';
+    public const TYPE_SEED = 'seeds';
     public const TYPE_SEEDS_BOX = 'seeds_box';
     public const TYPE_WATER_BOX = 'water_box';
     public const TYPE_BLACKOUT_BOX = 'blackout_box';
@@ -26,16 +27,19 @@ class Product
         self::TYPE_SHIPPING_BOX,
     ];
 
+    #[Groups(['delivery-list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['delivery-list'])]
     #[ORM\Column(length: 100)]
     #[Assert\Length(max: 100)]
     #[Assert\NotNull]
     private ?string $name = null;
     
+    #[Groups(['delivery-list'])]
     #[ORM\Column(length: 15)]
     #[Assert\Choice(self::TYPES)]
     #[Assert\NotNull]

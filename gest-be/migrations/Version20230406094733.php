@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230405124459 extends AbstractMigration
+final class Version20230406094733 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,6 +22,7 @@ final class Version20230405124459 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SEQUENCE activity_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE delivery_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE delivery_product_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE horder_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE product_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE step_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
@@ -34,9 +35,12 @@ final class Version20230405124459 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN activity.workable_from IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN activity.workable_until IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN activity.execution_time IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, customer_id INT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, customer_id INT NOT NULL, week_day SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3781EC109395C3F3 ON delivery (customer_id)');
-        $this->addSql('CREATE TABLE horder (id INT NOT NULL, product_id INT NOT NULL, status VARCHAR(10) NOT NULL, grams INT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE delivery_product (id INT NOT NULL, delivery_id INT NOT NULL, product_id INT NOT NULL, qty SMALLINT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_D954BB7312136921 ON delivery_product (delivery_id)');
+        $this->addSql('CREATE INDEX IDX_D954BB734584665A ON delivery_product (product_id)');
+        $this->addSql('CREATE TABLE horder (id INT NOT NULL, product_id INT NOT NULL, status VARCHAR(10) NOT NULL, grams SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_666E48114584665A ON horder (product_id)');
         $this->addSql('CREATE TABLE product (id INT NOT NULL, name VARCHAR(100) NOT NULL, type VARCHAR(15) NOT NULL, grams INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE step (id INT NOT NULL, product_id INT NOT NULL, name VARCHAR(10) NOT NULL, minutes SMALLINT NOT NULL, params JSON NOT NULL, sort SMALLINT NOT NULL, PRIMARY KEY(id))');
@@ -52,6 +56,8 @@ final class Version20230405124459 extends AbstractMigration
         $this->addSql('ALTER TABLE activity ADD CONSTRAINT FK_AC74095A73B21E9C FOREIGN KEY (step_id) REFERENCES step (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE activity ADD CONSTRAINT FK_AC74095AC00D111A FOREIGN KEY (executer_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC109395C3F3 FOREIGN KEY (customer_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB7312136921 FOREIGN KEY (delivery_id) REFERENCES delivery (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB734584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE horder ADD CONSTRAINT FK_666E48114584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE step ADD CONSTRAINT FK_43B9FE3C4584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE suspension ADD CONSTRAINT FK_82AF0500F3E2C918 FOREIGN KEY (prisoner_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -63,6 +69,7 @@ final class Version20230405124459 extends AbstractMigration
         $this->addSql('CREATE SCHEMA public');
         $this->addSql('DROP SEQUENCE activity_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE delivery_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE delivery_product_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE horder_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE product_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE step_id_seq CASCADE');
@@ -72,11 +79,14 @@ final class Version20230405124459 extends AbstractMigration
         $this->addSql('ALTER TABLE activity DROP CONSTRAINT FK_AC74095A73B21E9C');
         $this->addSql('ALTER TABLE activity DROP CONSTRAINT FK_AC74095AC00D111A');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC109395C3F3');
+        $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB7312136921');
+        $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB734584665A');
         $this->addSql('ALTER TABLE horder DROP CONSTRAINT FK_666E48114584665A');
         $this->addSql('ALTER TABLE step DROP CONSTRAINT FK_43B9FE3C4584665A');
         $this->addSql('ALTER TABLE suspension DROP CONSTRAINT FK_82AF0500F3E2C918');
         $this->addSql('DROP TABLE activity');
         $this->addSql('DROP TABLE delivery');
+        $this->addSql('DROP TABLE delivery_product');
         $this->addSql('DROP TABLE horder');
         $this->addSql('DROP TABLE product');
         $this->addSql('DROP TABLE step');
