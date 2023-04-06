@@ -1,14 +1,12 @@
+import type Service from "@/interfaces/service";
 import dataService from "./DataService";
 import type Order from '@/interfaces/order'
 
-interface OrderService {
-    getOrders(): Promise<Array<Order>>,
-    getNewOrder(): Order,
-    save(order: Order): Promise<boolean>
-}
-
-const service: OrderService = {
-    async getOrders() {
+const service: Service<Order> = {
+    async delete(order) {
+        return await dataService.get(import.meta.env.VITE_API_URL + 'orders/' + order.id);
+    },
+    async getAll() {
         return await dataService.get(import.meta.env.VITE_API_URL + 'orders');
     },
     async save(order) {
@@ -26,7 +24,7 @@ const service: OrderService = {
             return false
         }
     },
-    getNewOrder() {
+    getNew() {
         return {
             status: 'draft',
             product: {

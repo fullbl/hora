@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import type Order from '@/interfaces/order';
-import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount } from 'vue';
 import orderService from '@/service/OrderService';
 import productService from '@/service/ProductService';
-import { useToast } from 'primevue/usetoast';
-import InputNumber from 'primevue/inputnumber';
+import { useDataView } from './features/dataView'
 import type Product from '@/interfaces/product';
+import { onMounted, ref } from 'vue';
 
-const toast = useToast();
+const {
+    filters, 
+    data, single, save, 
+    openNew, editData, 
+    dialog, hideDialog, 
+    deleteDialog, confirmDelete, deleteData
+} = useDataView(orderService)
 
-const data = ref<Array<Order>>([]);
-const dialog = ref(false);
-const deleteDialog = ref(false);
-const single = ref<Order>(orderService.getNewOrder());
-const dt = ref(null);
-const filters = ref({});
-const submitted = ref(false);
 const statuses = [
     { label: 'Draft', value: 'draft' },
     { label: 'Ordered', value: 'ordered' },
@@ -26,73 +22,10 @@ const statuses = [
 ];
 const products = ref<Array<Product>>([])
 
-onBeforeMount(() => {
-    initFilters();
-});
 onMounted(async () => {
-    data.value = await orderService.getOrders()
-    products.value = await productService.getProducts()
+    products.value = await productService.getAll()
 });
 
-const openNew = () => {
-    single.value = orderService.getNewOrder()
-    submitted.value = false;
-    dialog.value = true;
-};
-
-const hideDialog = () => {
-    dialog.value = false;
-    submitted.value = false;
-};
-
-const saveSingle = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    submitted.value = true;
-    if (await orderService.save(single.value)) {
-        if (single.value.id) {
-            data.value.push(single.value);
-        }
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Order Updated/Created', life: 3000 });
-        single.value = orderService.getNewOrder();
-        dialog.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating order', life: 3000 });
-    }
-};
-
-const editData = (data: Order) => {
-    single.value = { ...data };
-    dialog.value = true;
-};
-
-const confirmDelete = (data: Order) => {
-    single.value = data;
-    deleteDialog.value = true;
-};
-
-const deleteData = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    if (await orderService.save(single.value)) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Order Deleted', life: 3000 });
-    }
-    else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting order', life: 3000 });
-    }
-    deleteDialog.value = false;
-    single.value = orderService.getNewOrder();
-};
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
 </script>
 
 <template>
@@ -175,14 +108,12 @@ const initFilters = () => {
 
                     <div class="field">
                         <label for="vatNumber">Quantity</label>
-                        <InputNumber type="number" id="vatNumber" v-model="single.quantity" required="true" autofocus
-                            :class="{ 'p-invalid': submitted && !single.quantity }" />
-                        <small class="p-invalid" v-if="submitted && !single.quantity">Quantity is required.</small>
+                        <InputNumber type="number" id="vatNumber" v-model="single.quantity" required="true" autofocus />
                     </div>
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveSingle" />
+                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
                     </template>
                 </Dialog>
 
