@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import type User from '@/interfaces/user';
-import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount } from 'vue';
 import userService from '@/service/UserService';
-import { useToast } from 'primevue/usetoast';
-import MultiSelect from 'primevue/multiselect';
-
-const toast = useToast();
-
-const data = ref<Array<User>>([]);
-
-const dialog = ref(false);
-const deleteDialog = ref(false);
-const single = ref<User>(userService.getNewUser());
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
+import { useDataView } from './features/dataView'
+const {
+    filters, 
+    data, single, save, 
+    openNew, editData, 
+    dialog, hideDialog, 
+    deleteDialog, confirmDelete, deleteData
+} = useDataView(userService)
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Operator', value: 'ROLE_OPERATOR' },
@@ -25,62 +17,6 @@ const statuses = [
     { label: 'Active', value: 'active' },
     { label: 'Inactive', value: 'inactive' },
 ];
-
-
-onMounted(async () => {
-    data.value = await userService.getUsers()
-});
-
-const openNew = () => {
-    single.value = userService.getNewUser();
-    dialog.value = true;
-};
-
-const hideDialog = () => {
-    dialog.value = false;
-};
-
-const save = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    if (await userService.save(single.value)){
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'User Updated/Created', life: 3000 });
-        single.value = userService.getNewUser();
-        data.value = await userService.getUsers();
-        dialog.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating user', life: 3000 });
-    }
-};
-
-const editData = (data: User) => {
-    single.value = { ...data };
-    dialog.value = true;
-};
-
-const confirmDelete = (data: User) => {
-    single.value = data;
-    deleteDialog.value = true;
-};
-
-const deleteData = async () => {
-    if (null === single.value) {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
-        return
-    }
-    if (await userService.delete(single.value)){
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
-        data.value = await userService.getUsers()
-    }
-    else{
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting user', life: 3000 });
-    }
-    deleteDialog.value = false;
-    single.value = userService.getNewUser();
-};
-
 </script>
 
 <template>
@@ -96,8 +32,7 @@ const deleteData = async () => {
                     </template>
                 </Toolbar>
 
-                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10"
-                    :filters="filters"
+                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data" responsiveLayout="scroll">

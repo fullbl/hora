@@ -1,15 +1,9 @@
 import dataService from "./DataService";
 import type User from '@/interfaces/user'
+import type Service from '@/interfaces/service'
 
-interface UserService {
-    getUsers(): Promise<Array<User>>,
-    getNewUser(): User,
-    save(user: User): Promise<boolean>,
-    delete(user: User): Promise<boolean>,
-}
-
-const service: UserService = {
-    async getUsers() {
+const service: Service<User> = {
+    async getAll() {
         return await dataService.get(import.meta.env.VITE_API_URL + 'users');
     },
     async delete(user) {
@@ -30,7 +24,7 @@ const service: UserService = {
             return false
         }
     },
-    getNewUser() {
+    getNew() {
         return {
             roles: [],
             username: '',
