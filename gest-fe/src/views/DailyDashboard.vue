@@ -16,7 +16,6 @@ const deliveryGroups = computed(() => {
         for (const dp of delivery.deliveryProducts) {
             const checkDate = new Date(date.value)
             checkDate.setDate(checkDate.getDate() + dp.product.days)
-            console.log(checkDate, delivery.weekDay)
             if (checkDate.getDay() !== delivery.weekDay) {
                 continue;
             }

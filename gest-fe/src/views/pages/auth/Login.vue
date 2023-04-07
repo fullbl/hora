@@ -19,7 +19,7 @@ const
             return;
         }
         loading = false
-        router.push({ name: 'dashboard' })
+        router.push({ name: 'daily-dashboard' })
     }
     ;
 </script>

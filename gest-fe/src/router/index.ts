@@ -12,6 +12,12 @@ import AppLayout from '@/layout/AppLayout.vue';
 const router = createRouter({
     history: createWebHashHistory(),
     routes: [
+
+        {
+            path: '/',
+            name: 'login',
+            component: () => import('@/views/pages/auth/Login.vue')
+        },
         {
             path: '/',
             component: AppLayout,
@@ -61,11 +67,6 @@ const router = createRouter({
                 },
 
             ]
-        },
-        {
-            path: '/auth/login',
-            name: 'login',
-            component: () => import('@/views/pages/auth/Login.vue')
         }
     ]
 });

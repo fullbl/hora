@@ -41,10 +41,21 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+const containerClass = computed(() => {
+    return {
+        'layout-overlay': layoutConfig.menuMode.value === 'overlay',
+        'layout-static': layoutConfig.menuMode.value === 'static',
+        'layout-static-inactive': layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static',
+        'layout-overlay-active': layoutState.overlayMenuActive.value,
+        'layout-mobile-active': layoutState.staticMenuMobileActive.value,
+        'p-input-filled': layoutConfig.inputStyle.value === 'filled',
+        'p-ripple-disabled': !layoutConfig.ripple.value
+    };
+});
 </script>
 
 <template>
-    <div class="layout-wrapper layout-static">
+    <div class="layout-wrapper layout-theme-dark" :class="containerClass">
         <app-topbar></app-topbar>
         <div class="layout-sidebar">
             <app-sidebar></app-sidebar>
