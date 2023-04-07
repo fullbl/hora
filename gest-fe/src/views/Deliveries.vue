@@ -1,29 +1,23 @@
 <script setup lang="ts">
 import deliveryService from '@/service/DeliveryService';
-import { useDataView } from './features/dataView'
+import { useDataView } from './composables/dataView'
 import type User from '@/interfaces/user';
 import type DeliveryProduct from '@/interfaces/deliveryProduct';
 import { onMounted, ref } from 'vue';
 import userService from '@/service/UserService';
 import productService from '@/service/ProductService';
+import { useDates } from './composables/dates'
+import { computed } from '@vue/reactivity';
+import type { TreeNode } from 'primevue/tree';
+
 const {
-    filters, 
-    data, single, save, 
-    openNew, editData, 
-    dialog, hideDialog, 
+    filters,
+    data, single, save,
+    openNew, editData,
+    dialog, hideDialog,
     deleteDialog, confirmDelete, deleteData
 } = useDataView(deliveryService)
-
-const weekDays = [
-    { label: 'Monday', value: 1 },
-    { label: 'Tuesday', value: 2 },
-    { label: 'Wednesday', value: 3 },
-    { label: 'Thursday', value: 4 },
-    { label: 'Friday', value: 5 },
-    { label: 'Saturday', value: 6 },
-    { label: 'Sunday', value: 0 },
-];
-
+const { weeks, weekDays } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<DeliveryProduct>>([])
 
@@ -34,6 +28,64 @@ onMounted(async () => {
         .map(p => ({ product: p, qty: 0 }))
 });
 
+const selectedWeeks = computed({
+    get(): TreeNode {
+        let _weeks = {} as TreeNode;
+        if (!single.value.hasOwnProperty('weeks')) {
+            return _weeks;
+        }
+        for (const month of weeks) {
+            let partialChecked = false
+            let checked = true
+            for (const week of month.children) {
+                if (single.value.weeks.includes(week.key)) {
+                    partialChecked = true
+                }
+                else {
+                    checked = false
+                }
+                _weeks[week.key] = {
+                    checked: single.value.weeks.includes(week.key),
+                    partialChecked: false
+                }
+            }
+            
+            if (true === checked) {
+                partialChecked = false
+            }
+            
+            _weeks[month.key] = {
+                checked,
+                partialChecked
+            }
+        }
+        
+        return _weeks;
+    },
+    set(weeksTree: TreeNode) {
+        let _weeks = [];
+        for (let i = 1; i <= 52; i++) {
+            if (weeksTree.hasOwnProperty(i) && weeksTree[i].checked) {
+                _weeks.push(i);
+            }
+        }
+        single.value.weeks = _weeks
+    }
+
+})
+
+const selectWeeks = function (type: string) {
+    switch (type) {
+        case 'even':
+            single.value.weeks = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53]
+            break;
+        case 'odd':
+            single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52]
+            break;
+        case 'all':
+            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x)
+    }
+}
 </script>
 
 <template>
@@ -85,7 +137,8 @@ onMounted(async () => {
                         headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Products</span>
-                            {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' + d.qty).join(', ') }}
+                            {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' +
+                                d.qty).join(', ') }}
                         </template>
                     </Column>
                     <Column headerStyle="min-width:10rem;">
@@ -107,10 +160,20 @@ onMounted(async () => {
                             optionValue="value" placeholder="Select a WeekDay">
                         </Dropdown>
                     </div>
+                    <div class="field">
+                        <label for="name">Weeks</label>
+                        <div class="mb-3 p-buttonset">
+                            <Button label="even" @click="selectWeeks('even')" />
+                            <Button label="odd" @click="selectWeeks('odd')" />
+                            <Button label="all" @click="selectWeeks('all')" />
+                        </div>
+                        <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
+                            placeholder="Select Weeks" class="md:w-20rem w-full" />
+                    </div>
 
                     <div class="field">
                         <label for="customer" class="mb-3">Customer</label>
-                        <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
+                        <Dropdown id="customer" v-model="single.customer.id" :options="customers" optionLabel="fullName" optionValue="id"
                             placeholder="Select a Customer">
                         </Dropdown>
                     </div>

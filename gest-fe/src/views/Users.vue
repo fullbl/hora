@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import userService from '@/service/UserService';
-import { useDataView } from './features/dataView'
+import { useDataView } from './composables/dataView'
 const {
     filters, 
     data, single, save, 

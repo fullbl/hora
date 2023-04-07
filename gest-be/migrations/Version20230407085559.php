@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230406145852 extends AbstractMigration
+final class Version20230407085559 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -35,9 +35,10 @@ final class Version20230406145852 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN activity.workable_from IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN activity.workable_until IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN activity.execution_time IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, customer_id INT NOT NULL, week_day SMALLINT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, customer_id INT NOT NULL, week_day SMALLINT NOT NULL, weeks TEXT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3781EC109395C3F3 ON delivery (customer_id)');
         $this->addSql('CREATE UNIQUE INDEX weekday_customer ON delivery (week_day, customer_id)');
+        $this->addSql('COMMENT ON COLUMN delivery.weeks IS \'(DC2Type:simple_array)\'');
         $this->addSql('CREATE TABLE delivery_product (id INT NOT NULL, delivery_id INT NOT NULL, product_id INT NOT NULL, qty SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_D954BB7312136921 ON delivery_product (delivery_id)');
         $this->addSql('CREATE INDEX IDX_D954BB734584665A ON delivery_product (product_id)');

@@ -3,8 +3,10 @@ import { onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import { computed } from '@vue/reactivity';
 import type Delivery from '@/interfaces/delivery';
+import { useDates } from './composables/dates';
 
 const deliveries = ref<Array<Delivery>>([]);
+const { getWeekNumber } = useDates();
 
 const date = ref(new Date())
 onMounted(async () => {
@@ -16,7 +18,10 @@ const deliveryGroups = computed(() => {
         for (const dp of delivery.deliveryProducts) {
             const checkDate = new Date(date.value)
             checkDate.setDate(checkDate.getDate() + dp.product.days)
-            if (checkDate.getDay() !== delivery.weekDay) {
+            if (
+                checkDate.getDay() !== delivery.weekDay ||
+                !delivery.weeks.includes(getWeekNumber(date.value))
+                ) {
                 continue;
             }
 
@@ -32,11 +37,26 @@ const deliveryGroups = computed(() => {
         return x;
     }, new Map());
 })
+
+const moveDate = function (side: string) {
+    const _date = new Date(date.value)
+    switch (side) {
+        case '+':
+            _date.setDate(date.value.getDate() + 1)
+            break;
+        case '-':
+            _date.setDate(date.value.getDate() - 1)
+            break;
+    }
+    date.value = _date
+}
 </script>
 
 <template>
     <div class="card">
-        <Calendar v-model="date" />
+        <Button icon="pi pi-arrow-left" class="mr-3" @click="moveDate('-')" />
+        <Calendar v-model="date" dateFormat="dd/mm/yy" />
+        <Button icon="pi pi-arrow-right" class="ml-3" @click="moveDate('+')" />
     </div>
     <div class="card">
         <table>
@@ -55,7 +75,8 @@ const deliveryGroups = computed(() => {
 </template>
 
 <style scoped lang="scss">
-td, th{
+td,
+th {
     padding: 4px
 }
 </style>

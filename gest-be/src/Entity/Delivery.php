@@ -21,26 +21,35 @@ class Delivery
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-    
+
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Range(min: 0, max: 6)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $weekDay = null;
-    
+
+    #[Groups(['delivery-list'])]
+    #[Assert\NotNull]
+    #[Assert\All([
+        new Assert\Range(min: 1, max: 53),
+    ])]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    private array $weeks = [];
+
     #[Groups(['delivery-list'])]
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
     private ?User $customer = null;
-    
+
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: Activity::class, orphanRemoval: true)]
     private Collection $activities;
-    
+
     #[Groups(['delivery-list'])]
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: DeliveryProduct::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $deliveryProducts;
+
 
     public function __construct()
     {
@@ -143,6 +152,18 @@ class Delivery
                 $deliveryProduct->setDelivery(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getWeeks(): array
+    {
+        return array_map(fn($w) => (int)$w, $this->weeks);
+    }
+
+    public function setWeeks(array $weeks): self
+    {
+        $this->weeks = $weeks;
 
         return $this;
     }

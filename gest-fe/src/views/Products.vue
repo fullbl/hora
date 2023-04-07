@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import productService from '@/service/ProductService';
-import { useDataView } from './features/dataView'
+import { useDataView } from './composables/dataView'
 const {
     filters, 
     data, single, save, 

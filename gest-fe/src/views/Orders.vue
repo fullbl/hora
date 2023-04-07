@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import orderService from '@/service/OrderService';
 import productService from '@/service/ProductService';
-import { useDataView } from './features/dataView'
+import { useDataView } from './composables/dataView'
 import type Product from '@/interfaces/product';
 import { onMounted, ref } from 'vue';
 
