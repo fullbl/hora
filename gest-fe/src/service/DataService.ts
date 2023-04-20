@@ -23,21 +23,28 @@ const helper = {
         const options = {
             method: method,
             headers: this.getHeaders(),
-            body: null as string|null
+            body: null as string | null
         };
         if (postData) {
             options.body = JSON.stringify(postData)
         }
-        const res: Response = await fetch(url, options)
-        const data: object = await res.json()
-        if (!res.ok) {
-            if (data.hasOwnProperty('message') && 'Expired JWT Token' === data.message) {
+        try {
+            const res: Response = await fetch(url, options)
+            const data = await res.json()
+            if (!res.ok) {
+                if (data.hasOwnProperty('message') && 'Expired JWT Token' === data.message) {
+                    authService.logout()
+                }
+                throw data as object
+            }
+            return data as T;
+        }
+        catch (e) {
+            if (e.hasOwnProperty('message') && 'NetworkError when attempting to fetch resource.' === e.message) {
                 authService.logout()
             }
-            throw data as object
+            throw e
         }
-
-        return data as T;
     }
 }
 

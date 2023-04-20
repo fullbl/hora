@@ -31,6 +31,7 @@ const service: Service<Delivery> = {
             weekDay: 1,
             customer: userService.getNew(),
             deliveryProducts: [],
+            weeks: [],
         }
     }
 }

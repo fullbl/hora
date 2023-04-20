@@ -9,6 +9,7 @@ import productService from '@/service/ProductService';
 import { useDates } from './composables/dates'
 import { computed } from '@vue/reactivity';
 import type { TreeNode } from 'primevue/tree';
+import type Product from '@/interfaces/product';
 
 const {
     filters,
@@ -19,13 +20,12 @@ const {
 } = useDataView(deliveryService)
 const { weeks, weekDays } = useDates()
 const customers = ref<Array<User>>([])
-const products = ref<Array<DeliveryProduct>>([])
+const products = ref<Array<Product>>([])
 
 onMounted(async () => {
     customers.value = (await userService.getAll())
         .filter(u => u.roles.includes('ROLE_CUSTOMER'))
     products.value = (await productService.getAll())
-        .map(p => ({ product: p, qty: 0 }))
 });
 
 const selectedWeeks = computed({
@@ -49,17 +49,17 @@ const selectedWeeks = computed({
                     partialChecked: false
                 }
             }
-            
+
             if (true === checked) {
                 partialChecked = false
             }
-            
+
             _weeks[month.key] = {
                 checked,
                 partialChecked
             }
         }
-        
+
         return _weeks;
     },
     set(weeksTree: TreeNode) {
@@ -173,23 +173,25 @@ const selectWeeks = function (type: string) {
 
                     <div class="field">
                         <label for="customer" class="mb-3">Customer</label>
-                        <Dropdown id="customer" v-model="single.customer.id" :options="customers" optionLabel="fullName" optionValue="id"
-                            placeholder="Select a Customer">
+                        <Dropdown id="customer" v-model="single.customer.id" :options="customers" optionLabel="fullName"
+                            optionValue="id" placeholder="Select a Customer">
                         </Dropdown>
                     </div>
 
                     <div class="field">
                         <label for="products" class="mb-3">Products</label>
-                        <MultiSelect id="products" v-model="single.deliveryProducts" :options="products"
-                            optionLabel="product.name" placeholder="Select some Products">
-                        </MultiSelect>
 
+                        <Button label="Add" icon="pi pi-plus"
+                            @click="single.deliveryProducts.push({ product: productService.getNew(), qty: 0 })" />
                         <DataTable :value="single.deliveryProducts">
-                            <Column field="product.name" header="Name"></Column>
-                            <Column field="product.type" header="Type"></Column>
+                            <Column field="product.name" header="Product">
+                                <template #body="slotProps">
+                                    <Dropdown v-model="slotProps.data.product" optionLabel="name" :options="products" />
+                                </template>
+                            </Column>
+                            <Column field="product.type" header="Type" />
                             <Column field="qty" header="Quantity">
                                 <template #body="slotProps">
-                                    <span class="p-column-title">Quantity</span>
                                     <InputNumber v-model="slotProps.data.qty" />
                                 </template>
                             </Column>
