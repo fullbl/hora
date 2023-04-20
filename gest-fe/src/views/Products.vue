@@ -66,9 +66,9 @@ const types = [
                             {{ slotProps.data.type }}
                         </template>
                     </Column>
-                    <Column field="grams" header="Grams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="grams" header="Decigrams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Grams</span>
+                            <span class="p-column-title">Decigrams</span>
                             {{ slotProps.data.grams }}
                         </template>
                     </Column>
@@ -104,7 +104,7 @@ const types = [
                     </div>
 
                     <div class="field">
-                        <label for="grams">Grams</label>
+                        <label for="grams">Decigrams</label>
                         <InputNumber type="number" id="grams" v-model="single.grams" required="true" autofocus />
                     </div>
 

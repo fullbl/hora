@@ -63,7 +63,7 @@ const moveDate = function (side: string) {
             <tr>
                 <th>Product</th>
                 <th>Qty</th>
-                <th>Grams</th>
+                <th>Decigrams</th>
             </tr>
             <tr class="col-12" v-for="[product, obj] in deliveryGroups">
                 <td>{{ product }}</td>
