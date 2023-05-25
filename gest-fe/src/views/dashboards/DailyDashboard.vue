@@ -19,7 +19,7 @@ const deliveryGroups = computed(() => {
             const checkDate = new Date(date.value)
             checkDate.setDate(checkDate.getDate() + dp.product.days)
             if (
-                checkDate.getDay() !== delivery.weekDay ||
+                checkDate.getDay() !== delivery.deliveryWeekDay ||
                 !delivery.weeks.includes(getWeekNumber(date.value))
                 ) {
                 continue;

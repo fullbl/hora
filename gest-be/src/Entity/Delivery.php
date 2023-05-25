@@ -7,12 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(['weekDay', 'customer'])]
-#[ORM\UniqueConstraint('weekday_customer', ['week_day', 'customer_id'])]
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
 {
@@ -23,11 +20,18 @@ class Delivery
     private ?int $id = null;
 
     #[Groups(['delivery-list'])]
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, name: 'week_day')]
     #[Assert\Range(min: 0, max: 6)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
-    private ?int $weekDay = null;
+    private ?int $harvestWeekDay = null;
+
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(type: Types::SMALLINT, options: ["default" => 1])]
+    #[Assert\Range(min: 0, max: 6)]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
+    private ?int $deliveryWeekDay = null;
 
     #[Groups(['delivery-list'])]
     #[Assert\NotNull]
@@ -74,14 +78,26 @@ class Delivery
         return $this;
     }
 
-    public function getWeekDay(): int
+    public function getHarvestWeekDay(): int
     {
-        return $this->weekDay;
+        return $this->harvestWeekDay;
     }
 
-    public function setWeekDay(int $weekDay): self
+    public function setHarvestWeekDay(int $harvestWeekDay): self
     {
-        $this->weekDay = $weekDay;
+        $this->harvestWeekDay = $harvestWeekDay;
+
+        return $this;
+    }
+
+    public function getDeliveryWeekDay(): int
+    {
+        return $this->deliveryWeekDay;
+    }
+
+    public function setDeliveryWeekDay(int $deliveryWeekDay): self
+    {
+        $this->deliveryWeekDay = $deliveryWeekDay;
 
         return $this;
     }

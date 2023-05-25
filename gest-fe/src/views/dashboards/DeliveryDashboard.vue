@@ -15,13 +15,13 @@ const weekDays = [
 onMounted(async () => {
     deliveryGroups.value = (await deliveryService.getAll())
         .reduce(function (x, delivery) {
-            if (!x.has(delivery.weekDay)) {
-                x.set(delivery.weekDay, new Map());
+            if (!x.has(delivery.deliveryWeekDay)) {
+                x.set(delivery.deliveryWeekDay, new Map());
             }
 
             for (const dp of delivery.deliveryProducts) {
-                const base = x.get(delivery.weekDay).get(dp.product.name) ?? 0
-                x.get(delivery.weekDay).set(dp.product.name, base + dp.qty)
+                const base = x.get(delivery.deliveryWeekDay).get(dp.product.name) ?? 0
+                x.get(delivery.deliveryWeekDay).set(dp.product.name, base + dp.qty)
             }
 
             return x;
