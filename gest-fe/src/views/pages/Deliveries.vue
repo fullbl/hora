@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import deliveryService from '@/service/DeliveryService';
-import { useDataView } from './composables/dataView'
+import { useDataView } from '../composables/dataView'
 import type User from '@/interfaces/user';
 import type DeliveryProduct from '@/interfaces/deliveryProduct';
 import { onMounted, ref } from 'vue';
 import userService from '@/service/UserService';
 import productService from '@/service/ProductService';
-import { useDates } from './composables/dates'
+import { useDates } from '../composables/dates'
 import { computed } from '@vue/reactivity';
 import type { TreeNode } from 'primevue/tree';
 import type Product from '@/interfaces/product';
@@ -31,21 +31,21 @@ onMounted(async () => {
 const selectedWeeks = computed({
     get(): TreeNode {
         let _weeks = {} as TreeNode;
-        if (!single.value.hasOwnProperty('weeks')) {
+        if ('undefined' === typeof single.value || !single.value.hasOwnProperty('weeks')) {
             return _weeks;
         }
         for (const month of weeks) {
             let partialChecked = false
             let checked = true
             for (const week of month.children) {
-                if (single.value.weeks.includes(week.key)) {
+                if (single.value.weeks.includes(parseInt(week.key))) {
                     partialChecked = true
                 }
                 else {
                     checked = false
                 }
                 _weeks[week.key] = {
-                    checked: single.value.weeks.includes(week.key),
+                    checked: single.value.weeks.includes(parseInt(week.key)),
                     partialChecked: false
                 }
             }
@@ -63,6 +63,9 @@ const selectedWeeks = computed({
         return _weeks;
     },
     set(weeksTree: TreeNode) {
+        if ('undefined' === typeof single.value) {
+            return;
+        }
         let _weeks = [];
         for (let i = 1; i <= 52; i++) {
             if (weeksTree.hasOwnProperty(i) && weeksTree[i].checked) {
@@ -75,6 +78,9 @@ const selectedWeeks = computed({
 })
 
 const selectWeeks = function (type: string) {
+    if ('undefined' === typeof single.value) {
+        return;
+    }
     switch (type) {
         case 'even':
             single.value.weeks = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53]
@@ -110,7 +116,7 @@ const selectWeeks = function (type: string) {
                             <h5 class="m-0">Manage Deliveries</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                <InputText v-model="filters.global.value" placeholder="Search..." />
                             </span>
                         </div>
                     </template>
@@ -152,8 +158,8 @@ const selectWeeks = function (type: string) {
                 </DataTable>
 
                 <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Delivery Details" :modal="true"
-                    class="p-fluid">
-
+                    class="p-fluid" v-if="'undefined' !== typeof single">
+                
                     <div class="field">
                         <label for="name">WeekDay</label>
                         <Dropdown id="type" v-model="single.weekDay" :options="weekDays" optionLabel="label"

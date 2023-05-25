@@ -30,6 +30,7 @@ const service: Service<Product> = {
             name: '',
             type: '',
             grams: 0,
+            days: 0
         }
     }
 }

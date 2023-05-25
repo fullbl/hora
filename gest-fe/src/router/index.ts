@@ -3,7 +3,7 @@ import authService from '@/service/AuthService';
 
 declare module 'vue-router' {
     interface RouteMeta {
-        auth?: 'ROLE_CUSTOMER' | 'ROLE_ADMIN' | 'ROLE_OPERATOR'
+        auth?: 'ROLE_CUSTOMER' | 'ROLE_ADMIN' | 'ROLE_OPERATOR';
     }
 }
 
@@ -12,7 +12,6 @@ import AppLayout from '@/layout/AppLayout.vue';
 const router = createRouter({
     history: createWebHashHistory(),
     routes: [
-
         {
             path: '/',
             name: 'login',
@@ -25,56 +24,55 @@ const router = createRouter({
                 {
                     path: '/users',
                     name: 'users',
-                    component: () => import('@/views/Users.vue'),
+                    component: () => import('@/views/pages/Users.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
                 {
                     path: '/products',
                     name: 'products',
-                    component: () => import('@/views/Products.vue'),
+                    component: () => import('@/views/pages/Products.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
                 {
                     path: '/orders',
                     name: 'orders',
-                    component: () => import('@/views/Orders.vue'),
+                    component: () => import('@/views/pages/Orders.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
                 {
                     path: '/deliveries',
                     name: 'deliveries',
-                    component: () => import('@/views/Deliveries.vue'),
+                    component: () => import('@/views/pages/Deliveries.vue'),
                     meta: { auth: 'ROLE_ADMIN' }
                 },
 
                 {
                     path: '/dashboards/storage',
                     name: 'storage-dashboard',
-                    component: () => import('@/views/StorageDashboard.vue'),
+                    component: () => import('@/views/dashboards/StorageDashboard.vue'),
                     meta: { auth: 'ROLE_OPERATOR' }
                 },
                 {
                     path: '/dashboards/delivery',
                     name: 'delivery-dashboard',
-                    component: () => import('@/views/DeliveryDashboard.vue'),
+                    component: () => import('@/views/dashboards/DeliveryDashboard.vue'),
                     meta: { auth: 'ROLE_OPERATOR' }
                 },
                 {
                     path: '/dashboards/daily',
                     name: 'daily-dashboard',
-                    component: () => import('@/views/DailyDashboard.vue'),
+                    component: () => import('@/views/dashboards/DailyDashboard.vue'),
                     meta: { auth: 'ROLE_OPERATOR' }
-                },
-
+                }
             ]
         }
     ]
 });
 
-router.beforeEach(async to => {
+router.beforeEach(async (to) => {
     if ('undefined' !== typeof to.meta.auth && !authService.isGranted(to.meta.auth)) {
-        return { name: 'login' }
+        return { name: 'login' };
     }
-})
+});
 
 export default router;

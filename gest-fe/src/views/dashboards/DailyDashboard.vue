@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import { computed } from '@vue/reactivity';
 import type Delivery from '@/interfaces/delivery';
-import { useDates } from './composables/dates';
+import { useDates } from '../composables/dates';
 
 const deliveries = ref<Array<Delivery>>([]);
 const { getWeekNumber } = useDates();

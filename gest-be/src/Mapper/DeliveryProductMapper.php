@@ -4,9 +4,11 @@ namespace App\Mapper;
 
 use App\Entity\Delivery;
 use App\Entity\DeliveryProduct;
+use App\Entity\Product;
 use App\Repository\DeliveryProductRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class DeliveryProductMapper
 {
@@ -14,6 +16,7 @@ class DeliveryProductMapper
         private DeliveryProductRepository $deliveryProductRepository,
         private ProductRepository $productRepository,
         private UserRepository $userRepository,
+        private EntityManagerInterface $em,
     ) {
     }
 
@@ -30,14 +33,8 @@ class DeliveryProductMapper
 
     public function mapSingle(array $data): DeliveryProduct
     {
-        if (isset($data['id'])) {
-            $dp = $this->deliveryProductRepository->find($data['id']);
-        } else {
             $dp = new DeliveryProduct();
-            $product = $this->productRepository->find($data['product']['id']);
-            $dp->setProduct($product);
-        }
-
+        $dp->setProduct($this->em->getReference(Product::class, $data['product']['id']));
         $dp->setQty($data['qty']);
 
         return $dp;

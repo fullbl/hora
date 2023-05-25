@@ -5,7 +5,7 @@ import type Delivery from '@/interfaces/delivery'
 
 const service: Service<Delivery> = {
     async delete(delivery) {
-        await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
+        await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id);
         return true
     },
     async getAll() {

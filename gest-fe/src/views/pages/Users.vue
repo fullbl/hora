@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import userService from '@/service/UserService';
-import { useDataView } from './composables/dataView'
-const {
-    filters, 
-    data, single, save, 
-    openNew, editData, 
-    dialog, hideDialog, 
-    deleteDialog, confirmDelete, deleteData
-} = useDataView(userService)
+import { useDataView } from '../composables/dataView'
+const { filters, data, single, save, openNew, editData, dialog, hideDialog, deleteDialog, confirmDelete, deleteData } = useDataView(userService);
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Operator', value: 'ROLE_OPERATOR' },

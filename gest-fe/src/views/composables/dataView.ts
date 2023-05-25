@@ -1,21 +1,28 @@
 import { ref, onMounted } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { FilterMatchMode } from 'primevue/api';
 import type Service from '@/interfaces/service';
+import type { DataTableFilterMeta } from 'primevue/datatable';
+import type { DataTableFilterMetaData } from 'primevue/datatable';
 
+interface HoraMeta extends DataTableFilterMeta
+{
+    global: DataTableFilterMetaData
+}
 export function useDataView<T>(service: Service<T>) {
-    const data = ref<Array<T>>([]);
-    const single = ref<T>(service.getNew());
+    const data = ref<Array<T>>();
+    const single = ref<T>();
     const toast = useToast();
     const dialog = ref(false);
     const deleteDialog = ref(false);
     const filters = ref({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    });
+        global: { value: '', matchMode: 'contains' }
+    } as HoraMeta);
 
     onMounted(async () => {
-        data.value = await service.getAll()
+        data.value = await service.getAll();
     });
+    single.value = service.getNew();
+    data.value = [];
 
     return {
         data,
@@ -24,7 +31,7 @@ export function useDataView<T>(service: Service<T>) {
         dialog,
         deleteDialog,
         async save() {
-            if (null === single.value) {
+            if ('undefined' === typeof single.value || null === single.value) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
                 return
             }
@@ -34,7 +41,7 @@ export function useDataView<T>(service: Service<T>) {
                 data.value = await service.getAll();
                 dialog.value = false;
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating user', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating', life: 3000 });
             }
         },
         openNew() {
@@ -53,7 +60,7 @@ export function useDataView<T>(service: Service<T>) {
             deleteDialog.value = true;
         },
         async deleteData() {
-            if (null === single.value) {
+            if ('undefined' === typeof single.value || null === single.value) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
                 return
             }

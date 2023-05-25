@@ -1,6 +1,7 @@
 import type Service from "@/interfaces/service";
 import dataService from "./DataService";
 import type Order from '@/interfaces/order'
+import type Product from "@/interfaces/product";
 
 const service: Service<Order> = {
     async delete(order) {
@@ -32,7 +33,7 @@ const service: Service<Order> = {
                 name: '',
                 type: '',
                 grams: 0
-            },
+            } as Product,
             quantity: 0,
         }
     }

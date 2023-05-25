@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import orderService from '@/service/OrderService';
 import productService from '@/service/ProductService';
-import { useDataView } from './composables/dataView'
+import { useDataView } from '../composables/dataView'
 import type Product from '@/interfaces/product';
 import { onMounted, ref } from 'vue';
 
@@ -90,7 +90,7 @@ onMounted(async () => {
                 </DataTable>
 
                 <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Single Details" :modal="true"
-                    class="p-fluid">
+                    class="p-fluid" v-if="'undefined' !== typeof single">
 
                     <div class="field">
                         <label for="product" class="mb-3">Product</label>

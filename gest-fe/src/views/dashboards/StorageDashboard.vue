@@ -14,7 +14,7 @@ onMounted(async () => {
             x[p.type].push(p);
 
             return x;
-        }, {});
+        }, {} as {[key: string]: Array<Product>});
 });
 </script>
 
