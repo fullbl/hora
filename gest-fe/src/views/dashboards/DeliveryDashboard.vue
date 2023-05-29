@@ -2,17 +2,11 @@
 import { onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import type Panel from 'primevue/panel';
+import { useDates } from '../composables/dates';
 
 const deliveryGroups = ref<Map<number, Map<string, Map<string, number>>>>(new Map());
-const weekDays = [
-    { label: 'Monday', value: 1 },
-    { label: 'Tuesday', value: 2 },
-    { label: 'Wednesday', value: 3 },
-    { label: 'Thursday', value: 4 },
-    { label: 'Friday', value: 5 },
-    { label: 'Saturday', value: 6 },
-    { label: 'Sunday', value: 0 },
-];
+const { weekDays } = useDates();
+
 onMounted(async () => {
     deliveryGroups.value = (await deliveryService.getAll())
         .reduce(function (x, delivery) {
@@ -21,9 +15,6 @@ onMounted(async () => {
             }
 
             for (const dp of delivery.deliveryProducts) {
-                if (!x.has(delivery.deliveryWeekDay)) {
-                    x.set(delivery.deliveryWeekDay, new Map());
-                }
                 const weekDay = x.get(delivery.deliveryWeekDay);
                 if (!weekDay.has(delivery.customer.fullName)) {
                     weekDay.set(delivery.customer.fullName, new Map());

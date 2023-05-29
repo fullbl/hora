@@ -6,9 +6,11 @@ import type Delivery from '@/interfaces/delivery';
 import { useDates } from '../composables/dates';
 
 const deliveries = ref<Array<Delivery>>([]);
-const { getWeekNumber } = useDates();
+const { getWeekNumber, getDate, weekDays } = useDates();
 
-const date = ref(new Date())
+const today = new Date();
+const week = ref(getWeekNumber(today));
+const year = ref(today.getFullYear());
 onMounted(async () => {
     deliveries.value = await deliveryService.getAll()
 });
@@ -16,61 +18,46 @@ onMounted(async () => {
 const deliveryGroups = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
         for (const dp of delivery.deliveryProducts) {
-            const checkDate = new Date(date.value)
-            checkDate.setDate(checkDate.getDate() + dp.product.days)
-            if (
-                checkDate.getDay() !== delivery.deliveryWeekDay ||
-                !delivery.weeks.includes(getWeekNumber(date.value))
-                ) {
+            const checkDate = getDate(year.value, week.value, delivery.harvestWeekDay - dp.product.days);
+            if(!delivery.weeks.includes(getWeekNumber(checkDate))){
                 continue;
             }
-
-            const obj = x.get(dp.product.name) ?? {
-                qty: 0,
-                grams: dp.product.grams
+            
+            const hash = getWeekNumber(checkDate) + '-' + checkDate.getDay();
+            if (!x.has(hash)) {
+                x.set(hash, new Map());
             }
-            obj.qty += dp.qty
-
-            x.set(dp.product.name, obj)
+            const products = x.get(hash);
+            if (!products.has(dp.product.name)) {
+                products.set(dp.product.name, {
+                    qty: 0,
+                    grams: dp.product.grams
+                });
+            }
+            const product = products.get(dp.product.name);
+            product.qty += dp.qty;
         }
 
         return x;
     }, new Map());
-})
+});
 
-const moveDate = function (side: string) {
-    const _date = new Date(date.value)
-    switch (side) {
-        case '+':
-            _date.setDate(date.value.getDate() + 1)
-            break;
-        case '-':
-            _date.setDate(date.value.getDate() - 1)
-            break;
-    }
-    date.value = _date
-}
 </script>
 
 <template>
     <div class="card">
-        <Button icon="pi pi-arrow-left" class="mr-3" @click="moveDate('-')" />
-        <Calendar v-model="date" dateFormat="dd/mm/yy" />
-        <Button icon="pi pi-arrow-right" class="ml-3" @click="moveDate('+')" />
+        <input type="number" v-model="year" placeholder="year" />
+        <input type="number" v-model="week" min="1" max="53" placeholder="week" />
     </div>
     <div class="card">
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Decigrams</th>
-            </tr>
-            <tr class="col-12" v-for="[product, obj] in deliveryGroups">
-                <td>{{ product }}</td>
-                <td>{{ obj.qty }}</td>
-                <td>{{ obj.qty * obj.grams }}</td>
-            </tr>
-        </table>
+        <div class="grid">
+            <div style="width:14.28%" v-for="weekDay of weekDays">
+                <h5>{{ weekDay.label }} {{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
+                <div v-for="[name, product] in deliveryGroups.get(getWeekNumber(getDate(year, week, weekDay.value)) + '-' + weekDay.value)">
+                        {{ name }} {{ product.qty }} ({{ product.qty * product.grams / 10 }} grams)
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
