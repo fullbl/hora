@@ -19,7 +19,7 @@ const
             return;
         }
         loading = false
-        router.push({ name: 'daily-dashboard' })
+        router.push({ name: 'planting-dashboard' })
     }
     ;
 </script>
