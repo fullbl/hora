@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
+import type Panel from 'primevue/panel';
 
-const deliveryGroups = ref<Map<number, Map<string, number>>>(new Map());
+const deliveryGroups = ref<Map<number, Map<string, Map<string, number>>>>(new Map());
 const weekDays = [
     { label: 'Monday', value: 1 },
     { label: 'Tuesday', value: 2 },
@@ -20,8 +21,18 @@ onMounted(async () => {
             }
 
             for (const dp of delivery.deliveryProducts) {
-                const base = x.get(delivery.deliveryWeekDay).get(dp.product.name) ?? 0
-                x.get(delivery.deliveryWeekDay).set(dp.product.name, base + dp.qty)
+                if (!x.has(delivery.deliveryWeekDay)) {
+                    x.set(delivery.deliveryWeekDay, new Map());
+                }
+                const weekDay = x.get(delivery.deliveryWeekDay);
+                if (!weekDay.has(delivery.customer.fullName)) {
+                    weekDay.set(delivery.customer.fullName, new Map());
+
+                }
+                const customer = weekDay.get(delivery.customer.fullName);
+                const base = customer.get(dp.product.name) ?? 0;
+
+                customer.set(dp.product.name, base + dp.qty);
             }
 
             return x;
@@ -33,10 +44,23 @@ onMounted(async () => {
 <template>
     <div class="card">
         <div class="grid">
-            <div class="col-1" v-for="weekDay of weekDays">
+            <div style="width:14.28%" v-for="weekDay of weekDays">
                 <h5>{{ weekDay.label }}</h5>
-                <div class="col-12" v-for="[product, qty] in deliveryGroups.get(weekDay.value)">
-                    {{ product }}: {{ qty }}
+                <div>
+                    <Panel v-for="[customer, products] in deliveryGroups.get(weekDay.value)" :header="customer" toggleable>
+                        <table>
+                            <p v-for="[product, qty] in products">
+                                <tr>
+                                    <td>
+                                        {{ product }}
+                                    </td>
+                                    <td>
+                                        {{ qty }}
+                                    </td>
+                                </tr>
+                            </p>
+                        </table>
+                    </Panel>
                 </div>
             </div>
         </div>
