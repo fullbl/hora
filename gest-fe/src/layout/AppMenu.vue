@@ -17,6 +17,7 @@ const model = ref([
         label: 'Dashboards',
         items: [
             { label: 'Storage Dashboard', icon: 'pi pi-fw pi-chart-bar', to: '/dashboards/storage' },
+            { label: 'Harvest Dashboard', icon: 'pi pi-fw pi-chart-bar', to: '/dashboards/harvest' },
             { label: 'Delivery Dashboard', icon: 'pi pi-fw pi-chart-bar', to: '/dashboards/delivery' },
             { label: 'Daily Dashboard', icon: 'pi pi-fw pi-chart-bar', to: '/dashboards/daily' },
         ]

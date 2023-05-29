@@ -53,6 +53,12 @@ const router = createRouter({
                     meta: { auth: 'ROLE_OPERATOR' }
                 },
                 {
+                    path: '/dashboards/harvest',
+                    name: 'harvest-dashboard',
+                    component: () => import('@/views/dashboards/HarvestDashboard.vue'),
+                    meta: { auth: 'ROLE_OPERATOR' }
+                },
+                {
                     path: '/dashboards/delivery',
                     name: 'delivery-dashboard',
                     component: () => import('@/views/dashboards/DeliveryDashboard.vue'),
