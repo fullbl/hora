@@ -18,12 +18,19 @@ onMounted(async () => {
 const deliveryGroups = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
         for (const dp of delivery.deliveryProducts) {
-            const checkDate = getDate(year.value, week.value, delivery.harvestWeekDay - dp.product.days);
-            if(!delivery.weeks.includes(getWeekNumber(checkDate))){
+            debugger
+            const plantingDate = getDate(year.value, week.value, delivery.harvestWeekDay - dp.product.days);
+            while(plantingDate < getDate(year.value, week.value, 0)){
+                plantingDate.setDate(plantingDate.getDate() + 7);
+            }
+            const harvestDate = new Date(plantingDate);
+            harvestDate.setDate(harvestDate.getDate() + dp.product.days);
+                        
+            if(!delivery.weeks.includes(getWeekNumber(harvestDate))){
                 continue;
             }
             
-            const hash = getWeekNumber(checkDate) + '-' + checkDate.getDay();
+            const hash = plantingDate.getDay();
             if (!x.has(hash)) {
                 x.set(hash, new Map());
             }
@@ -53,7 +60,7 @@ const deliveryGroups = computed(() => {
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
                 <h5>{{ weekDay.label }} {{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
-                <div v-for="[name, product] in deliveryGroups.get(getWeekNumber(getDate(year, week, weekDay.value)) + '-' + weekDay.value)">
+                <div v-for="[name, product] in deliveryGroups.get(weekDay.value)">
                         {{ name }} {{ product.qty }} ({{ product.qty * product.grams / 10 }} grams)
                 </div>
             </div>
