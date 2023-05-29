@@ -18,7 +18,6 @@ onMounted(async () => {
 const deliveryGroups = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
         for (const dp of delivery.deliveryProducts) {
-            debugger
             const plantingDate = getDate(year.value, week.value, delivery.harvestWeekDay - dp.product.days);
             while(plantingDate < getDate(year.value, week.value, 0)){
                 plantingDate.setDate(plantingDate.getDate() + 7);
