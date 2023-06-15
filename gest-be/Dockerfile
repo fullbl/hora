@@ -12,11 +12,7 @@ FROM mlocati/php-extension-installer:latest AS php_extension_installer
 # Build Caddy with the Mercure and Vulcain modules
 FROM caddy:2.6-builder-alpine AS app_caddy_builder
 
-RUN xcaddy build \
-	--with github.com/dunglas/mercure \
-	--with github.com/dunglas/mercure/caddy \
-	--with github.com/dunglas/vulcain \
-	--with github.com/dunglas/vulcain/caddy
+RUN xcaddy build
 
 # Prod image
 FROM php:8.2-fpm-alpine AS app_php
