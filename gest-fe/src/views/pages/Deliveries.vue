@@ -19,7 +19,7 @@ const {
     dialog, hideDialog,
     deleteDialog, confirmDelete, deleteData
 } = useDataView(deliveryService)
-const { weeks, weekDays } = useDates()
+const { getWeekNumber, weeks, weekDays } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
 
@@ -85,12 +85,18 @@ const selectWeeks = function (type: string) {
     switch (type) {
         case 'even':
             single.value.weeks = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53]
-            break;
+            break
         case 'odd':
             single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52]
-            break;
+            break
         case 'all':
             single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x)
+            break
+        case 'suspend':
+            single.value.weeks = single.value.weeks.filter((x => x <= getWeekNumber(new Date())))
+            break
+        case 'next':
+            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x).filter((x => x >= getWeekNumber(new Date())))
     }
 }
 </script>
@@ -192,6 +198,8 @@ const selectWeeks = function (type: string) {
                             <Button label="even" @click="selectWeeks('even')" />
                             <Button label="odd" @click="selectWeeks('odd')" />
                             <Button label="all" @click="selectWeeks('all')" />
+                            <Button label="suspend" @click="selectWeeks('suspend')" />
+                            <Button label="next" @click="selectWeeks('next')" />
                         </div>
                         <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
                             placeholder="Select Weeks" class="md:w-20rem w-full" />
