@@ -36,7 +36,7 @@ export function useDataView<T>(service: Service<T>) {
                 return
             }
             if (await service.save(single.value)) {
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'User Updated/Created', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Object Updated/Created', life: 3000 });
                 single.value = service.getNew();
                 data.value = await service.getAll();
                 dialog.value = false;
