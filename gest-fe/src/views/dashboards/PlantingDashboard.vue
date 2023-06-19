@@ -11,6 +11,7 @@ const { getWeekNumber, getDate, weekDays } = useDates();
 const today = new Date();
 const week = ref(getWeekNumber(today));
 const year = ref(today.getFullYear());
+
 onMounted(async () => {
     deliveries.value = await deliveryService.getAll()
 });

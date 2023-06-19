@@ -1,41 +1,59 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
+import type Delivery from '@/interfaces/delivery';
 
-const deliveryGroups = ref<Map<number, Map<string, Map<string, number>>>>(new Map());
-const { weekDays } = useDates();
+const deliveries = ref<Array<Delivery>>([]);
+const { getWeekNumber, getDate, weekDays } = useDates();
+
+const today = new Date();
+const week = ref(getWeekNumber(today));
+const year = ref(today.getFullYear());
 
 onMounted(async () => {
-    deliveryGroups.value = (await deliveryService.getAll())
-        .reduce(function (x, delivery) {
+    deliveries.value = await deliveryService.getAll()
+});
+
+const deliveryGroups = computed(() => {
+    return deliveries.value.reduce(function (x, delivery) {
+        if (!x.has(delivery.harvestWeekDay)) {
+            x.set(delivery.harvestWeekDay, new Map());
+        }
+
+        const harvestDate = getDate(year.value, week.value, delivery.harvestWeekDay);
+        if(!delivery.weeks.includes(getWeekNumber(harvestDate))){
+            return x;
+        }
+
+        for (const dp of delivery.deliveryProducts) {
             if (!x.has(delivery.harvestWeekDay)) {
                 x.set(delivery.harvestWeekDay, new Map());
             }
+            const weekDay = x.get(delivery.harvestWeekDay);
+            if (!weekDay.has(delivery.customer.fullName)) {
+                weekDay.set(delivery.customer.fullName, new Map());
 
-            for (const dp of delivery.deliveryProducts) {
-                if (!x.has(delivery.harvestWeekDay)) {
-                    x.set(delivery.harvestWeekDay, new Map());
-                }
-                const weekDay = x.get(delivery.harvestWeekDay);
-                if (!weekDay.has(delivery.customer.fullName)) {
-                    weekDay.set(delivery.customer.fullName, new Map());
-
-                }
-                const customer = weekDay.get(delivery.customer.fullName);
-                const base = customer.get(dp.product.name) ?? 0;
-
-                customer.set(dp.product.name, base + dp.qty);
             }
+            const customer = weekDay.get(delivery.customer.fullName);
+            const base = customer.get(dp.product.name) ?? 0;
 
-            return x;
-        }, new Map());
+            customer.set(dp.product.name, base + dp.qty);
+        }
 
+        return x;
+    }, new Map());
 });
+
 </script>
 
 <template>
+    <div class="card">
+        <input type="number" v-model="year" placeholder="year" />
+        <input type="number" v-model="week" min="1" max="53" placeholder="week" />
+    </div>
+
     <div class="card">
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
