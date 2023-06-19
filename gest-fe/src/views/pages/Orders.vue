@@ -50,7 +50,7 @@ onMounted(async () => {
                             <h5 class="m-0">Manage Orders</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                <InputText v-model="filters.global.value" placeholder="Search..." />
                             </span>
                         </div>
                     </template>

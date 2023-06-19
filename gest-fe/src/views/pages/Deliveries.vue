@@ -127,19 +127,19 @@ const selectWeeks = function (type: string) {
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="harvest" header="Harvest" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="harvestWeekDay" header="Harvest" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Harvest</span>
                             {{ weekDays.find(d => d.value === slotProps.data.harvestWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="delivery" header="Delivery" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Delivery</span>
                             {{ weekDays.find(d => d.value === slotProps.data.deliveryWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="customer" header="Customer" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                    <Column field="customer.fullName" header="Customer" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Customer</span>
                             {{ slotProps.data.customer.fullName }}
