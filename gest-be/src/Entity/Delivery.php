@@ -34,6 +34,11 @@ class Delivery
     private ?int $deliveryWeekDay = null;
 
     #[Groups(['delivery-list'])]
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Assert\Length(max:255)]
+    private ?string $notes = null;
+
+    #[Groups(['delivery-list'])]
     #[Assert\NotNull]
     #[Assert\All([
         new Assert\Range(min: 1, max: 53),
@@ -98,6 +103,17 @@ class Delivery
     public function setDeliveryWeekDay(int $deliveryWeekDay): self
     {
         $this->deliveryWeekDay = $deliveryWeekDay;
+
+        return $this;
+    }
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): self
+    {
+        $this->notes = $notes;
 
         return $this;
     }

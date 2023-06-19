@@ -10,6 +10,7 @@ import { useDates } from '../composables/dates'
 import { computed } from '@vue/reactivity';
 import type { TreeNode } from 'primevue/tree';
 import type Product from '@/interfaces/product';
+import type InputText from 'primevue/inputtext';
 
 const {
     filters,
@@ -153,6 +154,13 @@ const selectWeeks = function (type: string) {
                                 d.qty).join(', ') }}
                         </template>
                     </Column>
+                    <Column field="notes" header="Notes" :sortable="true"
+                        headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Notes</span>
+                            {{ slotProps.data.notes ?? '' }}
+                        </template>
+                    </Column>
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
@@ -214,6 +222,11 @@ const selectWeeks = function (type: string) {
                                 </template>
                             </Column>
                         </DataTable>
+                    </div>
+
+                    <div class="field">
+                        <label for="notes" class="mb-3">Notes</label>
+                        <InputText id="notes" v-model="single.notes" />
                     </div>
 
                     <template #footer>

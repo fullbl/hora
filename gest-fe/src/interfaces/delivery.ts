@@ -8,4 +8,5 @@ export default interface Delivery {
     weeks: Array<number>,
     customer: User,
     deliveryProducts: Array<DeliveryProduct>,
+    notes: string
 }
