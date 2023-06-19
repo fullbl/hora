@@ -103,7 +103,7 @@ export function useDates(): useDates {
                 children: [
                     { key: '27', label: '27 (2-8)' },
                     { key: '28', label: '28 (9-15)' },
-                    { key: '29', label: '29 (16-11)' },
+                    { key: '29', label: '29 (16-22)' },
                     { key: '30', label: '30 (23-29)' },
                     { key: '31', label: '31 (30-5)' }
                 ]
