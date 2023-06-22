@@ -34,6 +34,12 @@ class Activity
     private ?Delivery $delivery = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Range(min: 2023, max: 2100)]
+    #[Assert\Type('integer')]
+    #[Assert\NotNull]
+    private ?int $year = null;
+
+    #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Range(min: 1, max: 52)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
@@ -96,6 +102,17 @@ class Activity
     public function setWeek(int $week): self
     {
         $this->week = $week;
+
+        return $this;
+    }
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(int $year): self
+    {
+        $this->year = $year;
 
         return $this;
     }
