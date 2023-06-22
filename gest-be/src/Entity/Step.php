@@ -20,8 +20,7 @@ class Step
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Product $product = null;
 
     #[ORM\Column(length: 10)]
