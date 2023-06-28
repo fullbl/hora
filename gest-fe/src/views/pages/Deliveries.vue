@@ -17,7 +17,7 @@ const {
     data, single, save,
     openNew, editData,
     dialog, hideDialog,
-    deleteDialog, confirmDelete, 
+    deleteDialog, confirmDelete, deleteData
     isInvalid
 } = useDataView(deliveryService)
 const { getWeekNumber, weeks, weekDays } = useDates()
