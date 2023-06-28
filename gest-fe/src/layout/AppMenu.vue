@@ -20,6 +20,7 @@ const model = ref([
             { label: 'Planting Dashboard', icon: 'pi pi-fw pi-download', to: '/dashboards/planting' },
             { label: 'Harvest Dashboard', icon: 'pi pi-fw pi-upload', to: '/dashboards/harvest' },
             { label: 'Delivery Dashboard', icon: 'pi pi-fw pi-car', to: '/dashboards/delivery' },
+            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-money-bill', to: '/dashboards/payment' },
         ]
     }
 
