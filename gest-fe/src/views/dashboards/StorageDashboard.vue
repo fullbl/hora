@@ -34,7 +34,7 @@ onMounted(async () => {
                             <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
                                 <div class="bg-orange-500 h-full" style="width: 50%"></div>
                             </div>
-                            <span class="text-orange-500 ml-3 font-medium">{{ product.grams }}</span>
+                            <span class="text-orange-500 ml-3 font-medium">{{ product.decigrams }}</span>
                         </div>
                     </li>
                 </ul>

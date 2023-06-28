@@ -41,7 +41,7 @@ const deliveryGroups = computed(() => {
             if (!products.has(dp.product.name)) {
                 products.set(dp.product.name, {
                     qty: 0,
-                    grams: dp.product.grams
+                    decigrams: dp.product.decigrams
                 });
             }
             const product = products.get(dp.product.name);
@@ -51,14 +51,14 @@ const deliveryGroups = computed(() => {
         }
 
         return x;
-    }, new Map<number, Map<string, { qty: number, grams: number }>>());
+    }, new Map<number, Map<string, { qty: number, decigrams: number }>>());
 });
 
 const weekTotal = computed(() => {
     let total = 0;
     deliveryGroups.value.forEach(function (x) {
         x.forEach(function (y) {
-            total += y.grams * y.qty;
+            total += y.decigrams * y.qty;
         })
     });
 
@@ -68,7 +68,7 @@ const weekTotal = computed(() => {
 const dayTotal = function (weekDay: number) {
     let total = 0;
     deliveryGroups.value.get(weekDay)?.forEach(function (y) {
-        total += y.grams * y.qty;
+        total += y.decigrams * y.qty;
     });
 
     return total / 10;
@@ -92,7 +92,7 @@ const dayTotal = function (weekDay: number) {
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}g</b>
                 <div v-for="[name, product] in deliveryGroups.get(weekDay.value)">
-                    {{ name }} {{ product.qty }} ({{ product.qty * product.grams / 10 }}g)
+                    {{ name }} {{ product.qty }} ({{ product.qty * product.decigrams / 10 }}g)
                 </div>
             </div>
         </div>

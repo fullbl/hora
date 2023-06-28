@@ -51,7 +51,7 @@ class Product
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
-    private ?int $grams = null;
+    private ?int $decigrams = null;
     
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
@@ -77,14 +77,14 @@ class Product
         return $this;
     }
 
-    public function getGrams(): ?int
+    public function getDecigrams(): ?int
     {
-        return $this->grams;
+        return $this->decigrams;
     }
 
-    public function setGrams(int $grams): self
+    public function setDecigrams(int $decigrams): self
     {
-        $this->grams = $grams;
+        $this->decigrams = $decigrams;
 
         return $this;
     }

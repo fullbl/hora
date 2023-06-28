@@ -2,6 +2,6 @@ export default interface Product {
     id?: number,
     name: string,
     type: string,
-    grams: number,
+    decigrams: number,
     days: number,
 }

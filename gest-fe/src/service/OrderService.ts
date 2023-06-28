@@ -32,7 +32,7 @@ const service: Service<Order> = {
             product: {
                 name: '',
                 type: '',
-                grams: 0
+                decigrams: 0
             } as Product,
             quantity: 0,
         }

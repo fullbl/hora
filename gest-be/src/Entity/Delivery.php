@@ -59,7 +59,7 @@ class Delivery
     private Collection $deliveryProducts;
 
     #[ORM\Column(length: 10, nullable: true)]
-    private ?string $payment_method = null;
+    private ?string $paymentMethod = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
@@ -207,12 +207,12 @@ class Delivery
 
     public function getPaymentMethod(): ?string
     {
-        return $this->payment_method;
+        return $this->paymentMethod;
     }
 
-    public function setPaymentMethod(?string $payment_method): self
+    public function setPaymentMethod(?string $paymentMethod): self
     {
-        $this->payment_method = $payment_method;
+        $this->paymentMethod = $paymentMethod;
 
         return $this;
     }

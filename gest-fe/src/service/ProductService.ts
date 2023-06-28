@@ -29,7 +29,7 @@ const service: Service<Product> = {
         return {
             name: '',
             type: '',
-            grams: 0,
+            decigrams: 0,
             days: 0
         }
     }

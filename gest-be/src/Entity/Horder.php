@@ -42,7 +42,7 @@ class Horder
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
-    private ?int $grams = null;
+    private ?int $decigrams = null;
 
     public function getId(): ?int
     {
@@ -73,14 +73,14 @@ class Horder
         return $this;
     }
 
-    public function getGrams(): ?int
+    public function getDecigrams(): ?int
     {
-        return $this->grams;
+        return $this->decigrams;
     }
 
-    public function setGrams(int $grams): self
+    public function setDecigrams(int $decigrams): self
     {
-        $this->grams = $grams;
+        $this->decigrams = $decigrams;
 
         return $this;
     }

@@ -66,10 +66,10 @@ const types = [
                             {{ slotProps.data.type }}
                         </template>
                     </Column>
-                    <Column field="grams" header="Decigrams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="decigrams" header="Decigrams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Decigrams</span>
-                            {{ slotProps.data.grams }}
+                            {{ slotProps.data.decigrams }}
                         </template>
                     </Column>
                     <Column field="days" header="Days" :sortable="true" headerStyle="width:14%; min-width:10rem;">
@@ -104,12 +104,12 @@ const types = [
                     </div>
 
                     <div class="field">
-                        <label for="grams">Decigrams</label>
-                        <InputNumber type="number" id="grams" v-model="single.grams" required="true" autofocus />
+                        <label for="decigrams">Decigrams</label>
+                        <InputNumber type="number" id="decigrams" v-model="single.decigrams" required="true" autofocus />
                     </div>
 
                     <div class="field">
-                        <label for="grams">Days</label>
+                        <label for="decigrams">Days</label>
                         <InputNumber type="number" id="days" v-model="single.days" required="true" autofocus />
                     </div>
 
