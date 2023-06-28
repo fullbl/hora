@@ -15,7 +15,7 @@ import type InputText from 'primevue/inputtext';
 const {
     filters,
     data, single, save,
-    openNew, editData,
+    openNew, editData, cloneData,
     dialog, hideDialog,
     deleteDialog, confirmDelete, deleteData,
     isInvalid
@@ -175,10 +175,12 @@ const selectWeeks = function (type: string) {
                             {{ slotProps.data.notes ?? '' }}
                         </template>
                     </Column>
-                    <Column headerStyle="min-width:10rem;">
+                    <Column headerStyle="min-width:11rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editData(slotProps.data)" />
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-info mr-2"
+                                @click="cloneData(slotProps.data)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
                                 @click="confirmDelete(slotProps.data)" />
                         </template>

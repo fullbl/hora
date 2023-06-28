@@ -57,6 +57,11 @@ export function useDataView<T>(service: Service<T>) {
             single.value = { ...data };
             dialog.value = true;
         },
+        cloneData(data: T) {
+            single.value = { ...data };
+            delete single.value.id
+            dialog.value = true;
+        },
         confirmDelete(data: T) {
             single.value = data;
             deleteDialog.value = true;
