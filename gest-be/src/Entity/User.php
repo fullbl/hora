@@ -58,25 +58,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 15)]
     #[Assert\Length( max: 15)]
-    #[Assert\NotNull]
     private ?string $vatNumber = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
-    #[Assert\NotNull]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
-    #[Assert\NotNull]
     private ?string $address = null;
-
+    
     #[Ignore]
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Delivery::class)]
     private Collection $deliveries;
 
     #[ORM\OneToMany(mappedBy: 'prisoner', targetEntity: Suspension::class, orphanRemoval: true)]
     private Collection $suspensions;
+    
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Length(max: 7)]
+    private ?string $sdi = null;
+    
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(max: 50)]
+    private ?string $zone = null;
 
     public function __construct()
     {
@@ -268,6 +273,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $suspension->setPrisoner(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSdi(): ?string
+    {
+        return $this->sdi;
+    }
+
+    public function setSdi(?string $sdi): self
+    {
+        $this->sdi = $sdi;
+
+        return $this;
+    }
+
+    public function getZone(): ?string
+    {
+        return $this->zone;
+    }
+
+    public function setZone(?string $zone): self
+    {
+        $this->zone = $zone;
 
         return $this;
     }

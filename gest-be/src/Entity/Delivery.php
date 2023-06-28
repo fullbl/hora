@@ -57,10 +57,13 @@ class Delivery
     #[Groups(['delivery-list'])]
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: DeliveryProduct::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $deliveryProducts;
-
+    
+    #[Groups(['delivery-list'])]
+    #[Assert\Length(max:10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $paymentMethod = null;
 
+    #[Assert\GreaterThan(0)]
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
 
