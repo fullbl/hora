@@ -35,10 +35,16 @@ class DeliveryMapper
 
         $data = $request->toArray();
         $deliveryProducts = $this->deliveryProductMapper->map($data['deliveryProducts'], $delivery);
-        $customer = $this->em->getReference(User::class, $data['customer']['id']);
+        if(isset($data['customer']['id'])){
+            $delivery->setCustomer(
+                $this->em->getReference(User::class, $data['customer']['id'])
+            );
+        }
+        else {
+            $delivery->setCustomer(null);
+        }
 
         return $delivery
-            ->setCustomer($customer)
             ->setDeliveryProducts($deliveryProducts);
     }
 }

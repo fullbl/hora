@@ -6,7 +6,7 @@ export default interface Delivery {
     harvestWeekDay: number,
     deliveryWeekDay: number,
     weeks: Array<number>,
-    customer: User,
+    customer?: User,
     deliveryProducts: Array<DeliveryProduct>,
     notes: string
 }

@@ -48,16 +48,21 @@ class Delivery
 
     #[Groups(['delivery-list'])]
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $customer = null;
-
+    
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: Activity::class, orphanRemoval: true)]
     private Collection $activities;
 
     #[Groups(['delivery-list'])]
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: DeliveryProduct::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $deliveryProducts;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $payment_method = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $price = null;
 
 
     public function __construct()
@@ -196,6 +201,30 @@ class Delivery
     public function setWeeks(array $weeks): self
     {
         $this->weeks = $weeks;
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->payment_method;
+    }
+
+    public function setPaymentMethod(?string $payment_method): self
+    {
+        $this->payment_method = $payment_method;
+
+        return $this;
+    }
+
+    public function getPrice(): ?int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?int $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }

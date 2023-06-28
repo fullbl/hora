@@ -207,8 +207,8 @@ const selectWeeks = function (type: string) {
 
                     <div class="field">
                         <label for="customer" class="mb-3">Customer</label>
-                        <Dropdown id="customer" v-model="single.customer.id" :options="customers" optionLabel="fullName"
-                            optionValue="id" placeholder="Select a Customer" :filter="true">
+                        <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
+                            dataKey="id" placeholder="Select a Customer" showClear filter>
                         </Dropdown>
                     </div>
 
