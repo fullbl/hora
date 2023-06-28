@@ -58,11 +58,11 @@ const weekTotal = computed(() => {
     let total = 0;
     deliveryGroups.value.forEach(function (x) {
         x.forEach(function (y) {
-            total += y.decigrams * y.qty;
+            total += y.qty;
         })
     });
 
-    return total / 10;
+    return total;
 });
 
 const dayTotal = function (weekDay: number) {
@@ -83,7 +83,7 @@ const dayTotal = function (weekDay: number) {
     </div>
 
     <div class="card">
-        Week total: {{ weekTotal }}g
+        Week total: {{ weekTotal }}
     </div>
 
     <div class="card">
