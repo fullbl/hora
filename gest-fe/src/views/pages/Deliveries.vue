@@ -149,7 +149,7 @@ const selectWeeks = function (type: string) {
                     <Column field="customer.fullName" header="Customer" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Customer</span>
-                            {{ slotProps.data.customer.fullName }}
+                            {{ slotProps.data.customer?.fullName }}
                         </template>
                     </Column>
                     <Column field="deliveryProducts" header="Products" :sortable="true"
@@ -158,6 +158,13 @@ const selectWeeks = function (type: string) {
                             <span class="p-column-title">Products</span>
                             {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' +
                                 d.qty).join(', ') }}
+                        </template>
+                    </Column>
+                    <Column field="customer.zone" header="Zone" :sortable="true"
+                        headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Zone</span>
+                            {{ slotProps.data.customer?.zone }}
                         </template>
                     </Column>
                     <Column field="notes" header="Notes" :sortable="true"
