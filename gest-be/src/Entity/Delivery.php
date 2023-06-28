@@ -65,12 +65,6 @@ class Delivery
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $paymentMethod = null;
     
-    #[Groups(['delivery-list'])]
-    #[ORM\Column(nullable: true)]
-    #[Assert\GreaterThan(0)]
-    private ?int $price = null;
-
-
     public function __construct()
     {
         $this->activities = new ArrayCollection();
@@ -219,23 +213,6 @@ class Delivery
     public function setPaymentMethod(?string $paymentMethod): self
     {
         $this->paymentMethod = $paymentMethod;
-
-        return $this;
-    }
-
-    public function getPrice(): ?float
-    {
-        return $this->price / 100;
-    }
-
-    public function setPrice(?float $price): self
-    {
-        if(null === $price){
-            $this->price = null;
-        }
-        else {
-            $this->price = (int) ($price * 100);
-        }
 
         return $this;
     }

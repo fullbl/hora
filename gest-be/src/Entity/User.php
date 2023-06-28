@@ -44,12 +44,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Assert\NotNull]
     private ?string $password = null;
-    
+
     #[ORM\Column(length: 10)]
     #[Assert\Choice(self::STATUSES)]
     #[Assert\NotNull]
     private ?string $status = null;
-    
+
     #[Groups(['delivery-list'])]
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
@@ -57,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $fullName = null;
 
     #[ORM\Column(length: 15)]
-    #[Assert\Length( max: 15)]
+    #[Assert\Length(max: 15)]
     private ?string $vatNumber = null;
 
     #[ORM\Column(length: 255)]
@@ -67,22 +67,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
     private ?string $address = null;
-    
+
     #[Ignore]
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Delivery::class)]
     private Collection $deliveries;
 
     #[ORM\OneToMany(mappedBy: 'prisoner', targetEntity: Suspension::class, orphanRemoval: true)]
     private Collection $suspensions;
-    
+
     #[ORM\Column(length: 7, nullable: true)]
     #[Assert\Length(max: 7)]
     private ?string $sdi = null;
-    
+
     #[Groups(['delivery-list'])]
     #[ORM\Column(length: 50, nullable: true)]
     #[Assert\Length(max: 50)]
     private ?string $zone = null;
+    
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(options: ['default' => 0])]
+    #[Assert\Type('integer')]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\NotNull]
+    private int $discount = 0;
 
     public function __construct()
     {
@@ -298,6 +305,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setZone(?string $zone): self
     {
         $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getDiscount(): int
+    {
+        return $this->discount;
+    }
+
+    public function setDiscount(int $discount): self
+    {
+        $this->discount = $discount;
 
         return $this;
     }

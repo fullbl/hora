@@ -4,4 +4,5 @@ export default interface Product {
     type: string,
     decigrams: number,
     days: number,
+    price?: number
 }

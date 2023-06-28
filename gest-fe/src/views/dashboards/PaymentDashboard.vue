@@ -17,28 +17,18 @@ onMounted(async () => {
     deliveries.value = await deliveryService.getAll()
 });
 
-const monthlyPayments = computed(() => {
+const payments = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
-        if('monthly' === delivery.paymentMethod){
-            x.push({customer: delivery.customer?.fullName ?? '', amount: delivery.price?? 0})
-        }
-        return x;
-    }, [] as Array<{customer: string, amount: number}>);
-});
-const weeklyPayments = computed(() => {
-    return deliveries.value.reduce(function (x, delivery) {
-        if('monthly' === delivery.paymentMethod){
-            return x;
-        }
-
         const deliveryDate = getDate(year.value, week.value, delivery.deliveryWeekDay);
         if (!delivery.weeks.includes(getWeekNumber(deliveryDate))) {
             return x;
         }
+        const amount =  delivery.deliveryProducts.reduce((i, p) => i + (p.product.price ?? 0) * p.qty, 0) - (delivery.customer?.discount ?? 0)
 
-        x.push({customer: delivery.customer?.fullName ?? '', amount: delivery.price?? 0})
+
+        x.push({customer: delivery.customer?.fullName ?? '', amount, method: delivery.paymentMethod ?? '-'})
         return x;
-    }, [] as Array<{customer: string, amount: number}>);
+    }, [] as Array<{customer: string, amount: number, method: string|false}>);
 });
 
 </script>
@@ -50,15 +40,9 @@ const weeklyPayments = computed(() => {
     </div>
 
     <div class="card">
-        Monthly payments: 
-        <div v-for="payment in monthlyPayments">
-            {{ payment.customer }}: {{ payment.amount }}€
-        </div>
-    </div>
-    <div class="card">
-        Weekly payments: 
-        <div v-for="payment in weeklyPayments">
-            {{ payment.customer }}: {{ payment.amount }}€
+        Payments: 
+        <div v-for="payment in payments">
+            {{ payment.customer }} ({{ payment.method ?? '-' }}): {{ payment.amount }}€
         </div>
     </div>
 

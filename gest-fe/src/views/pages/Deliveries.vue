@@ -175,6 +175,13 @@ const selectWeeks = function (type: string) {
                             {{ slotProps.data.notes ?? '' }}
                         </template>
                     </Column>
+                    <Column field="price" header="Price" :sortable="true"
+                        headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Price</span>
+                            {{ slotProps.data.deliveryProducts.reduce((i, p) => i + p.product.price * p.qty, 0) - (slotProps.data.customer?.discount ?? 0) }}€
+                        </template>
+                    </Column>
                     <Column headerStyle="min-width:11rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
@@ -252,10 +259,6 @@ const selectWeeks = function (type: string) {
                         <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"  :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
                     </div>
                     
-                    <div class="field">
-                        <label for="price" class="mb-3">Price</label>
-                        <InputNumber :min=1 mode="currency" currency="EUR" locale="it-IT" id="price" v-model="single.price"  :class="{ 'p-invalid': isInvalid('price') }"/>
-                    </div>
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
                         <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />

@@ -149,6 +149,11 @@ const statuses = [
                     </div>
 
                     <div class="field">
+                        <label for="discount">Discount</label>
+                        <InputNumber id="discount" v-model="single.discount" :class="{ 'p-invalid': isInvalid('discount') }"/>
+                    </div>
+                    
+                    <div class="field">
                         <label for="roles" class="mb-3">Roles</label>
                         <MultiSelect id="roles" v-model="single.roles" :options="roles" optionLabel="label"
                             optionValue="value" placeholder="Select a Role">

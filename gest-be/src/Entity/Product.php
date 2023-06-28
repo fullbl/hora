@@ -59,6 +59,12 @@ class Product
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $days = null;
+    
+    #[Groups(['delivery-list'])]
+    #[Assert\Positive]
+    #[Assert\Type('integer')]
+    #[ORM\Column(nullable: true)]
+    private ?int $price = null;
 
     public function getId(): ?int
     {
@@ -109,6 +115,23 @@ class Product
     public function setDays(int $days): self
     {
         $this->days = $days;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price / 100;
+    }
+
+    public function setPrice(?int $price): self
+    {
+        if(null === $price){
+            $this->price = null;
+        }
+        else {
+            $this->price = (int) ($price * 100);
+        }
 
         return $this;
     }
