@@ -6,7 +6,8 @@ const {
     data, single, save, 
     openNew, editData, 
     dialog, hideDialog, 
-    deleteDialog, confirmDelete, deleteData
+    deleteDialog, confirmDelete, deleteData,
+    isInvalid
 } = useDataView(productService)
 
 const types = [
@@ -88,29 +89,29 @@ const types = [
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Product Details" :modal="true"
+                <Dialog v-model:visible="dialog" v-if="single" :style="{ width: '450px' }" header="Product Details" :modal="true"
                     class="p-fluid">
 
                     <div class="field">
                         <label for="name">Name</label>
-                        <InputText id="name" v-model.trim="single.name" required="true" autofocus />
+                        <InputText id="name" v-model.trim="single.name" required="true" autofocus  :class="{ 'p-invalid': isInvalid('name') }"/>
                     </div>
 
                     <div class="field">
                         <label for="type" class="mb-3">Type</label>
                         <Dropdown id="type" v-model="single.type" :options="types" optionLabel="label"
-                            optionValue="value" placeholder="Select a Type">
+                            optionValue="value" placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }">
                         </Dropdown>
                     </div>
 
                     <div class="field">
                         <label for="decigrams">Decigrams</label>
-                        <InputNumber type="number" id="decigrams" v-model="single.decigrams" required="true" autofocus />
+                        <InputNumber type="number" id="decigrams" v-model="single.decigrams" required="true" autofocus :class="{ 'p-invalid': isInvalid('decigrams') }" />
                     </div>
 
                     <div class="field">
                         <label for="decigrams">Days</label>
-                        <InputNumber type="number" id="days" v-model="single.days" required="true" autofocus />
+                        <InputNumber type="number" id="days" v-model="single.days" required="true" autofocus :class="{ 'p-invalid': isInvalid('days') }" />
                     </div>
 
                     <template #footer>

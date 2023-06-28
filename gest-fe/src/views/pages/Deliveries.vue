@@ -17,7 +17,8 @@ const {
     data, single, save,
     openNew, editData,
     dialog, hideDialog,
-    deleteDialog, confirmDelete, deleteData
+    deleteDialog, confirmDelete, 
+    isInvalid
 } = useDataView(deliveryService)
 const { getWeekNumber, weeks, weekDays } = useDates()
 const customers = ref<Array<User>>([])
@@ -190,13 +191,13 @@ const selectWeeks = function (type: string) {
                     <div class="field">
                         <label for="name">Harvest WeekDay</label>
                         <Dropdown id="type" v-model="single.harvestWeekDay" :options="weekDays" optionLabel="label"
-                            optionValue="value" placeholder="Select a WeekDay">
+                            optionValue="value" placeholder="Select a WeekDay" :class="{ 'p-invalid': isInvalid('harvestWeekDay') }">
                         </Dropdown>
                     </div>
                     <div class="field">
                         <label for="name">Delivery WeekDay</label>
                         <Dropdown id="type" v-model="single.deliveryWeekDay" :options="weekDays" optionLabel="label"
-                            optionValue="value" placeholder="Select a WeekDay">
+                            optionValue="value" placeholder="Select a WeekDay" :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }">
                         </Dropdown>
                     </div>
                     <div class="field">
@@ -209,13 +210,13 @@ const selectWeeks = function (type: string) {
                             <Button label="next" @click="selectWeeks('next')" />
                         </div>
                         <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
-                            placeholder="Select Weeks" class="md:w-20rem w-full" />
+                            placeholder="Select Weeks" class="md:w-20rem w-full" :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
                     </div>
 
                     <div class="field">
                         <label for="customer" class="mb-3">Customer</label>
                         <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
-                            dataKey="id" placeholder="Select a Customer" showClear filter>
+                            dataKey="id" placeholder="Select a Customer" showClear filter :class="{ 'p-invalid': isInvalid('customer') }">
                         </Dropdown>
                     </div>
 
@@ -241,17 +242,17 @@ const selectWeeks = function (type: string) {
 
                     <div class="field">
                         <label for="notes" class="mb-3">Notes</label>
-                        <InputText id="notes" v-model="single.notes" />
+                        <InputText id="notes" v-model="single.notes"  :class="{ 'p-invalid': isInvalid('notes') }"/>
                     </div>
                     
                     <div class="field">
                         <label for="paymentMethod" class="mb-3">Payment method</label>
-                        <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']" />
+                        <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"  :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
                     </div>
                     
                     <div class="field">
                         <label for="price" class="mb-3">Price</label>
-                        <InputNumber :min=1 mode="currency" currency="EUR" locale="it-IT" id="price" v-model="single.price" />
+                        <InputNumber :min=1 mode="currency" currency="EUR" locale="it-IT" id="price" v-model="single.price"  :class="{ 'p-invalid': isInvalid('price') }"/>
                     </div>
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />

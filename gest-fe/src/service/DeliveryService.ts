@@ -11,7 +11,11 @@ const service: Service<Delivery> = {
         return await dataService.get(import.meta.env.VITE_API_URL + 'deliveries');
     },
     async save(delivery) {
-        return await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
+        if (delivery.id) {
+            return await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
+        } else {
+            return await dataService.post(import.meta.env.VITE_API_URL + 'deliveries', delivery);
+        }
     },
     getNew() {
         return {

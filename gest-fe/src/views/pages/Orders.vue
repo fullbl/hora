@@ -10,7 +10,8 @@ const {
     data, single, save, 
     openNew, editData, 
     dialog, hideDialog, 
-    deleteDialog, confirmDelete, deleteData
+    deleteDialog, confirmDelete, deleteData,
+    isInvalid
 } = useDataView(orderService)
 
 const statuses = [
@@ -95,20 +96,20 @@ onMounted(async () => {
                     <div class="field">
                         <label for="product" class="mb-3">Product</label>
                         <Dropdown id="product" v-model="single.product.id" :options="products" optionLabel="name"
-                            optionValue="id" placeholder="Select a Product">
+                            optionValue="id" placeholder="Select a Product" :class="{ 'p-invalid': isInvalid('name') }">
                         </Dropdown>
                     </div>
 
                     <div class="field">
                         <label for="status" class="mb-3">Status</label>
                         <Dropdown id="status" v-model="single.status" :options="statuses" optionLabel="label"
-                            optionValue="value" placeholder="Select a Status">
+                            optionValue="value" placeholder="Select a Status" :class="{ 'p-invalid': isInvalid('status') }">
                         </Dropdown>
                     </div>
 
                     <div class="field">
                         <label for="vatNumber">Quantity</label>
-                        <InputNumber type="number" id="vatNumber" v-model="single.quantity" required="true" autofocus />
+                        <InputNumber type="number" id="vatNumber" v-model="single.quantity" required="true" autofocus :class="{ 'p-invalid': isInvalid('quantity') }" />
                     </div>
 
                     <template #footer>

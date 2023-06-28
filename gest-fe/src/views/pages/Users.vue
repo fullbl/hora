@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import userService from '@/service/UserService';
 import { useDataView } from '../composables/dataView'
-const { filters, data, single, save, openNew, editData, dialog, hideDialog, deleteDialog, confirmDelete, deleteData } = useDataView(userService);
+const { filters, data, single, save, openNew, editData, dialog, hideDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(userService);
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Operator', value: 'ROLE_OPERATOR' },
@@ -110,42 +110,42 @@ const statuses = [
 
                     <div class="field">
                         <label for="username">Username</label>
-                        <InputText id="username" v-model.trim="single.username" required="true" autofocus />
+                        <InputText id="username" v-model.trim="single.username" required autofocus :class="{ 'p-invalid': isInvalid('username') }" />
                     </div>
 
                     <div class="field">
                         <label for="fullName">FullName</label>
-                        <InputText id="fullName" v-model.trim="single.fullName" required="true" autofocus />
+                        <InputText id="fullName" v-model.trim="single.fullName" required autofocus :class="{ 'p-invalid': isInvalid('fullName') }" />
                     </div>
 
                     <div class="field">
                         <label for="vatNumber">VAT Number</label>
-                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required="true" autofocus />
+                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required autofocus :class="{ 'p-invalid': isInvalid('vatNumber') }" />
                     </div>
 
                     <div class="field">
                         <label for="sdi">SDI Number</label>
-                        <InputText id="sdi" v-model.trim="single.sdi" required="true" autofocus />
+                        <InputText id="sdi" v-model.trim="single.sdi" required autofocus :class="{ 'p-invalid': isInvalid('sdi') }" />
                     </div>
 
                     <div class="field">
                         <label for="email">E-mail</label>
-                        <InputText type="email" id="email" v-model.trim="single.email" required="true" autofocus />
+                        <InputText type="email" id="email" v-model.trim="single.email" required autofocus :class="{ 'p-invalid': isInvalid('email') }"/>
                     </div>
 
                     <div class="field">
                         <label for="address">Address</label>
-                        <InputText type="address" id="address" v-model.trim="single.address" required="true" autofocus />
+                        <InputText type="address" id="address" v-model.trim="single.address" required autofocus :class="{ 'p-invalid': isInvalid('address') }"/>
                     </div>
 
                     <div class="field">
                         <label for="password">Password</label>
-                        <Password id="password" v-model="single.password" rows="3" cols="20" />
+                        <Password id="password" v-model="single.password" :class="{ 'p-invalid': isInvalid('password') }"/>
                     </div>
 
                     <div class="field">
                         <label for="zone">Zone</label>
-                        <InputText id="zone" v-model="single.zone" rows="3" cols="20" />
+                        <InputText id="zone" v-model="single.zone" :class="{ 'p-invalid': isInvalid('zone') }"/>
                     </div>
 
                     <div class="field">
