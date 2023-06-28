@@ -23,26 +23,51 @@ const deliveryGroups = computed(() => {
         }
 
         const deliveryDate = getDate(year.value, week.value, delivery.deliveryWeekDay);
-        if(!delivery.weeks.includes(getWeekNumber(deliveryDate))){
+        if (!delivery.weeks.includes(getWeekNumber(deliveryDate))) {
             return x;
         }
 
         for (const dp of delivery.deliveryProducts) {
             const weekDay = x.get(delivery.deliveryWeekDay);
-            if (!weekDay.has(delivery.customer.fullName)) {
-                weekDay.set(delivery.customer.fullName, new Map());
-
+            if (undefined === delivery.customer || undefined === weekDay) {
+                continue;
             }
-            const customer = weekDay.get(delivery.customer.fullName);
-            const base = customer.get(dp.product.name) ?? 0;
+            if (!weekDay.has(delivery.customer.zone ?? '')) {
+                weekDay.set(delivery.customer.zone ?? '', new Map());
+            }
+            const zone = weekDay.get(delivery.customer.zone ?? '');
+            if (undefined === zone) {
+                continue;
+            }
+            if (!zone.has(delivery.customer.fullName)) {
+                zone.set(delivery.customer.fullName, new Map());
+            }
+            const customer = zone.get(delivery.customer.fullName);
 
-            customer.set(dp.product.name, base + dp.qty);
+            customer?.set(
+                dp.product.name,
+                (customer?.get(dp.product.name) ?? 0) + dp.qty);
         }
 
         return x;
-    }, new Map());
-
+    }, new Map<number, Map<string, Map<string, Map<string, number>>>>());
 });
+
+const zoneTotals = function (customers: Map<string, Map<string, number>>) {
+    let totals = new Map();
+
+    customers.forEach(function (x) {
+        x.forEach(function (y, k) {
+            if(!totals.has(k)){
+                totals.set(k, 0);
+            }
+
+            totals.set(k, totals.get(k) + y);
+        })
+    });
+
+    return totals;
+}
 </script>
 
 <template>
@@ -55,10 +80,9 @@ const deliveryGroups = computed(() => {
             <div style="width:14.28%" v-for="weekDay of weekDays">
                 <h5>{{ weekDay.label }}</h5>
                 <div>
-                    <Panel v-for="[customer, products] in deliveryGroups.get(weekDay.value)" :header="customer" toggleable>
+                    <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)" :header="zone" toggleable>
                         <table>
-                            <p v-for="[product, qty] in products">
-                                <tr>
+                                <tr v-for="[product, qty] in zoneTotals(customers)">
                                     <td>
                                         {{ product }}
                                     </td>
@@ -66,8 +90,19 @@ const deliveryGroups = computed(() => {
                                         {{ qty }}
                                     </td>
                                 </tr>
-                            </p>
-                        </table>
+                            </table>
+                        <Panel v-for="[customer, products] in customers" :header="customer" toggleable>
+                            <table>
+                                <tr v-for="[product, qty] in products">
+                                    <td>
+                                        {{ product }}
+                                    </td>
+                                    <td>
+                                        {{ qty }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </Panel>
                     </Panel>
                 </div>
             </div>

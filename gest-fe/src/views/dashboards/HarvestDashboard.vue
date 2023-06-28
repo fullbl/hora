@@ -37,13 +37,14 @@ const deliveryGroups = computed(() => {
                 continue;
             }
 
+            const customerHash = delivery.customer?.fullName ?? '';
             switch (groupMode.value) {
                 case 'customer':
-                    if (!weekDay.has(delivery.customer.fullName)) {
-                        weekDay.set(delivery.customer.fullName, new Map());
+                    if (!weekDay.has(customerHash)) {
+                        weekDay.set(customerHash, new Map());
 
                     }
-                    const customer = weekDay.get(delivery.customer.fullName);
+                    const customer = weekDay.get(customerHash);
                     if (undefined === customer) {
                         continue;
                     }
@@ -65,8 +66,8 @@ const deliveryGroups = computed(() => {
                     }
 
                     product.set(
-                        delivery.customer.fullName,
-                        (product.get(delivery.customer.fullName) ?? 0) + dp.qty
+                        customerHash,
+                        (product.get(customerHash) ?? 0) + dp.qty
                     );
                     break;
             }
