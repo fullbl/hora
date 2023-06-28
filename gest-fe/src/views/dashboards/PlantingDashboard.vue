@@ -71,7 +71,7 @@ const dayTotal = function (weekDay: number) {
         total += y.qty;
     });
 
-    return total / 10;
+    return total;
 }
 
 </script>
