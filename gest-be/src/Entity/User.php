@@ -79,6 +79,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 7)]
     private ?string $sdi = null;
     
+    #[Groups(['delivery-list'])]
     #[ORM\Column(length: 50, nullable: true)]
     #[Assert\Length(max: 50)]
     private ?string $zone = null;
