@@ -14,6 +14,7 @@ export function useDataView<T>(service: Service<T>) {
     const toast = useToast();
     const dialog = ref(false);
     const deleteDialog = ref(false);
+    const violations = ref([])
     const filters = ref({
         global: { value: '', matchMode: 'contains' }
     } as HoraMeta);
@@ -35,14 +36,17 @@ export function useDataView<T>(service: Service<T>) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
                 return
             }
-            if (await service.save(single.value)) {
+            try{
+                const res = await service.save(single.value)
+                console.log(res)
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Object Updated/Created', life: 3000 });
                 single.value = service.getNew();
                 data.value = await service.getAll();
-                dialog.value = false;
-            } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating/creating', life: 3000 });
             }
+            catch (e) {
+                toast.add({ severity: 'error', summary: 'Error', detail: e.message ?? e.detail ?? 'Generic error', life: 3000 });
+            }
+            dialog.value = false;
         },
         openNew() {
             single.value = service.getNew();
@@ -60,7 +64,7 @@ export function useDataView<T>(service: Service<T>) {
             deleteDialog.value = true;
         },
         async deleteData() {
-            if ('undefined' === typeof single.value || null === single.value) {
+            if (undefined === single.value || null === single.value) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
                 return
             }

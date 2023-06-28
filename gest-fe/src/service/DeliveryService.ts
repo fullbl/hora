@@ -1,30 +1,17 @@
-import type Service from "@/interfaces/service";
-import dataService from "./DataService";
-import userService from "./UserService";
-import type Delivery from '@/interfaces/delivery'
+import type Service from '@/interfaces/service';
+import dataService from './DataService';
+import userService from './UserService';
+import type Delivery from '@/interfaces/delivery';
 
 const service: Service<Delivery> = {
     async delete(delivery) {
-        await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id);
-        return true
+        return await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id);
     },
     async getAll() {
         return await dataService.get(import.meta.env.VITE_API_URL + 'deliveries');
     },
     async save(delivery) {
-        try {
-            if (delivery.id) {
-                await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
-            }
-            else {
-                await dataService.post(import.meta.env.VITE_API_URL + 'deliveries', delivery);
-            }
-
-            return true
-        }
-        catch (e) {
-            return false
-        }
+        return await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
     },
     getNew() {
         return {
@@ -33,8 +20,11 @@ const service: Service<Delivery> = {
             customer: userService.getNew(),
             deliveryProducts: [],
             weeks: [],
-        }
+            notes: '',
+            paymentMethod: 'monthly',
+            price: 1
+        };
     }
-}
+};
 
-export default service
+export default service;

@@ -1,6 +1,6 @@
-import dataService from "./DataService";
-import type User from '@/interfaces/user'
-import type Service from '@/interfaces/service'
+import dataService from './DataService';
+import type User from '@/interfaces/user';
+import type Service from '@/interfaces/service';
 
 const service: Service<User> = {
     async getAll() {
@@ -10,18 +10,10 @@ const service: Service<User> = {
         return await dataService.delete(import.meta.env.VITE_API_URL + 'users/' + user.id);
     },
     async save(user) {
-        try {
-            if (user.id) {
-                await dataService.put(import.meta.env.VITE_API_URL + 'users/' + user.id, user);
-            }
-            else {
-                await dataService.post(import.meta.env.VITE_API_URL + 'users', user);
-            }
-
-            return true
-        }
-        catch (e) {
-            return false
+        if (user.id) {
+            return await dataService.put(import.meta.env.VITE_API_URL + 'users/' + user.id, user);
+        } else {
+            return await dataService.post(import.meta.env.VITE_API_URL + 'users', user);
         }
     },
     getNew() {
@@ -35,8 +27,8 @@ const service: Service<User> = {
             address: '',
             deliveries: [],
             suspensions: []
-        }
+        };
     }
-}
+};
 
-export default service
+export default service;
