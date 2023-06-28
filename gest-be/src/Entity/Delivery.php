@@ -64,8 +64,8 @@ class Delivery
     private ?string $paymentMethod = null;
     
     #[Groups(['delivery-list'])]
-    #[Assert\GreaterThan(0)]
     #[ORM\Column(nullable: true)]
+    #[Assert\GreaterThan(0)]
     private ?int $price = null;
 
 
@@ -228,7 +228,12 @@ class Delivery
 
     public function setPrice(?float $price): self
     {
-        $this->price = (int) $price * 100;
+        if(null === $price){
+            $this->price = null;
+        }
+        else {
+            $this->price = (int) ($price * 100);
+        }
 
         return $this;
     }

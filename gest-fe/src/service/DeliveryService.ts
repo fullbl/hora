@@ -25,8 +25,6 @@ const service: Service<Delivery> = {
             deliveryProducts: [],
             weeks: [],
             notes: '',
-            paymentMethod: 'monthly',
-            price: 1
         };
     }
 };
