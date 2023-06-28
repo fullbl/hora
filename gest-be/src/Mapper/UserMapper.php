@@ -27,10 +27,12 @@ class UserMapper
         return $user
             ->setUsername($data['username'])
             ->setVatNumber($data['vatNumber'])
+            ->setSdi($data['sdi'])
             ->setAddress($data['address'])
             ->setEmail($data['email'])
             ->setFullName($data['fullName'])
             ->setRoles($data['roles'])
-            ->setStatus($data['status']);
+            ->setStatus($data['status'])
+            ->setZone($data['zone']);
     }
 }

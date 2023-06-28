@@ -40,7 +40,7 @@ const statuses = [
                         </div>
                     </template>
 
-                    <Column field="id" header="Id" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="id" header="Id" :sortable="true" headerStyle="width:10%; min-width:5rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Id</span>
                             {{ slotProps.data.id }}
@@ -71,6 +71,18 @@ const statuses = [
                             {{ slotProps.data.vatNumber }}
                         </template>
                     </Column>
+                    <Column field="sdi" header="Sdi" :sortable="true" headerStyle="width:10%; min-width:5rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Sdi</span>
+                            {{ slotProps.data.sdi }}
+                        </template>
+                    </Column>
+                    <Column field="zone" header="Zone" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Zone</span>
+                            {{ slotProps.data.zone }}
+                        </template>
+                    </Column>
                     <Column field="roles" header="Roles" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Roles</span>
@@ -93,7 +105,7 @@ const statuses = [
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="User Details" :modal="true"
+                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="User Details" :modal="true" v-if="single"
                     class="p-fluid">
 
                     <div class="field">
@@ -112,6 +124,11 @@ const statuses = [
                     </div>
 
                     <div class="field">
+                        <label for="sdi">SDI Number</label>
+                        <InputText id="sdi" v-model.trim="single.sdi" required="true" autofocus />
+                    </div>
+
+                    <div class="field">
                         <label for="email">E-mail</label>
                         <InputText type="email" id="email" v-model.trim="single.email" required="true" autofocus />
                     </div>
@@ -124,6 +141,11 @@ const statuses = [
                     <div class="field">
                         <label for="password">Password</label>
                         <Password id="password" v-model="single.password" rows="3" cols="20" />
+                    </div>
+
+                    <div class="field">
+                        <label for="zone">Zone</label>
+                        <InputText id="zone" v-model="single.zone" rows="3" cols="20" />
                     </div>
 
                     <div class="field">

@@ -8,8 +8,10 @@ export default interface User {
     status: string,
     fullName: string,
     vatNumber: string,
-    email: string,
-    address: string,
+    email?: string,
+    address?: string,
     deliveries: Array<unknown>,
-    suspensions: Array<unknown>
+    suspensions: Array<unknown>,
+    sdi?: string,
+    zone?: string
 }

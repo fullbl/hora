@@ -62,7 +62,8 @@ class Delivery
     #[Assert\Length(max:10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $paymentMethod = null;
-
+    
+    #[Groups(['delivery-list'])]
     #[Assert\GreaterThan(0)]
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
@@ -220,14 +221,14 @@ class Delivery
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): ?float
     {
-        return $this->price;
+        return $this->price / 100;
     }
 
-    public function setPrice(?int $price): self
+    public function setPrice(?float $price): self
     {
-        $this->price = $price;
+        $this->price = (int) $price * 100;
 
         return $this;
     }

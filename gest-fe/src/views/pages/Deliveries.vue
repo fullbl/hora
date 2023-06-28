@@ -236,7 +236,16 @@ const selectWeeks = function (type: string) {
                         <label for="notes" class="mb-3">Notes</label>
                         <InputText id="notes" v-model="single.notes" />
                     </div>
-
+                    
+                    <div class="field">
+                        <label for="paymentMethod" class="mb-3">Payment method</label>
+                        <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']" />
+                    </div>
+                    
+                    <div class="field">
+                        <label for="price" class="mb-3">Price</label>
+                        <InputNumber :min=1 mode="currency" currency="EUR" locale="it-IT" id="price" v-model="single.price" />
+                    </div>
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
                         <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
