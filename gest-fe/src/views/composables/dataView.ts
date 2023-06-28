@@ -74,12 +74,16 @@ export function useDataView<T>(service: Service<T>) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
                 return;
             }
-            if (await service.delete(single.value)) {
-                toast.add({ severity: 'success', summary: 'Successful', detail: 'User Deleted', life: 3000 });
+
+            try {
+                const res = await service.delete(single.value);
+                toast.add({ severity: 'success', summary: 'Successful', detail: 'Object Deleted', life: 3000 });
                 data.value = await service.getAll();
-            } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Error deleting user', life: 3000 });
+            } catch (e) {
+                violations.value = e.violations;
+                toast.add({ severity: 'error', summary: 'Error', detail: e.message ?? e.detail ?? 'Generic error', life: 3000 });
             }
+
             deleteDialog.value = false;
             single.value = service.getNew();
         }

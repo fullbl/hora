@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Delivery;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,28 +40,26 @@ class DeliveryRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Delivery[] Returns an array of Delivery objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function intersectingWeeks(array $weeks, ?User $customer, ?int $id): array
+    {
+        $deliveriesQb = $this->createQueryBuilder('d')
+            ->where('d.customer = :customer')
+            ->setParameter('customer', $customer);
 
-//    public function findOneBySomeField($value): ?Delivery
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if (null !== $id) {
+            $deliveriesQb
+                ->andWhere('d.id != :id')
+                ->setParameter('id', $id);
+        }
+        $deliveries = $deliveriesQb
+            ->getQuery()
+            ->getResult();
+
+        $intersecting = [];
+        foreach ($deliveries as $delivery) {
+            $intersecting = array_merge($intersecting, array_intersect($delivery->getWeeks(), $weeks));
+        }
+
+        return $intersecting;
+    }
 }

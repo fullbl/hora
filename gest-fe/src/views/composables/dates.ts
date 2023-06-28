@@ -74,7 +74,7 @@ export function useDates(): useDates {
                     { key: '15', label: '15 (9-15)' },
                     { key: '16', label: '16 (16-22)' },
                     { key: '17', label: '17 (23-29)' },
-                    { key: '18', label: '17 (30-6)' }
+                    { key: '18', label: '18 (30-6)' }
                 ]
             },
             {

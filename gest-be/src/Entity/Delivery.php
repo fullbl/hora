@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\DeliveryRepository;
+use App\Validator\ExistsInWeek;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ExistsInWeek]
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
 {
