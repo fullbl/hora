@@ -35,7 +35,7 @@ const deliveryGroups = computed(() => {
                 x.set(hash, new Map());
             }
             const products = x.get(hash);
-            if ('undefined' === typeof products) {
+            if (undefined === products) {
                 continue;
             }
             if (!products.has(dp.product.name)) {
@@ -45,7 +45,7 @@ const deliveryGroups = computed(() => {
                 });
             }
             const product = products.get(dp.product.name);
-            if ('undefined' !== typeof product) {
+            if (undefined !== product) {
                 product.qty += dp.qty;
             }
         }
