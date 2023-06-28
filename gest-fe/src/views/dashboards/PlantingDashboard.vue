@@ -68,7 +68,7 @@ const weekTotal = computed(() => {
 const dayTotal = function (weekDay: number) {
     let total = 0;
     deliveryGroups.value.get(weekDay)?.forEach(function (y) {
-        total += y.decigrams * y.qty;
+        total += y.qty;
     });
 
     return total / 10;
@@ -90,7 +90,7 @@ const dayTotal = function (weekDay: number) {
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
-                <b>Day total: {{ dayTotal(weekDay.value) }}g</b>
+                <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, product] in deliveryGroups.get(weekDay.value)">
                     {{ name }} {{ product.qty }} ({{ product.qty * product.decigrams / 10 }}g)
                 </div>
