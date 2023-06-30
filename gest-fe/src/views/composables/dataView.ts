@@ -51,6 +51,7 @@ export function useDataView<T>(service: Service<T>) {
             dialog.value = true;
         },
         hideDialog() {
+            violations.value = [];
             dialog.value = false;
         },
         editData(data: T) {

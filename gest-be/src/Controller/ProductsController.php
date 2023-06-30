@@ -26,7 +26,9 @@ class ProductsController extends AbstractController
     #[Route('/products', methods: ['GET'], name: 'products_list')]
     public function list(): JsonResponse
     {
-        return $this->json($this->repo->findAll());
+        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], [
+            'groups' => 'product'
+        ]);
     }
 
     #[Route('/products', methods: ['POST'], name: 'product_create')]
@@ -50,7 +52,9 @@ class ProductsController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($product);
+        return $this->json($product, Response::HTTP_OK, [], [
+            'groups' => 'product'
+        ]);
     }
 
     #[Route('/products/{id}', methods: ['GET'], name: 'products_show')]
@@ -62,7 +66,9 @@ class ProductsController extends AbstractController
             return $this->json('', Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($product);
+        return $this->json($product, Response::HTTP_OK, [], [
+            'groups' => 'product'
+        ]);
     }
 
     #[Route('/products/{id}', methods: ['PUT'], name: 'product_update')]
@@ -94,7 +100,9 @@ class ProductsController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($product);
+        return $this->json($product, Response::HTTP_OK, [], [
+            'groups' => 'product'
+        ]);
     }
 
     #[Route('/products/{id}', methods: ['DELETE'], name: 'product_delete')]

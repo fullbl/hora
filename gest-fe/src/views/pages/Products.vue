@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import productService from '@/service/ProductService';
 import { useDataView } from '../composables/dataView'
+import Steps from '@/components/Steps.vue';
 const {
     filters, 
     data, single, save, 
@@ -116,8 +117,10 @@ const types = [
 
                     <div class="field">
                         <label for="price">Price</label>
-                        <InputNumber type="number" id="price" v-model="single.price" autofocus :class="{ 'p-invalid': isInvalid('days') }" />
+                        <InputNumber type="number" id="price" v-model="single.price" autofocus :class="{ 'p-invalid': isInvalid('price') }" />
                     </div>
+
+                    <Steps v-model="single.steps" />
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -125,6 +128,7 @@ const types = [
                     </template>
                 </Dialog>
 
+                
                 <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />

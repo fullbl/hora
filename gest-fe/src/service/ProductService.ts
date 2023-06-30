@@ -10,6 +10,13 @@ const service: Service<Product> = {
         return await dataService.get(import.meta.env.VITE_API_URL + 'products');
     },
     async save(product) {
+        debugger
+        if(product.steps){
+            product.steps = product.steps.map(function(s,i){
+                s.sort = i;
+                return s;
+            });
+        }
         if (product.id) {
             return await dataService.put(import.meta.env.VITE_API_URL + 'products/' + product.id, product);
         } else {
