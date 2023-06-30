@@ -114,7 +114,7 @@ const save = async function () {
 
             <div class="field">
                 <label for="qty">Qty</label>
-                <InputNumber type="number" id="decigrams" v-model="activity.qty" required autofocus />
+                <InputNumber type="number" id="decigrams" v-model="activity.qty" required autofocus showButtons />
             </div>
 
             <Button icon="pi pi-trash" severity="danger" @click="remove(activity)" />

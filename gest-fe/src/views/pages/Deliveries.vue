@@ -243,7 +243,7 @@ const selectWeeks = function (type: string) {
                             <Column field="product.type" header="Type" />
                             <Column field="qty" header="Quantity">
                                 <template #body="slotProps">
-                                    <InputNumber v-model="slotProps.data.qty" />
+                                    <InputNumber v-model="slotProps.data.qty" showButtons />
                                 </template>
                             </Column>
                         </DataTable>

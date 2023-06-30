@@ -108,8 +108,8 @@ onMounted(async () => {
                     </div>
 
                     <div class="field">
-                        <label for="vatNumber">Quantity</label>
-                        <InputNumber type="number" id="vatNumber" v-model="single.quantity" required="true" autofocus :class="{ 'p-invalid': isInvalid('quantity') }" />
+                        <label for="quantity">Quantity</label>
+                        <InputNumber type="number" id="quantity" v-model="single.quantity" required="true" autofocus showButtons :class="{ 'p-invalid': isInvalid('quantity') }" />
                     </div>
 
                     <template #footer>

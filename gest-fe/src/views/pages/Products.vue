@@ -107,17 +107,17 @@ const types = [
 
                     <div class="field">
                         <label for="decigrams">Decigrams</label>
-                        <InputNumber type="number" id="decigrams" v-model="single.decigrams" required autofocus :class="{ 'p-invalid': isInvalid('decigrams') }" />
+                        <InputNumber type="number" id="decigrams" v-model="single.decigrams" required autofocus showButtons :class="{ 'p-invalid': isInvalid('decigrams') }" />
                     </div>
 
                     <div class="field">
                         <label for="days">Days</label>
-                        <InputNumber type="number" id="days" v-model="single.days" required autofocus :class="{ 'p-invalid': isInvalid('days') }" />
+                        <InputNumber type="number" id="days" v-model="single.days" required autofocus showButtons :class="{ 'p-invalid': isInvalid('days') }" />
                     </div>
 
                     <div class="field">
                         <label for="price">Price</label>
-                        <InputNumber type="number" id="price" v-model="single.price" autofocus :class="{ 'p-invalid': isInvalid('price') }" />
+                        <InputNumber type="number" id="price" v-model="single.price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
                     </div>
 
                     <Steps v-model="single.steps" />
