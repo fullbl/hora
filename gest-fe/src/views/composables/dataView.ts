@@ -3,6 +3,7 @@ import { useToast } from 'primevue/usetoast';
 import type Service from '@/interfaces/service';
 import type { DataTableFilterMeta } from 'primevue/datatable';
 import type { DataTableFilterMetaData } from 'primevue/datatable';
+import { useDialog } from './dialog';
 
 interface HoraMeta extends DataTableFilterMeta {
     global: DataTableFilterMetaData;
@@ -11,8 +12,7 @@ export function useDataView<T>(service: Service<T>) {
     const data = ref<Array<T>>();
     const single = ref<T>();
     const toast = useToast();
-    const dialog = ref(false);
-    const deleteDialog = ref(false);
+    const {dialog, deleteDialog, hideDialog} = useDialog();
     const violations = ref([]);
     const filters = ref({
         global: { value: '', matchMode: 'contains' }
@@ -50,10 +50,7 @@ export function useDataView<T>(service: Service<T>) {
             single.value = service.getNew();
             dialog.value = true;
         },
-        hideDialog() {
-            violations.value = [];
-            dialog.value = false;
-        },
+        hideDialog,
         editData(data: T) {
             single.value = { ...data };
             dialog.value = true;

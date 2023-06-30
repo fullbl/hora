@@ -63,10 +63,11 @@ class Activity
     #[Assert\NotNull]
     private ?string $status = null;
     
-    #[ORM\Column]
-    #[Assert\Json]
+    #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Type('integer')]
+    #[Assert\Positive]
     #[Assert\NotNull]
-    private array $data = [];
+    private ?int $qty = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -74,7 +75,6 @@ class Activity
     private ?User $executer = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\DateTime]
     private ?\DateTimeImmutable $executionTime = null;
 
     public function getId(): ?int
@@ -165,14 +165,14 @@ class Activity
         return $this;
     }
 
-    public function getData(): array
+    public function getQty(): ?int
     {
-        return $this->data;
+        return $this->qty;
     }
 
-    public function setData(array $data): self
+    public function setQty(int $qty): self
     {
-        $this->data = $data;
+        $this->qty = $qty;
 
         return $this;
     }

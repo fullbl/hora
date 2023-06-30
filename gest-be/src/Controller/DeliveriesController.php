@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
-class DeliveryController extends AbstractController
+class DeliveriesController extends AbstractController
 {
     public function __construct(
         private DeliveryRepository $repo, 

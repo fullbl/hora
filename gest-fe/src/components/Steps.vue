@@ -14,21 +14,13 @@ const remove = function (value: Step) {
     steps.value = steps.value.filter((v) => v !== value);
 }
 
-const types = [
-    { label: 'Soaking', value: 'soaking' },
-    { label: 'Planting', value: 'planting' },
-    { label: 'Blackout', value: 'blackout' },
-    { label: 'Light', value: 'light' },
-    { label: 'Shipping', value: 'shipping' },
-    { label: 'Payment', value: 'payment' }
-];
+const types = stepService.getTypes();
 
 const steps = computed({
     get(): Step[] {
         return props.modelValue
     },
     set(value: Step[]) {
-        console.log(value)
         emit('update:modelValue', value)
     }
 })

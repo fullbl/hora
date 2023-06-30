@@ -4,6 +4,9 @@ import deliveryService from '@/service/DeliveryService';
 import { computed } from '@vue/reactivity';
 import type Delivery from '@/interfaces/delivery';
 import { useDates } from '../composables/dates';
+import Activity from '@/components/Activity.vue';
+import type Product from '@/interfaces/product';
+import Toast from 'primevue/toast';
 
 const deliveries = ref<Array<Delivery>>([]);
 const { getWeekNumber, getDate, weekDays } = useDates();
@@ -41,7 +44,9 @@ const deliveryGroups = computed(() => {
             if (!products.has(dp.product.name)) {
                 products.set(dp.product.name, {
                     qty: 0,
-                    decigrams: dp.product.decigrams
+                    decigrams: dp.product.decigrams,
+                    delivery: delivery,
+                    product: dp.product
                 });
             }
             const product = products.get(dp.product.name);
@@ -51,7 +56,7 @@ const deliveryGroups = computed(() => {
         }
 
         return x;
-    }, new Map<number, Map<string, { qty: number, decigrams: number }>>());
+    }, new Map<number, Map<string, { qty: number, decigrams: number, delivery: Delivery, product: Product }>>());
 });
 
 const weekTotal = computed(() => {
@@ -86,13 +91,16 @@ const dayTotal = function (weekDay: number) {
         Week total: {{ weekTotal }}
     </div>
 
+    <Toast />
+
     <div class="card">
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, product] in deliveryGroups.get(weekDay.value)">
-                    {{ name }} {{ product.qty }} ({{ product.qty * product.decigrams / 10 }}g)
+                    {{ name }} {{ product.qty }} ({{ product.qty * product.decigrams / 10 }}g) 
+                    <Activity type="light" :baseProducts="[product.product]" :year="year" :week="week" :delivery="product.delivery"  />
                 </div>
             </div>
         </div>

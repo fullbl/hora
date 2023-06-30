@@ -10,7 +10,7 @@ export default interface Activity {
     week: number,
     step: Step,
     status: string,
-    data: object,
-    executer: User,
-    executionTime: Date
+    qty: number,
+    executer?: User,
+    executionTime?: Date
 }
