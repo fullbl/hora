@@ -40,7 +40,7 @@ class Step
     private ?int $id = null;
     
     #[ORM\ManyToOne(inversedBy: 'steps')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
     
     #[Groups(['product'])]
@@ -55,10 +55,6 @@ class Step
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $minutes = null;
-    
-    #[ORM\Column]
-    #[Assert\Json]
-    private array $params = [];
     
     #[Groups(['product'])]
     #[ORM\Column(type: Types::SMALLINT)]
@@ -104,18 +100,6 @@ class Step
     public function setMinutes(int $minutes): self
     {
         $this->minutes = $minutes;
-
-        return $this;
-    }
-
-    public function getParams(): array
-    {
-        return $this->params;
-    }
-
-    public function setParams(array $params): self
-    {
-        $this->params = $params;
 
         return $this;
     }
