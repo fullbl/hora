@@ -237,7 +237,7 @@ const selectWeeks = function (type: string) {
                         <DataTable :value="single.deliveryProducts">
                             <Column field="product.name" header="Product">
                                 <template #body="slotProps">
-                                    <Dropdown v-model="slotProps.data.product" optionLabel="name" :options="products" />
+                                    <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id" :options="products" />
                                 </template>
                             </Column>
                             <Column field="product.type" header="Type" />
