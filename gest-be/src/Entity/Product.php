@@ -135,7 +135,7 @@ class Product
         return $this->price / 100;
     }
 
-    public function setPrice(?int $price): self
+    public function setPrice(?float $price): self
     {
         if(null === $price){
             $this->price = null;
