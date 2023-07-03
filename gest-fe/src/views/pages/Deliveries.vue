@@ -179,7 +179,7 @@ const selectWeeks = function (type: string) {
                         headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Price</span>
-                            {{ slotProps.data.deliveryProducts.reduce((i, p) => i + p.product.price * p.qty, 0) - (slotProps.data.customer?.discount ?? 0) }}€
+                            {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i + (p.product.price ?? 0) / 100 * p.qty, 0) - (slotProps.data.customer?.discount ?? 0) }}€
                         </template>
                     </Column>
                     <Column headerStyle="min-width:11rem;">

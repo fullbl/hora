@@ -23,7 +23,7 @@ const payments = computed(() => {
         if (!delivery.weeks.includes(getWeekNumber(deliveryDate))) {
             return x;
         }
-        const amount =  delivery.deliveryProducts.reduce((i, p) => i + (p.product.price ?? 0) * p.qty, 0) - (delivery.customer?.discount ?? 0)
+        const amount =  delivery.deliveryProducts.reduce((i, p) => i + (p.product.price ?? 0) / 100 * p.qty, 0) - (delivery.customer?.discount ?? 0)
 
 
         x.push({customer: delivery.customer?.fullName ?? '', amount, method: delivery.paymentMethod ?? '-'})

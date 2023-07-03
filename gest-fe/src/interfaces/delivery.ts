@@ -9,6 +9,5 @@ export default interface Delivery {
     customer?: User,
     deliveryProducts: Array<DeliveryProduct>,
     notes: string,
-    paymentMethod?: string,
-    price?: number
+    paymentMethod?: string
 }
