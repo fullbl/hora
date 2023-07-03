@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -70,7 +69,6 @@ class Product
     private ?int $price = null;
     
     #[Groups(['product'])]
-    #[Ignore]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $steps;
 

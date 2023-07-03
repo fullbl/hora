@@ -31,12 +31,13 @@ class ProductMapper
             'json',
             [
                 AbstractNormalizer::OBJECT_TO_POPULATE => $product,
+                AbstractNormalizer::GROUPS => ['delivery-list'],
             ]
         );
         $data = $request->toArray();
         foreach ($data['steps'] as $stepData) {
             if (isset($stepData['id'])) {
-                $step = $this->em->getReference(Step::class, $stepData['id']);
+                $step = $this->em->find(Step::class, $stepData['id']);
                 $step = $this->serializer->deserialize(
                     json_encode($stepData),
                     Step::class,
@@ -54,6 +55,7 @@ class ProductMapper
             }
             
             $newProduct->addStep($step);
+            $this->em->persist($step);
         }
 
         return $newProduct;
