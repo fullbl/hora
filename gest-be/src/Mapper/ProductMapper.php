@@ -47,6 +47,7 @@ class ProductMapper
                     'json'
                 );
             }
+            $step->setProduct($newProduct);
 
             $newProduct->addStep($step);
         }
