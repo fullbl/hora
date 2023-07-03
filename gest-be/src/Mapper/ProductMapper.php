@@ -31,7 +31,7 @@ class ProductMapper
             'json',
             [
                 AbstractNormalizer::OBJECT_TO_POPULATE => $product,
-                AbstractNormalizer::GROUPS => ['delivery-list'],
+                AbstractNormalizer::GROUPS => ['product-edit'],
             ]
         );
         $data = $request->toArray();
@@ -53,9 +53,7 @@ class ProductMapper
                     'json'
                 );
             }
-            
             $newProduct->addStep($step);
-            $this->em->persist($step);
         }
 
         return $newProduct;

@@ -30,39 +30,39 @@ class Product
         self::TYPE_SHIPPING_BOX,
     ];
 
-    #[Groups(['activity-list', 'delivery-list', 'product'])]
+    #[Groups(['activity-list', 'delivery-list', 'product', 'product-edit'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['delivery-list', 'product', 'product-edit'])]
     #[ORM\Column(length: 100)]
     #[Assert\Length(max: 100)]
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['delivery-list', 'product', 'product-edit'])]
     #[ORM\Column(length: 15)]
     #[Assert\Choice(self::TYPES)]
     #[Assert\NotNull]
     private ?string $type = null;
     
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['delivery-list', 'product', 'product-edit'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $decigrams = null;
     
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['delivery-list', 'product', 'product-edit'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $days = null;
     
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['delivery-list', 'product', 'product-edit'])]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[ORM\Column(nullable: true)]
