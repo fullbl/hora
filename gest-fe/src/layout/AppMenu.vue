@@ -16,7 +16,6 @@ const model = ref([
     {
         label: 'Dashboards',
         items: [
-            { label: 'Storage Dashboard', icon: 'pi pi-fw pi-database', to: '/dashboards/storage' },
             { label: 'Planting Dashboard', icon: 'pi pi-fw pi-download', to: '/dashboards/planting' },
             { label: 'Harvest Dashboard', icon: 'pi pi-fw pi-upload', to: '/dashboards/harvest' },
             { label: 'Delivery Dashboard', icon: 'pi pi-fw pi-car', to: '/dashboards/delivery' },
