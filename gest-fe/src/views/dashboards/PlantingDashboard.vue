@@ -114,7 +114,7 @@ const dayTotal = function (weekDay: number) {
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
-                    {{ name }} ({{ dp.qty * dp.decigrams / 10 }}g)
+                    {{ name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
                     <ActivityButton v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'light').length"
                         type="light" :baseProducts=" [dp.product] " :year=" year " :week=" week " :delivery=" dp.delivery " />
                     <ProgressBar :value="(dp.done / dp.qty) * 100">
