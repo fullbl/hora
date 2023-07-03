@@ -15,8 +15,7 @@ class ProductMapper
     public function __construct(
         private SerializerInterface $serializer,
         private EntityManagerInterface $em
-        )
-    {
+    ) {
     }
 
     public function fromRequest(Request $request): Product
@@ -27,32 +26,36 @@ class ProductMapper
     public function fill(Product $product, Request $request): Product
     {
         $newProduct = $this->serializer->deserialize(
-            $request->getContent(), 
-            Product::class, 
-            'json', 
+            $request->getContent(),
+            Product::class,
+            'json',
             [
                 AbstractNormalizer::OBJECT_TO_POPULATE => $product,
-                ]
+            ]
         );
         $data = $request->toArray();
-        $newProduct->setSteps([]);
-        foreach($data['steps'] as $stepData){
-            if(isset($stepData['id'])){
+        foreach ($data['steps'] as $stepData) {
+            if (isset($stepData['id'])) {
                 $step = $this->em->getReference(Step::class, $stepData['id']);
-            }
-            else {
                 $step = $this->serializer->deserialize(
-                    json_encode($stepData), 
-                    Step::class, 
+                    json_encode($stepData),
+                    Step::class,
+                    'json',
+                    [
+                        AbstractNormalizer::OBJECT_TO_POPULATE => $step,
+                    ]
+                );
+            } else {
+                $step = $this->serializer->deserialize(
+                    json_encode($stepData),
+                    Step::class,
                     'json'
                 );
             }
-            $step->setProduct($newProduct);
-
+            
             $newProduct->addStep($step);
         }
 
         return $newProduct;
-
     }
 }
