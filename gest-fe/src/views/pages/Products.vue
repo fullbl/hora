@@ -117,7 +117,7 @@ const types = [
 
                     <div class="field">
                         <label for="price">Price</label>
-                        <InputNumber type="number" id="price" v-model="single.price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
+                        <InputNumber type="number" id="price" mode="currency" currency="EUR" v-model="single.price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
                     </div>
 
                     <Steps v-model="single.steps" />
