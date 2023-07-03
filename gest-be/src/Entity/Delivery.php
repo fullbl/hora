@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
 {
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'activity-list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

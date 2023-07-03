@@ -33,17 +33,18 @@ class Step
         self::STEP_PAYMENT,
     ];
 
-    #[Groups(['product'])]
+    #[Groups(['delivery-list', 'activity-list', 'product'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-    
+  
+    #[Groups(['activity-list'])]
     #[ORM\ManyToOne(inversedBy: 'steps')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
     
-    #[Groups(['product'])]
+    #[Groups(['delivery-list', 'activity-list', 'product'])]
     #[ORM\Column(length: 10)]
     #[Assert\Length(max: 10)]
     #[Assert\NotNull]

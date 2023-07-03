@@ -30,7 +30,7 @@ class Product
         self::TYPE_SHIPPING_BOX,
     ];
 
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['activity-list', 'delivery-list', 'product'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -68,7 +68,7 @@ class Product
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
     
-    #[Groups(['product'])]
+    #[Groups(['delivery-list', 'product'])]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $steps;
 

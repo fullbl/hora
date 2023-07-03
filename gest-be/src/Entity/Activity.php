@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ActivityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
@@ -23,28 +24,33 @@ class Activity
         self::STATUS_ERROR,
     ];
 
+    #[Groups(['activity-list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+    
+    #[Groups(['activity-list'])]
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
     private ?Delivery $delivery = null;
-
+    
+    #[Groups(['activity-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Range(min: 2023, max: 2100)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $year = null;
-
+    
+    #[Groups(['activity-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Range(min: 1, max: 52)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $week = null;
 
+    #[Groups(['activity-list'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
@@ -58,11 +64,13 @@ class Activity
     #[Assert\DateTime]
     private ?\DateTimeImmutable $workableUntil = null;
 
+    #[Groups(['activity-list'])]
     #[ORM\Column(length: 10)]
     #[Assert\Choice(self::STATUSES)]
     #[Assert\NotNull]
     private ?string $status = null;
     
+    #[Groups(['activity-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Type('integer')]
     #[Assert\Positive]
@@ -74,6 +82,7 @@ class Activity
     #[Assert\NotNull]
     private ?User $executer = null;
 
+    #[Groups(['activity-list'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $executionTime = null;
 

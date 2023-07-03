@@ -26,7 +26,7 @@ class ActivitiesController extends AbstractController
     #[Route('/activities', methods: ['GET'], name: 'activities_list')]
     public function list(): JsonResponse
     {
-        return $this->json($this->repo->findAll());
+        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'activity-list']);
     }
 
     #[Route('/activities', methods: ['POST'], name: 'activity_create')]
