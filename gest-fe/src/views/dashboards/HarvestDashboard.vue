@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
+import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
+import Toast from 'primevue/toast';
+import ActivityButton from '@/components/ActivityButton.vue';
 import type Delivery from '@/interfaces/delivery';
+import type Activity from '@/interfaces/activity';
+import type Product from '@/interfaces/product';
+import type Step from '@/interfaces/step';
 
 const deliveries = ref<Array<Delivery>>([]);
+const activities = ref<Array<Activity>>([]);
+
 const { getWeekNumber, getDate, weekDays } = useDates();
 
 const today = new Date();
@@ -15,6 +23,7 @@ const groupMode = ref('customer');
 
 onMounted(async () => {
     deliveries.value = await deliveryService.getAll()
+    activities.value = await activityService.getAll()
 });
 
 const deliveryGroups = computed(() => {
@@ -51,7 +60,21 @@ const deliveryGroups = computed(() => {
 
                     customer.set(
                         dp.product.name,
-                        (customer.get(dp.product.name) ?? 0) + dp.qty
+                        {
+                            qty: (customer.get(dp.product.name)?.qty ?? 0) + dp.qty,
+                            done: activities.value
+                                .filter(a =>
+                                    a.delivery?.id === delivery.id &&
+                                    a.step.product?.id === dp.product.id &&
+                                    ['light', 'dark'].includes(a.step.name) &&
+                                    a.year === year.value &&
+                                    a.week === week.value
+                                )
+                                .reduce((i, dp) => i + dp.qty, 0)
+                            ,
+                            delivery: delivery,
+                            product: dp.product
+                        }
                     );
                     break;
 
@@ -67,14 +90,26 @@ const deliveryGroups = computed(() => {
 
                     product.set(
                         customerHash,
-                        (product.get(customerHash) ?? 0) + dp.qty
+                        {
+                            qty: (product.get(dp.product.name)?.qty ?? 0) + dp.qty,
+                            done: activities.value
+                                .filter(a =>
+                                    a.step.product?.id === dp.product.id &&
+                                    ['light', 'dark'].includes(a.step.name) &&
+                                    a.year === year.value &&
+                                    a.week === week.value
+                                )
+                                .reduce((i, dp) => i + dp.qty, 0),
+                            delivery: delivery,
+                            product: dp.product
+                        },
                     );
                     break;
             }
         }
 
         return x;
-    }, new Map<number, Map<string, Map<string, number>>>());
+    }, new Map<number, Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>>());
 });
 
 const weekTotal = computed(() => {
@@ -82,7 +117,7 @@ const weekTotal = computed(() => {
     deliveryGroups.value.forEach(function (x) {
         x.forEach(function (y) {
             y.forEach(function (z) {
-                total += z;
+                total += z.qty;
             });
         })
     });
@@ -94,7 +129,7 @@ const dayTotal = function (weekDay: number) {
     let total = 0;
     deliveryGroups.value.get(weekDay)?.forEach(function (y) {
         y.forEach(function (z) {
-            total += z;
+            total += z.qty;
         });
     });
 
@@ -104,7 +139,7 @@ const dayTotal = function (weekDay: number) {
 const groupWeekTotal = function (weekDay: number, groupName: string) {
     let total = 0;
     deliveryGroups.value.get(weekDay)?.get(groupName)?.forEach(function (z) {
-        total += z;
+        total += z.qty;
     });
 
     return total;
@@ -112,18 +147,18 @@ const groupWeekTotal = function (weekDay: number, groupName: string) {
 
 const groupTotal = function (groupName: string) {
     let total = 0;
-    deliveryGroups.value.forEach(function(weekDay){
+    deliveryGroups.value.forEach(function (weekDay) {
         weekDay.get(groupName)?.forEach(function (z) {
-            total += z;
+            total += z.qty;
         });
     });
 
     return total;
 }
 
-const groupNames = computed(function() {
+const groupNames = computed(function () {
     let names: string[] = [];
-    deliveryGroups.value.forEach(function(x){
+    deliveryGroups.value.forEach(function (x) {
         names = names.concat(Array.from(x.keys()))
     });
     return Array.from(new Set(names));
@@ -139,7 +174,7 @@ const groupNames = computed(function() {
         <div>
             <input type="radio" value="customer" v-model="groupMode" />
             <label for="customer">By customer</label>
-    
+
             <input type="radio" value="product" v-model="groupMode" />
             <label for="product">By product</label>
         </div>
@@ -152,6 +187,8 @@ const groupNames = computed(function() {
         </div>
     </div>
 
+    <Toast />
+
     <div class="card">
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
@@ -163,18 +200,20 @@ const groupNames = computed(function() {
                         <template #header>
                             {{ groupName }} {{ groupWeekTotal(weekDay.value, groupName) }}
                         </template>
-                        <table>
-                            <p v-for="[product, qty] in products">
-                                <tr>
-                                    <td>
-                                        {{ product }}
-                                    </td>
-                                    <td>
-                                        {{ qty }}
-                                    </td>
-                                </tr>
-                            </p>
-                        </table>
+                        <p v-for="[name, dp] in products">
+                            {{ name }}: {{ dp.qty }}
+                            <ActivityButton
+                                v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'light').length"
+                                type="light" :baseProducts="[dp.product]" :year="year" :week="week"
+                                :delivery="dp.delivery" />
+                            <ActivityButton
+                                v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'blackout').length"
+                                type="blackout" :baseProducts="[dp.product]" :year="year" :week="week"
+                                :delivery="dp.delivery" />
+                            <ProgressBar :value="(dp.done / dp.qty) * 100">
+                                {{ dp.done }} / {{ dp.qty }}
+                            </ProgressBar>
+                        </p>
                     </Panel>
                 </div>
             </div>

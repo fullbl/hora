@@ -61,9 +61,10 @@ const deliveryGroups = computed(() => {
             }
             product.qty += dp.qty;
             product.done = activities.value
-                .filter(a => 
-                    a.step.product?.id === dp.product.id && 
-                    a.step.name === 'light' &&
+                .filter(a =>
+                    a.delivery?.id === delivery.id &&
+                    a.step.product?.id === dp.product.id &&
+                    ['planting'].includes(a.step.name) &&
                     a.year === year.value &&
                     a.week === week.value
                 )
@@ -115,8 +116,8 @@ const dayTotal = function (weekDay: number) {
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
                     {{ name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
-                    <ActivityButton v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'light').length"
-                        type="light" :baseProducts=" [dp.product] " :year=" year " :week=" week " :delivery=" dp.delivery " />
+                    <ActivityButton v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'planting').length"
+                        type="planting" :baseProducts="[dp.product]" :year="year" :week="week" :delivery="dp.delivery" />
                     <ProgressBar :value="(dp.done / dp.qty) * 100">
                         {{ dp.done }} / {{ dp.qty }}
                     </ProgressBar>

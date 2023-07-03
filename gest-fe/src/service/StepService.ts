@@ -47,7 +47,7 @@ const service: StepService = {
                 return 'pi pi-download';
             case 'light':
                 return 'pi pi-sun';
-            case 'dark':
+            case 'blackout':
                 return 'pi pi-moon';
             case 'shipping':
                 return 'pi pi-car';
