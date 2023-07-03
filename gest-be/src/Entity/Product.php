@@ -77,6 +77,7 @@ class Product
     {
         $this->steps = new ArrayCollection();
     }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -130,19 +131,14 @@ class Product
         return $this;
     }
 
-    public function getPrice(): ?float
+    public function getPrice(): ?int
     {
-        return $this->price / 100;
+        return $this->price;
     }
 
-    public function setPrice(?float $price): self
+    public function setPrice(?int $price): self
     {
-        if(null === $price){
-            $this->price = null;
-        }
-        else {
-            $this->price = (int) ($price * 100);
-        }
+        $this->price = $price;
 
         return $this;
     }
@@ -155,6 +151,16 @@ class Product
         return $this->steps;
     }
 
+    /**
+     * @param array<Step> $steps
+     */
+    public function setSteps(array $steps): self
+    {
+        $this->steps = new ArrayCollection($steps);
+        
+        return $this;
+    }
+    
     public function addStep(Step $step): self
     {
         if (!$this->steps->contains($step)) {

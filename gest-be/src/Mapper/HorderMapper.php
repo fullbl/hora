@@ -23,7 +23,6 @@ class HorderMapper
 
         return $horder
             ->setProduct($product)
-            ->setQuantity($data['quantity'])
             ->setStatus($data['status']);
     }
 }

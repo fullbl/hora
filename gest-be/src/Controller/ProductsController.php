@@ -75,6 +75,7 @@ class ProductsController extends AbstractController
     public function update(int $id, Request $request): JsonResponse
     {
         $product = $this->repo->find($id);
+
         if (null === $product) {
 
             return $this->json(

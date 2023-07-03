@@ -2,6 +2,7 @@
 import productService from '@/service/ProductService';
 import { useDataView } from '../composables/dataView'
 import Steps from '@/components/Steps.vue';
+import { computed } from 'vue';
 const {
     filters, 
     data, single, save, 
@@ -20,6 +21,17 @@ const types = [
     {label: 'Light box', value: 'light_box'},
     {label: 'Shipping box', value: 'shipping_box'},
 ];
+
+const price = computed({
+    get(): number {
+        return (single.value?.price ?? 0) / 100
+    },
+    set(price: number) {
+        if(single.value){
+            single.value.price = parseInt(price * 100)
+        }
+    }
+})
 </script>
 
 <template>
@@ -117,7 +129,7 @@ const types = [
 
                     <div class="field">
                         <label for="price">Price</label>
-                        <InputNumber type="number" id="price" mode="currency" currency="EUR" v-model="single.price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
+                        <InputNumber type="number" id="price" mode="currency" currency="EUR" v-model="price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
                     </div>
 
                     <Steps v-model="single.steps" />
