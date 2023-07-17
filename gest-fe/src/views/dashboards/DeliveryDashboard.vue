@@ -91,7 +91,19 @@ const zoneTotals = function (customers: Map<string, Map<string, { qty: number, d
 
     return totals;
 }
-const customerTotals = function (products: Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>) {
+const zoneTotal = function (customers: Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>) {
+    let totals = 0
+
+    customers.forEach(function (x) {
+        x.forEach(function (y, k) {
+            totals += y.qty;
+        })
+    });
+
+    return totals;
+}
+
+const customerTotal = function (products: Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>) {
     let totals = 0;
 
     products.forEach(function (y, k) {
@@ -114,7 +126,7 @@ const customerTotals = function (products: Map<string, { qty: number, done: numb
             <div style="width:14.28%" v-for="weekDay of weekDays">
                 <h5>{{ weekDay.label }}</h5>
                 <div>
-                    <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)" :header="zone" toggleable collapsed>
+                    <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)" :header="zone + ': ' + zoneTotal(customers)" toggleable collapsed>
                         <table>
                             <tr v-for="[product, qty] in zoneTotals(customers)">
                                 <td>
@@ -125,7 +137,7 @@ const customerTotals = function (products: Map<string, { qty: number, done: numb
                                 </td>
                             </tr>
                         </table>
-                        <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotals(products)" toggleable collapsed>
+                        <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotal(products)" toggleable collapsed>
                             <p v-for="[name, dp] in products">
                                 {{ name }}: {{ dp.qty }}
                                 <ActivityButton
