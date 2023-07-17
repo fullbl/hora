@@ -22,7 +22,7 @@ const {
     deleteDialog, confirmDelete, deleteData,
     isInvalid
 } = useDataView(deliveryService)
-const { getWeekNumber, weeks, weekDays } = useDates()
+const { getWeekNumber, weeks, weekDays, getDate } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
 
@@ -112,6 +112,11 @@ const selectWeeks = function (type: string) {
             single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x).filter((x => x >= getWeekNumber(new Date())))
     }
 }
+
+const nextDelivery = function(item: Delivery) {
+    const today = new Date
+    return item.weeks.map(w => getDate(today.getFullYear(), w, item.deliveryWeekDay)).filter(d => d >= new Date())[0]
+}
 </script>
 
 <template>
@@ -170,6 +175,13 @@ const selectWeeks = function (type: string) {
                         <template #body="slotProps">
                             <span class="p-column-title">Customer</span>
                             {{ slotProps.data.customer?.fullName }}
+                        </template>
+                    </Column>
+                    <Column header="Next Delivery" :sortable="true"
+                        headerStyle="width:14%; min-width:8rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Next Delivery</span>
+                            {{ nextDelivery(slotProps.data)?.toLocaleDateString() }}
                         </template>
                     </Column>
                     <Column field="deliveryProducts" header="Products" :sortable="true"
