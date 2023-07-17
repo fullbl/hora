@@ -11,6 +11,7 @@ import { computed } from '@vue/reactivity';
 import type { TreeNode } from 'primevue/tree';
 import type Product from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 
 const {
     filters,
@@ -244,6 +245,12 @@ const selectWeeks = function (type: string) {
                             <Column field="qty" header="Quantity">
                                 <template #body="slotProps">
                                     <InputNumber v-model="slotProps.data.qty" showButtons />
+                                </template>
+                            </Column>
+                            <Column header="x">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" 
+                                    @click="single.deliveryProducts = single.deliveryProducts.filter(dp => dp !== slotProps.data)" />
                                 </template>
                             </Column>
                         </DataTable>
