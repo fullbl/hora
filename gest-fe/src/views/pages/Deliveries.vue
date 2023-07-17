@@ -22,6 +22,7 @@ const {
     deleteDialog, confirmDelete, deleteData,
     isInvalid
 } = useDataView(deliveryService)
+
 const { getWeekNumber, weeks, weekDays, getDate } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
@@ -113,9 +114,10 @@ const selectWeeks = function (type: string) {
     }
 }
 
-const nextDelivery = function(item: Delivery) {
+const nextDelivery = function (item: Delivery) {
     const today = new Date
-    return item.weeks.map(w => getDate(today.getFullYear(), w, item.deliveryWeekDay)).filter(d => d >= new Date())[0]
+    return item.weeks.map(w => getDate(today.getFullYear(), w, item.deliveryWeekDay))
+        .filter(d => d >= new Date())[0]
 }
 </script>
 
@@ -139,6 +141,7 @@ const nextDelivery = function(item: Delivery) {
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">Manage Deliveries</h5>
+                            <Button @click="data = data?.filter(d => nextDelivery(d) > new Date())">active only</Button>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText v-model="filters.global.value" placeholder="Search..." />
@@ -324,7 +327,8 @@ const nextDelivery = function(item: Delivery) {
                 </Dialog>
 
             </div>
+        </div>
     </div>
-</div></template>
+</template>
 
 <style scoped lang="scss"></style>
