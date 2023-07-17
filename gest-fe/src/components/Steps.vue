@@ -2,6 +2,7 @@
 import type Step from "@/interfaces/step";
 import stepService from '@/service/StepService';
 import { computed } from "vue";
+import StepTime from "./StepTime.vue";
 
 
 const props = defineProps(['modelValue'])
@@ -25,6 +26,12 @@ const steps = computed({
     }
 })
 
+const divideMap = {
+    soaking: 'hours',
+    planting: 'hours',
+    light: 'days',
+    blackout: 'days',
+}
 </script>
 
 <template>
@@ -37,7 +44,7 @@ const steps = computed({
                     <Dropdown v-model="slotProps.item.name" :options="types" optionLabel="label" optionValue="value"
                         placeholder="Select a Type">
                     </Dropdown>
-                    <InputNumber v-model="slotProps.item.minutes" required autofocus placeholder="minutes" />
+                    <StepTime v-model="slotProps.item.minutes" :divide="divideMap[slotProps.item.name] ?? 'minutes'" />
                     <Button icon="pi pi-trash" severity="danger" @click="remove(slotProps.item)" />
                 </div>
             </template>
