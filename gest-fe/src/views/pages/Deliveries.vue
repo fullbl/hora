@@ -12,6 +12,7 @@ import type { TreeNode } from 'primevue/tree';
 import type Product from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import type Delivery from '@/interfaces/delivery';
 
 const {
     filters,
@@ -80,6 +81,9 @@ const selectedWeeks = computed({
 
 })
 
+const getNumber = (item: Delivery) =>
+    parseInt(data.value?.filter(d => d.customer?.id === item.customer?.id).findIndex(d => d.id === item.id)) + 1
+
 const preSave = function () {
     if (0 >= single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0)) {
         alert('Product quantity is 0!');
@@ -137,14 +141,18 @@ const selectWeeks = function (type: string) {
                         </div>
                     </template>
 
-                    <Column field="id" header="Id" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="id" header="Id" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Id</span>
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="harvestWeekDay" header="Harvest" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column header="#" :sortable="true">
+                        <template #body="slotProps">
+                            {{ getNumber(slotProps.data) }}
+                        </template>
+                    </Column>
+                    <Column field="harvestWeekDay" header="Harvest" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Harvest</span>
                             {{ weekDays.find(d => d.value === slotProps.data.harvestWeekDay)?.label }}
@@ -191,7 +199,7 @@ const selectWeeks = function (type: string) {
                                 (p.product.price ?? 0) / 100 * p.qty, 0) - (slotProps.data.customer?.discount ?? 0, 0) }}€
                         </template>
                     </Column>
-                    <Column field="qty" header="Quantity" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column header="Quantity" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Quantity</span>
                             {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i + p.qty, 0) }}
