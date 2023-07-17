@@ -80,6 +80,13 @@ const selectedWeeks = computed({
 
 })
 
+const preSave = function () {
+    if (0 >= single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0)) {
+        alert('Product quantity is 0!');
+    }
+    save()
+}
+
 const selectWeeks = function (type: string) {
     if ('undefined' === typeof single.value) {
         return;
@@ -136,19 +143,22 @@ const selectWeeks = function (type: string) {
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="harvestWeekDay" header="Harvest" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="harvestWeekDay" header="Harvest" :sortable="true"
+                        headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Harvest</span>
                             {{ weekDays.find(d => d.value === slotProps.data.harvestWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true"
+                        headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Delivery</span>
                             {{ weekDays.find(d => d.value === slotProps.data.deliveryWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="customer.fullName" header="Customer" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                    <Column field="customer.fullName" header="Customer" :sortable="true"
+                        headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Customer</span>
                             {{ slotProps.data.customer?.fullName }}
@@ -162,25 +172,23 @@ const selectWeeks = function (type: string) {
                                 d.qty).join(', ') }}
                         </template>
                     </Column>
-                    <Column field="customer.zone" header="Zone" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column field="customer.zone" header="Zone" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Zone</span>
                             {{ slotProps.data.customer?.zone }}
                         </template>
                     </Column>
-                    <Column field="notes" header="Notes" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column field="notes" header="Notes" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Notes</span>
                             {{ slotProps.data.notes ?? '' }}
                         </template>
                     </Column>
-                    <Column field="price" header="Price" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column field="price" header="Price" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Price</span>
-                            {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i + (p.product.price ?? 0) / 100 * p.qty, 0) - (slotProps.data.customer?.discount ?? 0) }}€
+                            {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i +
+                                (p.product.price ?? 0) / 100 * p.qty, 0) - (slotProps.data.customer?.discount ?? 0) }}€
                         </template>
                     </Column>
                     <Column headerStyle="min-width:11rem;">
@@ -197,17 +205,19 @@ const selectWeeks = function (type: string) {
 
                 <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Delivery Details" :modal="true"
                     class="p-fluid" v-if="'undefined' !== typeof single">
-                
+
                     <div class="field">
                         <label for="name">Harvest WeekDay</label>
                         <Dropdown id="type" v-model="single.harvestWeekDay" :options="weekDays" optionLabel="label"
-                            optionValue="value" placeholder="Select a WeekDay" :class="{ 'p-invalid': isInvalid('harvestWeekDay') }">
+                            optionValue="value" placeholder="Select a WeekDay"
+                            :class="{ 'p-invalid': isInvalid('harvestWeekDay') }">
                         </Dropdown>
                     </div>
                     <div class="field">
                         <label for="name">Delivery WeekDay</label>
                         <Dropdown id="type" v-model="single.deliveryWeekDay" :options="weekDays" optionLabel="label"
-                            optionValue="value" placeholder="Select a WeekDay" :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }">
+                            optionValue="value" placeholder="Select a WeekDay"
+                            :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }">
                         </Dropdown>
                     </div>
                     <div class="field">
@@ -220,13 +230,15 @@ const selectWeeks = function (type: string) {
                             <Button label="next" @click="selectWeeks('next')" />
                         </div>
                         <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
-                            placeholder="Select Weeks" class="md:w-20rem w-full" :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
+                            placeholder="Select Weeks" class="md:w-20rem w-full"
+                            :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
                     </div>
 
                     <div class="field">
                         <label for="customer" class="mb-3">Customer</label>
                         <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
-                            dataKey="id" placeholder="Select a Customer" showClear filter :class="{ 'p-invalid': isInvalid('customer') }">
+                            dataKey="id" placeholder="Select a Customer" showClear filter
+                            :class="{ 'p-invalid': isInvalid('customer') }">
                         </Dropdown>
                     </div>
 
@@ -238,7 +250,8 @@ const selectWeeks = function (type: string) {
                         <DataTable :value="single.deliveryProducts">
                             <Column field="product.name" header="Product">
                                 <template #body="slotProps">
-                                    <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id" :options="products" />
+                                    <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id"
+                                        :options="products" />
                                 </template>
                             </Column>
                             <Column field="product.type" header="Type" />
@@ -249,8 +262,8 @@ const selectWeeks = function (type: string) {
                             </Column>
                             <Column header="x">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" 
-                                    @click="single.deliveryProducts = single.deliveryProducts.filter(dp => dp !== slotProps.data)" />
+                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                                        @click="single.deliveryProducts = single.deliveryProducts.filter(dp => dp !== slotProps.data)" />
                                 </template>
                             </Column>
                         </DataTable>
@@ -258,17 +271,18 @@ const selectWeeks = function (type: string) {
 
                     <div class="field">
                         <label for="notes" class="mb-3">Notes</label>
-                        <InputText id="notes" v-model="single.notes"  :class="{ 'p-invalid': isInvalid('notes') }"/>
+                        <InputText id="notes" v-model="single.notes" :class="{ 'p-invalid': isInvalid('notes') }" />
                     </div>
-                    
+
                     <div class="field">
                         <label for="paymentMethod" class="mb-3">Payment method</label>
-                        <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"  :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
+                        <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"
+                            :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
                     </div>
-                    
+
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
+                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="preSave" />
                     </template>
                 </Dialog>
 
@@ -284,8 +298,7 @@ const selectWeeks = function (type: string) {
                 </Dialog>
 
             </div>
-        </div>
     </div>
-</template>
+</div></template>
 
 <style scoped lang="scss"></style>
