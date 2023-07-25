@@ -30,18 +30,16 @@ const deliveryGroups = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
         for (const dp of delivery.deliveryProducts) {
             const date = getDate(year.value, week.value, delivery.harvestWeekDay)
-            const harvestDate = new Date(date);
-            if (!delivery.weeks.includes(getWeekNumber(harvestDate))) {
-                continue;
-            }
 
             for (const step of dp.product.steps?.reverse() ?? []) {
                 date.setMinutes(date.getMinutes() - step.minutes)
+                while (date < getDate(year.value, week.value, 0)) {
+                    date.setDate(date.getDate() + 7);
+                }
+                if (!delivery.weeks.includes(getWeekNumber(date))) {
+                    continue;
+                }
                 if (selectedSteps.value.includes(step.name)) {
-                    while (date < getDate(year.value, week.value, 0)) {
-                        date.setDate(date.getDate() + 7);
-                    }
-
                     const dateHash = date.getDay();
                     if (!x.has(dateHash)) {
                         x.set(dateHash, new Map());
@@ -51,7 +49,7 @@ const deliveryGroups = computed(() => {
                         continue;
                     }
 
-                    const productHash = dp.product.name + step.name
+                    const productHash = '' + dp.product.id + step.id
                     if (!products.has(productHash)) {
                         products.set(productHash, {
                             qty: 0,
@@ -92,7 +90,8 @@ const deliveryGroups = computed(() => {
             <input type="number" v-model="year" placeholder="year" />
             <input type="number" v-model="week" min="1" max="53" placeholder="week" />
         </div>
-        <SelectButton v-model="selectedSteps" :options="steps" optionLabel="label" optionValue="value" multiple aria-labelledby="multiple">
+        <SelectButton v-model="selectedSteps" :options="steps" optionLabel="label" optionValue="value" multiple
+            aria-labelledby="multiple">
             <template #option="slotProps">
                 <i :class="stepService.getIcon(slotProps.option.value)"> {{ slotProps.option.value }}</i>
             </template>
@@ -103,7 +102,7 @@ const deliveryGroups = computed(() => {
 
     <div class="card">
         <div class="grid">
-            <div style="width:14.28%" v-for="weekDay of  weekDays ">
+            <div style="width:14.28%" v-for="weekDay of weekDays ">
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
                     <i :class="stepService.getIcon(dp.step)">{{ dp.step }}</i>
