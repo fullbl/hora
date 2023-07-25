@@ -18,7 +18,7 @@ class Log
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $entityclass = null;
+    private ?string $entityClass = null;
 
     #[ORM\Column]
     private ?int $entityId = null;
@@ -48,12 +48,12 @@ class Log
 
     public function getEntityClass(): ?string
     {
-        return $this->entityclass;
+        return $this->entityClass;
     }
 
-    public function setEntityClass(string $entityclass): static
+    public function setEntityClass(string $entityClass): static
     {
-        $this->entityclass = $entityclass;
+        $this->entityClass = $entityClass;
 
         return $this;
     }

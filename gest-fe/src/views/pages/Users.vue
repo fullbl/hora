@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import userService from '@/service/UserService';
 import { useDataView } from '../composables/dataView'
+import Logger from '@/components/Logger.vue';
+import { ref } from 'vue';
 const { filters, data, single, save, openNew, editData, dialog, hideDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(userService);
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
@@ -11,6 +13,8 @@ const statuses = [
     { label: 'Active', value: 'active' },
     { label: 'Inactive', value: 'inactive' },
 ];
+const logEntity = ref(null);
+
 </script>
 
 <template>
@@ -95,64 +99,73 @@ const statuses = [
                             {{ slotProps.data.status }}
                         </template>
                     </Column>
-                    <Column headerStyle="min-width:10rem;">
+                    <Column headerStyle="min-width:12rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editData(slotProps.data)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
                                 @click="confirmDelete(slotProps.data)" />
+                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary ml-2"
+                                @click="logEntity = slotProps.data.id" />
                         </template>
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="User Details" :modal="true" v-if="single"
-                    class="p-fluid">
+                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="User Details" :modal="true"
+                    v-if="single" class="p-fluid">
 
                     <div class="field">
                         <label for="username">Username</label>
-                        <InputText id="username" v-model.trim="single.username" required autofocus :class="{ 'p-invalid': isInvalid('username') }" />
+                        <InputText id="username" v-model.trim="single.username" required autofocus
+                            :class="{ 'p-invalid': isInvalid('username') }" />
                     </div>
 
                     <div class="field">
                         <label for="fullName">FullName</label>
-                        <InputText id="fullName" v-model.trim="single.fullName" required autofocus :class="{ 'p-invalid': isInvalid('fullName') }" />
+                        <InputText id="fullName" v-model.trim="single.fullName" required autofocus
+                            :class="{ 'p-invalid': isInvalid('fullName') }" />
                     </div>
 
                     <div class="field">
                         <label for="vatNumber">VAT Number</label>
-                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required autofocus :class="{ 'p-invalid': isInvalid('vatNumber') }" />
+                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required autofocus
+                            :class="{ 'p-invalid': isInvalid('vatNumber') }" />
                     </div>
 
                     <div class="field">
                         <label for="sdi">SDI Number</label>
-                        <InputText id="sdi" v-model.trim="single.sdi" required autofocus :class="{ 'p-invalid': isInvalid('sdi') }" />
+                        <InputText id="sdi" v-model.trim="single.sdi" required autofocus
+                            :class="{ 'p-invalid': isInvalid('sdi') }" />
                     </div>
 
                     <div class="field">
                         <label for="email">E-mail</label>
-                        <InputText type="email" id="email" v-model.trim="single.email" required autofocus :class="{ 'p-invalid': isInvalid('email') }"/>
+                        <InputText type="email" id="email" v-model.trim="single.email" required autofocus
+                            :class="{ 'p-invalid': isInvalid('email') }" />
                     </div>
 
                     <div class="field">
                         <label for="address">Address</label>
-                        <InputText type="address" id="address" v-model.trim="single.address" required autofocus :class="{ 'p-invalid': isInvalid('address') }"/>
+                        <InputText type="address" id="address" v-model.trim="single.address" required autofocus
+                            :class="{ 'p-invalid': isInvalid('address') }" />
                     </div>
 
                     <div class="field">
                         <label for="password">Password</label>
-                        <Password id="password" v-model="single.password" :class="{ 'p-invalid': isInvalid('password') }"/>
+                        <Password id="password" v-model="single.password" :class="{ 'p-invalid': isInvalid('password') }" />
                     </div>
 
                     <div class="field">
                         <label for="zone">Zone</label>
-                        <InputText id="zone" v-model="single.zone" :class="{ 'p-invalid': isInvalid('zone') }"/>
+                        <InputText id="zone" v-model="single.zone" :class="{ 'p-invalid': isInvalid('zone') }" />
                     </div>
 
                     <div class="field">
                         <label for="discount">Discount</label>
-                        <InputNumber id="discount" v-model="single.discount" :class="{ 'p-invalid': isInvalid('discount') }"/>
+                        <InputNumber id="discount" v-model="single.discount"
+                            :class="{ 'p-invalid': isInvalid('discount') }" />
                     </div>
-                    
+
                     <div class="field">
                         <label for="roles" class="mb-3">Roles</label>
                         <MultiSelect id="roles" v-model="single.roles" :options="roles" optionLabel="label"
@@ -184,9 +197,10 @@ const statuses = [
                     </template>
                 </Dialog>
 
+                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
+
             </div>
-        </div>
     </div>
-</template>
+</div></template>
 
 <style scoped lang="scss"></style>

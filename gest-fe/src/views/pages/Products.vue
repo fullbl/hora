@@ -2,7 +2,8 @@
 import productService from '@/service/ProductService';
 import { useDataView } from '../composables/dataView'
 import Steps from '@/components/Steps.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import Logger from '@/components/Logger.vue';
 const {
     filters, 
     data, single, save, 
@@ -11,6 +12,8 @@ const {
     deleteDialog, confirmDelete, deleteData,
     isInvalid
 } = useDataView(productService)
+
+const logEntity = ref(null);
 
 const types = [
     {label: 'Ground', value: 'ground'},
@@ -95,9 +98,11 @@ const price = computed({
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                                @click="editData(slotProps.data)" />
+                            @click="editData(slotProps.data)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                                @click="confirmDelete(slotProps.data)" />
+                            @click="confirmDelete(slotProps.data)" />
+                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary ml-2"
+                                @click="logEntity = slotProps.data.id" />
                         </template>
                     </Column>
                 </DataTable>
@@ -151,6 +156,8 @@ const price = computed({
                         <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteData" />
                     </template>
                 </Dialog>
+
+                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null"/>
 
             </div>
         </div>

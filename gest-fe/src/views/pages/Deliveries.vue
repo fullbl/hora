@@ -13,6 +13,7 @@ import type Product from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import type Delivery from '@/interfaces/delivery';
+import Logger from '@/components/Logger.vue';
 
 const {
     filters,
@@ -26,6 +27,7 @@ const {
 const { getWeekNumber, weeks, weekDays, getDate } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
+const logEntity = ref(null);
 
 onMounted(async () => {
     customers.value = (await userService.getAll())
@@ -180,8 +182,7 @@ const nextDelivery = function (item: Delivery) {
                             {{ slotProps.data.customer?.fullName }}
                         </template>
                     </Column>
-                    <Column header="Next Delivery" :sortable="true"
-                        headerStyle="width:14%; min-width:8rem;">
+                    <Column header="Next Delivery" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Next Delivery</span>
                             {{ nextDelivery(slotProps.data)?.toLocaleDateString() }}
@@ -220,14 +221,16 @@ const nextDelivery = function (item: Delivery) {
                             {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i + p.qty, 0) }}
                         </template>
                     </Column>
-                    <Column headerStyle="min-width:11rem;">
+                    <Column headerStyle="min-width:14rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editData(slotProps.data)" />
                             <Button icon="pi pi-copy" class="p-button-rounded p-button-info mr-2"
                                 @click="cloneData(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2"
                                 @click="confirmDelete(slotProps.data)" />
+                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary mr-2"
+                                @click="logEntity = slotProps.data.id" />
                         </template>
                     </Column>
                 </DataTable>
@@ -325,6 +328,9 @@ const nextDelivery = function (item: Delivery) {
                         <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteData" />
                     </template>
                 </Dialog>
+
+                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null"/>
+
 
             </div>
         </div>
