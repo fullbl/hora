@@ -91,17 +91,7 @@ const zoneTotals = function (customers: Map<string, Map<string, { qty: number, d
 
     return totals;
 }
-const zoneTotal = function (customers: Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>) {
-    let totals = 0
 
-    customers.forEach(function (x) {
-        x.forEach(function (y, k) {
-            totals += y.qty;
-        })
-    });
-
-    return totals;
-}
 
 const customerTotal = function (products: Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>) {
     let totals = 0;
@@ -112,21 +102,57 @@ const customerTotal = function (products: Map<string, { qty: number, done: numbe
 
     return totals;
 }
+
+const zoneTotal = function (customers: Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>) {
+    let totals = 0
+
+    customers.forEach(function (x) {
+        totals += customerTotal(x);
+    });
+
+    return totals;
+}
+
+const weekDayTotal = function (weekDay: number) {
+    let totals = 0;
+    const zones = deliveryGroups.value.get(weekDay)
+    if (undefined === zones) {
+        return 0
+    }
+
+    zones.forEach(function (x) {
+        totals += zoneTotal(x);
+    });
+
+    return totals;
+}
+
+const weekTotal = computed(function () {
+    let totals = 0;
+    for (let i = 0; i < 6; i++) {
+        totals += weekDayTotal(i);
+    }
+
+    return totals;
+});
+
 </script>
 
 <template>
     <div class="card">
         <input type="number" v-model="year" placeholder="year" />
         <input type="number" v-model="week" min="1" max="53" placeholder="week" />
+        Total: {{ weekTotal }}
     </div>
     <Toast />
 
     <div class="card">
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
-                <h5>{{ weekDay.label }}</h5>
+                <h5>{{ weekDay.label }}: {{ weekDayTotal(weekDay.value) }}</h5>
                 <div>
-                    <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)" :header="zone + ': ' + zoneTotal(customers)" toggleable collapsed>
+                    <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)"
+                        :header="zone + ': ' + zoneTotal(customers)" toggleable collapsed>
                         <table>
                             <tr v-for="[product, qty] in zoneTotals(customers)">
                                 <td>
@@ -137,7 +163,8 @@ const customerTotal = function (products: Map<string, { qty: number, done: numbe
                                 </td>
                             </tr>
                         </table>
-                        <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotal(products)" toggleable collapsed>
+                        <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotal(products)"
+                            toggleable collapsed>
                             <p v-for="[name, dp] in products">
                                 {{ name }}: {{ dp.qty }}
                                 <ActivityButton
