@@ -25,6 +25,8 @@ class ProductMapper
 
     public function fill(Product $product, Request $request): Product
     {
+        $data = $request->toArray();
+
         $newProduct = $this->serializer->deserialize(
             $request->getContent(),
             Product::class,
@@ -34,7 +36,9 @@ class ProductMapper
                 AbstractNormalizer::GROUPS => ['product-edit'],
             ]
         );
-        $data = $request->toArray();
+        foreach ($newProduct->getSteps()->filter(fn (Step $step): bool => false === array_search($step->getId(), array_column($data['steps'], 'id'), true)) as $step) {
+            $newProduct->removeStep($step);
+        }
         foreach ($data['steps'] as $stepData) {
             if (isset($stepData['id'])) {
                 $step = $this->em->find(Step::class, $stepData['id']);
