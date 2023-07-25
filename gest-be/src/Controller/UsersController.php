@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Mapper\UserMapper;
+use App\Repository\LogRepository;
 use App\Repository\UserRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +20,8 @@ class UsersController extends AbstractController
     public function __construct(
         private UserRepository $repo,
         private UserMapper $mapper,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private LogRepository $logRepo,
     ) {
     }
 
@@ -86,7 +88,9 @@ class UsersController extends AbstractController
             );
         }
         try {
+            $this->logRepo->prepareForEntity($user);
             $this->repo->save($user, true);
+            $this->logRepo->saveForEntity($user);
         } catch (Exception $e) {
 
             return $this->json(

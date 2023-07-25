@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Mapper\DeliveryMapper;
 use App\Repository\DeliveryRepository;
+use App\Repository\LogRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,10 +18,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class DeliveriesController extends AbstractController
 {
     public function __construct(
-        private DeliveryRepository $repo, 
+        private DeliveryRepository $repo,
         private DeliveryMapper $mapper,
-        private ValidatorInterface $validator)
-    {
+        private ValidatorInterface $validator,
+        private LogRepository $logRepo,
+    ) {
     }
 
     #[Route('/deliveries', methods: ['GET'], name: 'deliveries_list')]
@@ -87,7 +89,9 @@ class DeliveriesController extends AbstractController
             );
         }
         try {
+            $this->logRepo->prepareForEntity($delivery);
             $this->repo->save($delivery, true);
+            $this->logRepo->saveForEntity($delivery);
         } catch (Exception $e) {
 
             return $this->json(
@@ -95,7 +99,7 @@ class DeliveriesController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        
+
         return $this->json('');
     }
 

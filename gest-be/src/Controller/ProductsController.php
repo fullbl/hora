@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Mapper\ProductMapper;
+use App\Repository\LogRepository;
 use App\Repository\ProductRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,10 +18,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ProductsController extends AbstractController
 {
     public function __construct(
-        private ProductRepository $repo, 
+        private ProductRepository $repo,
         private ProductMapper $mapper,
-        private ValidatorInterface $validator)
-    {
+        private ValidatorInterface $validator,
+        private LogRepository $logRepo
+    ) {
     }
 
     #[Route('/products', methods: ['GET'], name: 'products_list')]
@@ -93,7 +95,9 @@ class ProductsController extends AbstractController
             );
         }
         try {
+            $this->logRepo->prepareForEntity($product);
             $this->repo->save($product, true);
+            $this->logRepo->saveForEntity($product);
         } catch (Exception $e) {
 
             return $this->json(
