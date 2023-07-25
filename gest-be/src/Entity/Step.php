@@ -50,7 +50,7 @@ class Step
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[Groups(['product'])]
+    #[Groups(['product', 'delivery-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]

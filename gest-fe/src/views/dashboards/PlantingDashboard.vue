@@ -5,11 +5,9 @@ import activityService from '@/service/ActivityService';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
-import ActivityButton from '@/components/ActivityButton.vue';
 import type Delivery from '@/interfaces/delivery';
 import type Product from '@/interfaces/product';
 import type Activity from '@/interfaces/activity';
-import type Step from '@/interfaces/step';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -116,8 +114,6 @@ const dayTotal = function (weekDay: number) {
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
                     {{ name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
-                    <ActivityButton v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'planting').length"
-                        type="planting" :baseProducts="[dp.product]" :year="year" :week="week" :delivery="dp.delivery" />
                     <ProgressBar :value="(dp.done / dp.qty) * 100">
                         {{ dp.done }} / {{ dp.qty }}
                     </ProgressBar>

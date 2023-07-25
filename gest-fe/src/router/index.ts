@@ -53,6 +53,12 @@ const router = createRouter({
                     meta: { auth: 'ROLE_OPERATOR' }
                 },
                 {
+                    path: '/dashboards/steps',
+                    name: 'steps-dashboard',
+                    component: () => import('@/views/dashboards/StepsDashboard.vue'),
+                    meta: { auth: 'ROLE_OPERATOR' }
+                },
+                {
                     path: '/dashboards/planting',
                     name: 'planting-dashboard',
                     component: () => import('@/views/dashboards/PlantingDashboard.vue'),
