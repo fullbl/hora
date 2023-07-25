@@ -31,7 +31,7 @@ const deliveryGroups = computed(() => {
         for (const dp of delivery.deliveryProducts) {
             const date = getDate(year.value, week.value, delivery.harvestWeekDay)
 
-            for (const step of dp.product.steps?.reverse() ?? []) {
+            for (const step of dp.product.steps?.toReversed() ?? []) {
                 date.setMinutes(date.getMinutes() - step.minutes)
                 while (date < getDate(year.value, week.value, 0)) {
                     date.setDate(date.getDate() + 7);
@@ -39,44 +39,44 @@ const deliveryGroups = computed(() => {
                 if (!delivery.weeks.includes(getWeekNumber(date))) {
                     continue;
                 }
-                if (selectedSteps.value.includes(step.name)) {
-                    const dateHash = date.getDay();
-                    if (!x.has(dateHash)) {
-                        x.set(dateHash, new Map());
-                    }
-                    const products = x.get(dateHash);
-                    if (undefined === products) {
-                        continue;
-                    }
-
-                    const productHash = '' + dp.product.id + step.id
-                    if (!products.has(productHash)) {
-                        products.set(productHash, {
-                            qty: 0,
-                            done: 0,
-                            decigrams: dp.product.decigrams,
-                            delivery: delivery,
-                            product: dp.product,
-                            step: step.name
-                        });
-                    }
-                    const product = products.get(productHash);
-                    if (undefined === product) {
-                        continue;
-                    }
-                    product.qty += dp.qty;
-                    product.done = activities.value
-                        .filter(a =>
-                            a.delivery?.id === delivery.id &&
-                            a.step.product?.id === dp.product.id &&
-                            selectedSteps.value.includes(a.step.name) &&
-                            a.year === year.value &&
-                            a.week === week.value
-                        )
-                        .reduce((i, dp) => i + dp.qty, 0)
+                if (!selectedSteps.value.includes(step.name)) {
+                    continue;
                 }
-            }
+                const dateHash = date.getDay();
+                if (!x.has(dateHash)) {
+                    x.set(dateHash, new Map());
+                }
+                const products = x.get(dateHash);
+                if (undefined === products) {
+                    continue;
+                }
 
+                const productHash = '' + dp.product.id + step.id
+                if (!products.has(productHash)) {
+                    products.set(productHash, {
+                        qty: 0,
+                        done: 0,
+                        decigrams: dp.product.decigrams,
+                        delivery: delivery,
+                        product: dp.product,
+                        step: step.name
+                    });
+                }
+                const product = products.get(productHash);
+                if (undefined === product) {
+                    continue;
+                }
+                product.qty += dp.qty;
+                product.done = activities.value
+                    .filter(a =>
+                        a.delivery?.id === delivery.id &&
+                        a.step.product?.id === dp.product.id &&
+                        selectedSteps.value.includes(a.step.name) &&
+                        a.year === year.value &&
+                        a.week === week.value
+                    )
+                    .reduce((i, dp) => i + dp.qty, 0)
+            }
         }
 
         return x;
