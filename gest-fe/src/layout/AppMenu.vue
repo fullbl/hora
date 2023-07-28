@@ -22,6 +22,12 @@ const model = ref([
             { label: 'Delivery Dashboard', icon: stepService.getIcon('shipping'), to: '/dashboards/delivery' },
             { label: 'Payment Dashboard', icon: stepService.getIcon('payment'), to: '/dashboards/payment' },
         ]
+    },
+    {
+        label: 'Operations',
+        items: [
+            { label: 'Planting', icon: stepService.getIcon('planting'), to: '/operations/planting' },
+        ]
     }
 
 ]);

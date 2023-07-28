@@ -25,7 +25,12 @@ const props = defineProps({
     baseProducts: {
         required: false,
         default: [],
-        type: Array<Product>,
+        type: Array<{qty: number, product: Product}>,
+    },
+    baseQtys: {
+        required: false,
+        default: [],
+        type: Array<number>,
     },
     year: {
         required: true,
@@ -45,21 +50,21 @@ const icon = computed(() => stepService.getIcon(props.type))
 
 const activities = ref([] as Activity[]);
 const allProducts = ref([] as Product[]);
-const products = ref([] as Product[]);
+const products = ref([] as {qty: number, product: Product}[]);
 onMounted(async () => {
     allProducts.value = await productService.getAll()
     products.value = props.baseProducts
 });
 
 const onClick = function() {
-    activities.value = products.value.map(function (product: Product): Activity {
-        const fullProducts = allProducts.value.filter((p: Product) => p.id === product.id);
+    activities.value = products.value.map(function (p): Activity {
+        const fullProducts = allProducts.value.filter((x: Product) => x.id === p.product.id);
         if(!fullProducts.length){
             toast.add({severity: 'error', summary: 'Error', detail: 'Product not found'});
             throw new Error('product not found');
         }
 
-        product.steps = fullProducts[0].steps;
+        p.product.steps = fullProducts[0].steps;
         const step = fullProducts[0].steps?.filter(s => props.type === s.name)[0];
         if (undefined === step) {
             toast.add({severity: 'error', summary: 'Error', detail: 'Undefined step'});
@@ -75,7 +80,7 @@ const onClick = function() {
             week: props.week,
             status: 'done',
             step,
-            qty: 0,
+            qty: p.qty,
         }
     });
     dialog.value = true

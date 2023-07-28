@@ -8,7 +8,6 @@ import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
 import type Delivery from '@/interfaces/delivery';
-import type Product from '@/interfaces/product';
 import type Activity from '@/interfaces/activity';
 import SelectButton from 'primevue/selectbutton';
 
@@ -28,7 +27,7 @@ onMounted(async () => {
 });
 
 const deliveryGroups = computed(() => {
-    return plannedService.getPlanned(deliveries.value, selectedSteps.value, year.value, week.value)
+    return plannedService.getPlanned(deliveries.value, activities.value, selectedSteps.value, year.value, week.value)
 });
 
 const weekDayTotal = function (weekDay: number) {
