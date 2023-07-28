@@ -1,13 +1,14 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import authService from '@/service/AuthService';
-
+import admin from './admin';
+import dashboards from './dashboards';
+import AppLayout from '@/layout/AppLayout.vue';
+import operations from './operations';
 declare module 'vue-router' {
     interface RouteMeta {
         auth?: 'ROLE_CUSTOMER' | 'ROLE_ADMIN' | 'ROLE_OPERATOR';
     }
 }
-
-import AppLayout from '@/layout/AppLayout.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -20,69 +21,7 @@ const router = createRouter({
         {
             path: '/',
             component: AppLayout,
-            children: [
-                {
-                    path: '/users',
-                    name: 'users',
-                    component: () => import('@/views/pages/Users.vue'),
-                    meta: { auth: 'ROLE_ADMIN' }
-                },
-                {
-                    path: '/products',
-                    name: 'products',
-                    component: () => import('@/views/pages/Products.vue'),
-                    meta: { auth: 'ROLE_ADMIN' }
-                },
-                {
-                    path: '/orders',
-                    name: 'orders',
-                    component: () => import('@/views/pages/Orders.vue'),
-                    meta: { auth: 'ROLE_ADMIN' }
-                },
-                {
-                    path: '/deliveries',
-                    name: 'deliveries',
-                    component: () => import('@/views/pages/Deliveries.vue'),
-                    meta: { auth: 'ROLE_ADMIN' }
-                },
-
-                {
-                    path: '/dashboards/storage',
-                    name: 'storage-dashboard',
-                    component: () => import('@/views/dashboards/StorageDashboard.vue'),
-                    meta: { auth: 'ROLE_OPERATOR' }
-                },
-                {
-                    path: '/dashboards/steps',
-                    name: 'steps-dashboard',
-                    component: () => import('@/views/dashboards/StepsDashboard.vue'),
-                    meta: { auth: 'ROLE_OPERATOR' }
-                },
-                {
-                    path: '/dashboards/planting',
-                    name: 'planting-dashboard',
-                    component: () => import('@/views/dashboards/PlantingDashboard.vue'),
-                    meta: { auth: 'ROLE_OPERATOR' }
-                },
-                {
-                    path: '/dashboards/harvest',
-                    name: 'harvest-dashboard',
-                    component: () => import('@/views/dashboards/HarvestDashboard.vue'),
-                    meta: { auth: 'ROLE_OPERATOR' }
-                },
-                {
-                    path: '/dashboards/delivery',
-                    name: 'delivery-dashboard',
-                    component: () => import('@/views/dashboards/DeliveryDashboard.vue'),
-                    meta: { auth: 'ROLE_OPERATOR' }
-                },
-                {
-                    path: '/dashboards/payment',
-                    name: 'payment-dashboard',
-                    component: () => import('@/views/dashboards/PaymentDashboard.vue'),
-                    meta: { auth: 'ROLE_OPERATOR' }
-                },
-            ]
+            children: admin.concat(operations, dashboards)
         }
     ]
 });
