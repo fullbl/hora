@@ -8,7 +8,6 @@ import { useDates } from '../composables/dates';
 import type Delivery from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
-import ActivityButton from '@/components/ActivityButton.vue';
 import type Product from '@/interfaces/product';
 
 const deliveries = ref<Array<Delivery>>([]);
@@ -67,8 +66,6 @@ const payments = computed(() => {
         Payments:
         <div v-for="payment in payments">
             {{ payment.customer }} ({{ payment.method ?? '-' }}): {{ payment.amount }}€
-            <ActivityButton
-                type="payment" :baseProducts="payment.products" :year="year" :week="week" :delivery="payment.delivery" />
             <ProgressBar :value="(payment.done / payment.amount) * 100">
                 {{ payment.done }} / {{ payment.amount }}
             </ProgressBar>

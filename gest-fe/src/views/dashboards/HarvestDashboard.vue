@@ -5,11 +5,9 @@ import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
-import ActivityButton from '@/components/ActivityButton.vue';
 import type Delivery from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import type Product from '@/interfaces/product';
-import type Step from '@/interfaces/step';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -202,14 +200,6 @@ const groupNames = computed(function () {
                         </template>
                         <p v-for="[name, dp] in products">
                             {{ name }}: {{ dp.qty }}
-                            <ActivityButton
-                                v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'light').length"
-                                type="light" :baseProducts="[dp.product]" :year="year" :week="week"
-                                :delivery="dp.delivery" />
-                            <ActivityButton
-                                v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'blackout').length"
-                                type="blackout" :baseProducts="[dp.product]" :year="year" :week="week"
-                                :delivery="dp.delivery" />
                             <ProgressBar :value="(dp.done / dp.qty) * 100">
                                 {{ dp.done }} / {{ dp.qty }}
                             </ProgressBar>

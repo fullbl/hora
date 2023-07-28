@@ -9,7 +9,6 @@ import type Product from '@/interfaces/product';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import type Step from '@/interfaces/step';
-import ActivityButton from '@/components/ActivityButton.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -167,10 +166,6 @@ const weekTotal = computed(function () {
                             toggleable collapsed>
                             <p v-for="[name, dp] in products">
                                 {{ name }}: {{ dp.qty }}
-                                <ActivityButton
-                                    v-if="0 < (dp.product.steps ?? []).filter((s: Step) => s.name === 'shipping').length"
-                                    type="shipping" :baseProducts="[dp.product]" :year="year" :week="week"
-                                    :delivery="dp.delivery" />
                                 <ProgressBar :value="(dp.done / dp.qty) * 100">
                                     {{ dp.done }} / {{ dp.qty }}
                                 </ProgressBar>
