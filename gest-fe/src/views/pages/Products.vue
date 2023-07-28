@@ -4,6 +4,7 @@ import { useDataView } from '../composables/dataView'
 import Steps from '@/components/Steps.vue';
 import { computed, ref } from 'vue';
 import Logger from '@/components/Logger.vue';
+import type Step from '@/interfaces/step';
 const {
     filters, 
     data, single, save, 
@@ -31,7 +32,7 @@ const price = computed({
     },
     set(price: number) {
         if(single.value){
-            single.value.price = parseInt(price * 100)
+            single.value.price = Math.round(price * 100)
         }
     }
 })
@@ -65,37 +66,61 @@ const price = computed({
                         </div>
                     </template>
 
-                    <Column field="id" header="Id" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="id" header="Id" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Id</span>
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="name" header="Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="name" header="Name" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
-                    <Column field="type" header="Type" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                    <Column field="type" header="Type" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Type</span>
                             {{ slotProps.data.type }}
                         </template>
                     </Column>
-                    <Column field="decigrams" header="Decigrams" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="decigrams" header="Decigrams" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Decigrams</span>
                             {{ slotProps.data.decigrams }}
                         </template>
                     </Column>
-                    <Column field="days" header="Days" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="days" header="Days" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Days</span>
                             {{ slotProps.data.days }}
                         </template>
                     </Column>
-                    <Column headerStyle="min-width:10rem;">
+                    <Column field="price" header="Price" :sortable="true">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Price</span>
+                            {{ slotProps.data.price ?? 0 / 100 }} €
+                        </template>
+                    </Column>
+                    <Column header="Soaking hours" :sortable="true">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Soaking hours</span>
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name = 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
+                        </template>
+                    </Column>
+                    <Column header="Blackout days" :sortable="true">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Blackout days</span>
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name = 'blackout').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
+                        </template>
+                    </Column>
+                    <Column header="Light days" :sortable="true">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Light days</span>
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name = 'light').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
+                        </template>
+                    </Column>
+                    <Column headerStyle="min-width:12rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                             @click="editData(slotProps.data)" />
