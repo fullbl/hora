@@ -1,28 +1,25 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import deliveryService from '@/service/DeliveryService';
-import plannedService from '@/service/PlannedService';
-import activityService from '@/service/ActivityService';
 
 import type Delivery from '@/interfaces/delivery';
 import { useDates } from '../composables/dates';
 import type Calendar from 'primevue/calendar';
 import ActivityButton from '@/components/ActivityButton.vue';
 import type Activity from '@/interfaces/activity';
+import Planner from '@/service/Planner';
 
 const date = ref(new Date)
 const { getWeekNumber } = useDates();
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
-
+const planner = new Planner()
 onMounted(async () => {
-    deliveries.value = await deliveryService.getAll()
-    activities.value = await activityService.getAll()
+    (await planner.load()).groupByProduct()
 });
 
 const deliveryGroups = computed(() => {
-    return plannedService.getPlanned(
+    return planner.getPlanned(
         deliveries.value,
         activities.value,
         ['soaking'],

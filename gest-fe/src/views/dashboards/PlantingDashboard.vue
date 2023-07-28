@@ -1,76 +1,27 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import deliveryService from '@/service/DeliveryService';
-import activityService from '@/service/ActivityService';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
-import type Delivery from '@/interfaces/delivery';
-import type Product from '@/interfaces/product';
-import type Activity from '@/interfaces/activity';
+import Planner from '@/service/Planner';
 
-const deliveries = ref<Array<Delivery>>([]);
-const activities = ref<Array<Activity>>([]);
 const { getWeekNumber, getDate, weekDays } = useDates();
 
 const today = new Date();
 const week = ref(getWeekNumber(today));
 const year = ref(today.getFullYear());
+const planner = new Planner
 
 onMounted(async () => {
-    deliveries.value = await deliveryService.getAll()
-    activities.value = await activityService.getAll()
+    (await planner.load()).flatPlanned()
 });
 
 const deliveryGroups = computed(() => {
-    return deliveries.value.reduce(function (x, delivery) {
-        for (const dp of delivery.deliveryProducts) {
-            const plantingDate = getDate(year.value, week.value, delivery.harvestWeekDay - dp.product.days);
-            while (plantingDate < getDate(year.value, week.value, 0)) {
-                plantingDate.setDate(plantingDate.getDate() + 7);
-            }
-            const harvestDate = new Date(plantingDate);
-            harvestDate.setDate(harvestDate.getDate() + dp.product.days);
-
-            if (!delivery.weeks.includes(getWeekNumber(harvestDate))) {
-                continue;
-            }
-
-            const hash = plantingDate.getDay();
-            if (!x.has(hash)) {
-                x.set(hash, new Map());
-            }
-            const products = x.get(hash);
-            if (undefined === products) {
-                continue;
-            }
-            if (!products.has(dp.product.name)) {
-                products.set(dp.product.name, {
-                    qty: 0,
-                    done: 0,
-                    decigrams: dp.product.decigrams,
-                    delivery: delivery,
-                    product: dp.product
-                });
-            }
-            const product = products.get(dp.product.name);
-            if (undefined === product) {
-                continue;
-            }
-            product.qty += dp.qty;
-            product.done = activities.value
-                .filter(a =>
-                    a.delivery?.id === delivery.id &&
-                    a.step.product?.id === dp.product.id &&
-                    ['planting'].includes(a.step.name) &&
-                    a.year === year.value &&
-                    a.week === week.value
-                )
-                .reduce((i, dp) => i + dp.qty, 0)
-        }
-
-        return x;
-    }, new Map<number, Map<string, { qty: number, done: number, decigrams: number, delivery: Delivery, product: Product }>>());
+    return planner.groupByWeekAndProduct(
+        planner
+            .setDates(year.value, week.value)
+            .filter(['blackout'])
+    )
 });
 
 const weekTotal = computed(() => {
@@ -113,7 +64,7 @@ const dayTotal = function (weekDay: number) {
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
-                    {{ name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
+                    {{ dp.product.name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
                     <ProgressBar :value="(dp.done / dp.qty) * 100">
                         {{ dp.done }} / {{ dp.qty }}
                     </ProgressBar>
