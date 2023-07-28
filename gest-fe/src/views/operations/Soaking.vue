@@ -41,7 +41,8 @@ const deliveryGroups = computed(() => {
             <h2>{{ name }}</h2>
 
             <div v-for="p in planned">
-                {{ p.stepName }} {{ p.qty }} {{ p.delivery.customer?.fullName }}
+                {{ p.qty }} {{ p.delivery.customer?.fullName }}
+                {{  p.deliveryDate.toLocaleDateString() }}
                 <ProgressBar :value="(p.done / p.qty) * 100">
                     {{ p.done }} / {{ p.qty }}
                 </ProgressBar>

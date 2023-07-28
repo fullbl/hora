@@ -47,14 +47,20 @@ export default class Planner {
 
     setDates(year: number, week: number) {
         this.planned.value = this.planned.value.map((p) => {
-            const date = getDate(year, week, p.delivery.harvestWeekDay);
+            const harvestDate = getDate(year, week, p.delivery.harvestWeekDay);
+            const deliveryDate = getDate(year, week, p.delivery.deliveryWeekDay);
+            const date = new Date(harvestDate.getTime());
             date.setMinutes(date.getMinutes() - p.minutesBeforeHarvest);
             while (date < getDate(year, week, 0)) {
                 date.setDate(date.getDate() + 7);
+                deliveryDate.setDate(deliveryDate.getDate() + 7);
+                harvestDate.setDate(harvestDate.getDate() + 7);
             }
             return {
                 ...p,
                 date: date,
+                harvestDate: harvestDate,
+                deliveryDate: deliveryDate,
                 done: this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.stepName && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0)
             };
         });

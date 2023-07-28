@@ -10,4 +10,6 @@ export default interface Planned {
     delivery: Delivery;
     minutesBeforeHarvest: number;
     date?: Date;
+    harvestDate?: Date;
+    deliveryDate?: Date;
 }
