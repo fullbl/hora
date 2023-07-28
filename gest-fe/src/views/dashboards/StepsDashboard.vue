@@ -79,7 +79,7 @@ const weekTotal = computed(function () {
                     {{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
                     <i :class="stepService.getIcon(dp.stepName)">{{ dp.stepName }}</i>
-                    {{ dp.product.name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
+                    {{ dp.product.name }}: {{ dp.qty }}
                     <ProgressBar :value="(dp.done / dp.qty) * 100">
                         {{ dp.done }} / {{ dp.qty }}
                     </ProgressBar>
