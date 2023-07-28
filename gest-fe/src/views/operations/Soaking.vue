@@ -42,8 +42,8 @@ const deliveryGroups = computed(() => {
             <Button @click="date = new Date(date.getTime() + 24 * 60 * 60 * 1000)">&gt;</Button>
         </div>
     </div>
-    <div class="card" v-for="[a, g] in deliveryGroups">
-        Customer {{ g.delivery.customer?.fullName }}
+    <div class="card" v-for="[a, g] in deliveryGroups" style="width: 25em">
+        <h2>{{ g.delivery.customer?.fullName }}</h2>
         {{ g.stepName }} {{ g.qty }} {{ g.product.name }}
         <ProgressBar :value="(g.done / g.qty) * 100">
             {{ g.done }} / {{ g.qty }}
