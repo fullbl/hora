@@ -7,5 +7,6 @@ export default interface Product {
     decigrams: number,
     days: number,
     price?: number,
-    steps?: Step[]
+    steps?: Step[],
+    weight: boolean
 }

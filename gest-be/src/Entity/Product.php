@@ -71,6 +71,10 @@ class Product
     #[Groups(['delivery-list', 'product'])]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $steps;
+    
+    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[ORM\Column(options: ['default' => false])]
+    private bool $weight = false;
 
 
     public function __construct()
@@ -178,6 +182,18 @@ class Product
                 $step->setproduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getWeight(): bool
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(bool $weight): static
+    {
+        $this->weight = $weight;
 
         return $this;
     }

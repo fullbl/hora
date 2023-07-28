@@ -27,7 +27,8 @@ const service: Service<Product> = {
             name: '',
             type: '',
             decigrams: 0,
-            days: 0
+            days: 0,
+            weight: false
         };
     }
 };

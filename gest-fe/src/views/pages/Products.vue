@@ -5,6 +5,7 @@ import Steps from '@/components/Steps.vue';
 import { computed, ref } from 'vue';
 import Logger from '@/components/Logger.vue';
 import type Step from '@/interfaces/step';
+import Checkbox from 'primevue/checkbox';
 const {
     filters,
     data, single, save,
@@ -83,6 +84,12 @@ const price = computed({
                             {{ slotProps.data.type }}
                         </template>
                     </Column>
+                    <Column field="weight" header="Weight" :sortable="true">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Weight</span>
+                            {{ slotProps.data.weight ? 'Yes' : 'No' }}
+                        </template>
+                    </Column>
                     <Column field="decigrams" header="Decigrams" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Decigrams</span>
@@ -137,32 +144,37 @@ const price = computed({
                 <Dialog v-model:visible="dialog" v-if="single" style="width: 40rem" header="Product Details" :modal="true"
                     class="p-fluid">
                     <div class="formgrid grid">
-                        <div class="field col-6">
+                        <div class="field col-4">
                             <label for="name">Name</label>
                             <InputText id="name" v-model.trim="single.name" required="true" autofocus
                                 :class="{ 'p-invalid': isInvalid('name') }" />
                         </div>
 
-                        <div class="field col-6">
+                        <div class="field col-4">
                             <label for="type">Type</label>
                             <Dropdown id="type" v-model="single.type" :options="types" optionLabel="label"
                                 optionValue="value" placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }">
                             </Dropdown>
                         </div>
 
-                        <div class="field col-6">
+                        <div class="field col-4">
+                            <label for="weight">Weight</label>
+                                <Checkbox id="weight" v-model="single.weight" :binary="true"
+                                    :class="{ 'p-invalid': isInvalid('weight') }" style="display: block" />
+                        </div>
+                        <div class="field col-4">
                             <label for="decigrams">Decigrams</label>
                             <InputNumber type="number" id="decigrams" v-model="single.decigrams" required autofocus
                                 showButtons :class="{ 'p-invalid': isInvalid('decigrams') }" />
                         </div>
 
-                        <div class="field col">
+                        <div class="field col-4">
                             <label for="days">Days</label>
                             <InputNumber type="number" id="days" v-model="single.days" required autofocus showButtons
                                 :class="{ 'p-invalid': isInvalid('days') }" />
                         </div>
 
-                        <div class="field col">
+                        <div class="field col-4">
                             <label for="price">Price</label>
                             <InputNumber type="number" id="price" mode="currency" currency="EUR" v-model="price" autofocus
                                 showButtons :class="{ 'p-invalid': isInvalid('price') }" />
