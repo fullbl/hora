@@ -44,66 +44,41 @@ const deliveryGroups = computed(() => {
                 continue;
             }
 
-            const customerHash = delivery.customer?.fullName ?? '';
-            switch (groupMode.value) {
-                case 'customer':
-                    if (!weekDay.has(customerHash)) {
-                        weekDay.set(customerHash, new Map());
-
-                    }
-                    const customer = weekDay.get(customerHash);
-                    if (undefined === customer) {
-                        continue;
-                    }
-
-                    customer.set(
-                        dp.product.name,
-                        {
-                            qty: (customer.get(dp.product.name)?.qty ?? 0) + dp.qty,
-                            done: activities.value
-                                .filter(a =>
-                                    a.delivery?.id === delivery.id &&
-                                    a.step.product?.id === dp.product.id &&
-                                    ['light', 'dark'].includes(a.step.name) &&
-                                    a.year === year.value &&
-                                    a.week === week.value
-                                )
-                                .reduce((i, dp) => i + dp.qty, 0)
-                            ,
-                            delivery: delivery,
-                            product: dp.product
-                        }
-                    );
-                    break;
-
-                case 'product':
-                    if (!weekDay.has(dp.product.name)) {
-                        weekDay.set(dp.product.name, new Map());
-
-                    }
-                    const product = weekDay.get(dp.product.name);
-                    if (undefined === product) {
-                        continue;
-                    }
-
-                    product.set(
-                        customerHash,
-                        {
-                            qty: (product.get(dp.product.name)?.qty ?? 0) + dp.qty,
-                            done: activities.value
-                                .filter(a =>
-                                    a.step.product?.id === dp.product.id &&
-                                    ['light', 'dark'].includes(a.step.name) &&
-                                    a.year === year.value &&
-                                    a.week === week.value
-                                )
-                                .reduce((i, dp) => i + dp.qty, 0),
-                            delivery: delivery,
-                            product: dp.product
-                        },
-                    );
-                    break;
+            let hash = dp.product.name;
+            if ('customer' === groupMode.value) {
+                hash = delivery.customer?.fullName ?? '';
             }
+
+            if (!weekDay.has(hash)) {
+                weekDay.set(hash, new Map());
+
+            }
+            const group = weekDay.get(hash);
+            if (undefined === group) {
+                continue;
+            }
+
+            group.set(
+                dp.product.name,
+                {
+                    qty: (group.get(dp.product.name)?.qty ?? 0) + dp.qty,
+                    done: activities.value
+                        .filter(a =>
+                            a.delivery?.id === delivery.id &&
+                            a.step.product?.id === dp.product.id &&
+                            ['light', 'dark'].includes(a.step.name) &&
+                            a.year === year.value &&
+                            a.week === week.value
+                        )
+                        .reduce((i, dp) => i + dp.qty, 0)
+                    ,
+                    delivery: delivery,
+                    product: dp.product
+                }
+            );
+            break;
+
+
         }
 
         return x;
