@@ -99,7 +99,7 @@ const price = computed({
                     <Column field="price" header="Price" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Price</span>
-                            {{ slotProps.data.price ?? 0 / 100 }} €
+                            {{ (slotProps.data.price ?? 0) / 100 }} €
                         </template>
                     </Column>
                     <Column header="Soaking hours" :sortable="true">
