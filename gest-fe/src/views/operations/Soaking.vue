@@ -42,7 +42,7 @@ const deliveryGroups = computed(() => {
             <Button @click="date = new Date(date.getTime() + 24 * 60 * 60 * 1000)">&gt;</Button>
         </div>
     </div>
-    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+    <div class="flex flex-row flex-wrap justify-content-between">
         <div class="card" v-for="[a, g] in deliveryGroups" style="width: 25em">
             <h2>{{ g.delivery.customer?.fullName }}</h2>
             {{ g.stepName }} {{ g.qty }} {{ g.product.name }}
