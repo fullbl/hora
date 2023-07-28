@@ -25,7 +25,7 @@ const deliveryGroups = computed(() => {
     return plannedService.getPlanned(
         deliveries.value,
         activities.value,
-        ['planting'],
+        ['soaking'],
         date.value.getFullYear(),
         getWeekNumber(date.value),
         date.value.getDay()
@@ -49,7 +49,7 @@ const deliveryGroups = computed(() => {
             {{ g.done }} / {{ g.qty }}
         </ProgressBar>
 
-        <ActivityButton type="planting" :baseProducts="[{qty: g.qty - g.done, product: g.product}]" :year="date.getFullYear()" :week="getWeekNumber(date)"
+        <ActivityButton type="soaking" :baseProducts="[{qty: g.qty - g.done, product: g.product}]" :year="date.getFullYear()" :week="getWeekNumber(date)"
             :delivery="g.delivery" />
     </div>
 </template>

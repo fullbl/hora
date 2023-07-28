@@ -26,7 +26,7 @@ const model = ref([
     {
         label: 'Operations',
         items: [
-            { label: 'Planting', icon: stepService.getIcon('planting'), to: '/operations/planting' },
+            { label: 'Soaking', icon: stepService.getIcon('soaking'), to: '/operations/soaking' },
         ]
     }
 
