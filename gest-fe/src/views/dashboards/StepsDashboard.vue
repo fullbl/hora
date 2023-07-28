@@ -1,57 +1,55 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import deliveryService from '@/service/DeliveryService';
-import activityService from '@/service/ActivityService';
-import plannedService from '@/service/PlannedService';
-import stepService from '@/service/StepService';
-import { computed } from '@vue/reactivity';
-import { useDates } from '../composables/dates';
-import Toast from 'primevue/toast';
-import type Delivery from '@/interfaces/delivery';
-import type Activity from '@/interfaces/activity';
-import SelectButton from 'primevue/selectbutton';
+import { onMounted, ref } from 'vue'
+import stepService from '@/service/StepService'
+import { computed } from '@vue/reactivity'
+import { useDates } from '../composables/dates'
+import Toast from 'primevue/toast'
+import SelectButton from 'primevue/selectbutton'
+import Planner from '@/service/Planner'
 
-const deliveries = ref<Array<Delivery>>([]);
-const activities = ref<Array<Activity>>([]);
-const { getWeekNumber, getDate, weekDays } = useDates();
+const { getWeekNumber, getDate, weekDays } = useDates()
 
-const today = new Date();
-const week = ref(getWeekNumber(today));
-const year = ref(today.getFullYear());
-const selectedSteps = ref(['soaking']);
+const today = new Date()
+const week = ref(getWeekNumber(today))
+const year = ref(today.getFullYear())
+const selectedSteps = ref(['soaking'])
 const steps = stepService.getTypes()
+const planner = new Planner
 
 onMounted(async () => {
-    deliveries.value = await deliveryService.getAll()
-    activities.value = await activityService.getAll()
-});
+    (await planner.load()).flatPlanned()
+})
 
 const deliveryGroups = computed(() => {
-    return plannedService.getPlanned(deliveries.value, activities.value, selectedSteps.value, year.value, week.value)
-});
+    return planner.groupByWeekAndProduct(
+        planner
+            .setDates(year.value, week.value)
+            .filter(selectedSteps.value)
+    )
+})
 
 const weekDayTotal = function (weekDay: number) {
-    let totals = 0;
+    let totals = 0
     const group = deliveryGroups.value.get(weekDay)
     if (undefined === group) {
         return 0
     }
 
     group.forEach(function (x) {
-        totals += x.qty;
-    });
+        totals += x.qty
+    })
 
-    return totals;
+    return totals
 }
 
 const weekTotal = computed(function () {
-    let totals = 0;
+    let totals = 0
     for (let i = 0; i < 6; i++) {
-        totals += weekDayTotal(i);
+        totals += weekDayTotal(i)
     }
 
-    return totals;
-});
+    return totals
+})
 
 </script>
 
