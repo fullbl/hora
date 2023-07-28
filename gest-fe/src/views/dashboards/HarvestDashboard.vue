@@ -8,6 +8,8 @@ import Toast from 'primevue/toast';
 import type Delivery from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import type Product from '@/interfaces/product';
+import ProgressHolder from '@/components/ProgressHolder.vue';
+import QtyHolder from '@/components/QtyHolder.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -45,8 +47,10 @@ const deliveryGroups = computed(() => {
             }
 
             let hash = dp.product.name;
+            let inverseHash = delivery.customer?.fullName ?? '';
             if ('customer' === groupMode.value) {
                 hash = delivery.customer?.fullName ?? '';
+                inverseHash = dp.product.name;
             }
 
             if (!weekDay.has(hash)) {
@@ -59,7 +63,7 @@ const deliveryGroups = computed(() => {
             }
 
             group.set(
-                dp.product.name,
+                inverseHash,
                 {
                     qty: (group.get(dp.product.name)?.qty ?? 0) + dp.qty,
                     done: activities.value
@@ -76,9 +80,6 @@ const deliveryGroups = computed(() => {
                     product: dp.product
                 }
             );
-            break;
-
-
         }
 
         return x;
@@ -134,7 +135,7 @@ const groupNames = computed(function () {
     deliveryGroups.value.forEach(function (x) {
         names = names.concat(Array.from(x.keys()))
     });
-    return Array.from(new Set(names));
+    return Array.from(new Set(names)).sort((a,b) => a.localeCompare(b));
 });
 
 </script>
@@ -154,32 +155,38 @@ const groupNames = computed(function () {
     </div>
 
     <div class="card">
-        Week total: {{ weekTotal }}
-        <div v-for="name in groupNames">
-            {{ name }} total: {{ groupTotal(name) }}
-        </div>
+        <Panel toggleable>
+            <template #header>
+                Week total: {{ weekTotal }}
+            </template>
+            <div class="flex flex-wrap justify-content-around">
+                <div v-for="name in groupNames">
+                    <QtyHolder :qty="groupTotal(name)">{{ name }}</QtyHolder>
+                </div>
+            </div>
+        </Panel>
     </div>
 
     <Toast />
 
     <div class="card">
         <div class="grid">
-            <div style="width:14.28%" v-for="weekDay of weekDays">
-                <h5>{{ weekDay.label }}</h5>
-                <b>Day total: {{ dayTotal(weekDay.value) }}</b>
-                <div>
-                    <Panel v-for="[groupName, products] in deliveryGroups.get(weekDay.value)" :header="groupName"
-                        toggleable>
-                        <template #header>
-                            {{ groupName }} {{ groupWeekTotal(weekDay.value, groupName) }}
-                        </template>
-                        <p v-for="[name, dp] in products">
-                            {{ name }}: {{ dp.qty }}
-                            <ProgressBar :value="(dp.done / dp.qty) * 100">
-                                {{ dp.done }} / {{ dp.qty }}
-                            </ProgressBar>
-                        </p>
-                    </Panel>
+            <div v-for="weekDay of weekDays">
+                <div v-if="dayTotal(weekDay.value) > 0">
+                    <h5>{{ weekDay.label }}</h5>
+                    <b>Day total: {{ dayTotal(weekDay.value) }}</b>
+                    <div class="flex flex-wrap justify-content-between">
+                        <Panel v-for="[groupName, products] in deliveryGroups.get(weekDay.value)" :header="groupName"
+                            toggleable>
+                            <template #header>
+                                {{ groupName }} {{ groupWeekTotal(weekDay.value, groupName) }}
+                            </template>
+                            <p v-for="[name, dp] in Array.from(products).sort(([x, a],[y, b]) => a.product.name.localeCompare(b.product.name))">
+                                <QtyHolder :qty="dp.qty">{{ dp.product.name }}</QtyHolder>
+                                <ProgressHolder :dp="dp" />
+                            </p>
+                        </Panel>
+                    </div>
                 </div>
             </div>
         </div>

@@ -9,6 +9,8 @@ import type Product from '@/interfaces/product';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import type Step from '@/interfaces/step';
+import QtyHolder from '@/components/QtyHolder.vue';
+import ProgressHolder from '@/components/ProgressHolder.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -152,23 +154,14 @@ const weekTotal = computed(function () {
                 <div>
                     <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)"
                         :header="zone + ': ' + zoneTotal(customers)" toggleable collapsed>
-                        <table>
-                            <tr v-for="[product, qty] in zoneTotals(customers)">
-                                <td>
-                                    {{ product }}
-                                </td>
-                                <td>
-                                    {{ qty }}
-                                </td>
-                            </tr>
-                        </table>
+                        <p v-for="[product, qty] in Array.from(zoneTotals(customers)).sort(([x,a],[y,b]) => x.localeCompare(y))" class="m-0">
+                            <QtyHolder :qty="qty">{{ product }}</QtyHolder>
+                        </p>
                         <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotal(products)"
                             toggleable collapsed>
-                            <p v-for="[name, dp] in products">
-                                {{ name }}: {{ dp.qty }}
-                                <ProgressBar :value="(dp.done / dp.qty) * 100">
-                                    {{ dp.done }} / {{ dp.qty }}
-                                </ProgressBar>
+                            <p v-for="[name, dp] in Array.from(products).sort(([x,a], [y,b]) => x.localeCompare(y))" class="m-0">
+                                <QtyHolder :qty="dp.qty">{{ name }}</QtyHolder>
+                                <ProgressHolder :dp="dp" />
                             </p>
                         </Panel>
                     </Panel>

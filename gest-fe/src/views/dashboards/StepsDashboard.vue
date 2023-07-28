@@ -6,6 +6,8 @@ import { useDates } from '../composables/dates'
 import Toast from 'primevue/toast'
 import SelectButton from 'primevue/selectbutton'
 import Planner from '@/service/Planner'
+import QtyHolder from '@/components/QtyHolder.vue'
+import ProgressHolder from '@/components/ProgressHolder.vue'
 
 const { getWeekNumber, getDate, weekDays } = useDates()
 
@@ -76,11 +78,11 @@ const weekTotal = computed(function () {
                 <h5>{{ weekDay.label }} ({{ weekDayTotal(weekDay.value) }})<br>
                     {{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
-                    <i :class="stepService.getIcon(dp.stepName)">{{ dp.stepName }}</i>
-                    {{ dp.product.name }}: {{ dp.qty }}
-                    <ProgressBar :value="(dp.done / dp.qty) * 100">
-                        {{ dp.done }} / {{ dp.qty }}
-                    </ProgressBar>
+                    <QtyHolder :qty="dp.qty">
+                        <i :class="stepService.getIcon(dp.stepName)">{{ dp.stepName }}</i>
+                        {{ dp.product.name }}
+                    </QtyHolder>
+                    <ProgressHolder :dp="dp" />
                 </div>
             </div>
         </div>

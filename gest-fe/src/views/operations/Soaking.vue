@@ -7,12 +7,11 @@ import type Calendar from 'primevue/calendar';
 import ActivityButton from '@/components/ActivityButton.vue';
 import type Activity from '@/interfaces/activity';
 import Planner from '@/service/Planner';
+import QtyHolder from '@/components/QtyHolder.vue';
 
 const date = ref(new Date)
 const { getWeekNumber } = useDates();
 
-const deliveries = ref<Array<Delivery>>([]);
-const activities = ref<Array<Activity>>([]);
 const planner = new Planner()
 onMounted(async () => {
     (await planner.load()).flatPlanned()
@@ -40,15 +39,21 @@ const deliveryGroups = computed(() => {
         <div class="card" v-for="[name, planned] in deliveryGroups" style="width: 25em">
             <h2>{{ name }}</h2>
 
-            <div v-for="p in planned">
-                {{ p.qty }} {{ p.delivery.customer?.fullName }}
-                {{  p.deliveryDate.toLocaleDateString() }}
+            <div class="card" v-for="p in planned">
+                <QtyHolder :qty="p.qty + ''">
+                    {{ p.delivery.customer?.fullName }}
+                </QtyHolder>
+                <p>
+                    Harvest: {{ p.harvestDate?.toLocaleDateString() }}
+                    <br>
+                    Delivery: {{ p.deliveryDate?.toLocaleDateString() }}
+                </p>
                 <ProgressBar :value="(p.done / p.qty) * 100">
                     {{ p.done }} / {{ p.qty }}
                 </ProgressBar>
-        
-                <ActivityButton type="soaking" :baseProducts="[{qty: p.qty - p.done, product: p.product}]" :year="date.getFullYear()" :week="getWeekNumber(date)"
-                    :delivery="p.delivery" />
+
+                <ActivityButton type="soaking" :baseProducts="[{ qty: p.qty - p.done, product: p.product }]"
+                    :year="date.getFullYear()" :week="getWeekNumber(date)" :delivery="p.delivery" />
             </div>
         </div>
     </div>

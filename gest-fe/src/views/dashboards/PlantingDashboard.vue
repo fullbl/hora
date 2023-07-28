@@ -4,6 +4,8 @@ import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
 import Planner from '@/service/Planner';
+import ProgressHolder from '@/components/ProgressHolder.vue';
+import QtyHolder from '@/components/QtyHolder.vue';
 
 const { getWeekNumber, getDate, weekDays } = useDates();
 
@@ -64,10 +66,8 @@ const dayTotal = function (weekDay: number) {
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
-                    {{ dp.product.name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
-                    <ProgressBar :value="(dp.done / dp.qty) * 100">
-                        {{ dp.done }} / {{ dp.qty }}
-                    </ProgressBar>
+                    <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g)</QtyHolder>
+                    <ProgressHolder :dp="dp" />
                 </div>
             </div>
         </div>

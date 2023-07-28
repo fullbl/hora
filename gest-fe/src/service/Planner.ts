@@ -90,10 +90,11 @@ export default class Planner {
             const weekDayHash = p.date?.getDay() ?? 100;
             const products = g.get(weekDayHash) ?? new Map();
             const productHash = p.product.id + p.stepName;
+            let qty = p.qty
             if (products.has(productHash)) {
-                p.qty += products.get(productHash)?.qty ?? 0;
+                qty += products.get(productHash)?.qty ?? 0;
             }
-            products.set(productHash, p);
+            products.set(productHash, {...p, qty});
             g.set(weekDayHash, products);
 
             return g;
