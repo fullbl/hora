@@ -105,19 +105,19 @@ const price = computed({
                     <Column header="Soaking hours" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Soaking hours</span>
-                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name = 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
                         </template>
                     </Column>
                     <Column header="Blackout days" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Blackout days</span>
-                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name = 'blackout').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'blackout').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
                         </template>
                     </Column>
                     <Column header="Light days" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Light days</span>
-                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name = 'light').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'light').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
                         </template>
                     </Column>
                     <Column headerStyle="min-width:12rem;">
