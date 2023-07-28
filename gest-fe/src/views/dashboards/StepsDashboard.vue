@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
+import plannedService from '@/service/PlannedService';
 import stepService from '@/service/StepService';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
@@ -27,60 +28,7 @@ onMounted(async () => {
 });
 
 const deliveryGroups = computed(() => {
-    return deliveries.value.reduce(function (x, delivery) {
-        for (const dp of delivery.deliveryProducts) {
-            const date = getDate(year.value, week.value, delivery.harvestWeekDay)
-
-            for (const step of dp.product.steps?.toReversed() ?? []) {
-                date.setMinutes(date.getMinutes() - step.minutes)
-                while (date < getDate(year.value, week.value, 0)) {
-                    date.setDate(date.getDate() + 7);
-                }
-                if (!delivery.weeks.includes(getWeekNumber(date))) {
-                    continue;
-                }
-                if (!selectedSteps.value.includes(step.name)) {
-                    continue;
-                }
-                const dateHash = date.getDay();
-                if (!x.has(dateHash)) {
-                    x.set(dateHash, new Map());
-                }
-                const products = x.get(dateHash);
-                if (undefined === products) {
-                    continue;
-                }
-
-                const productHash = '' + dp.product.id + step.id
-                if (!products.has(productHash)) {
-                    products.set(productHash, {
-                        qty: 0,
-                        done: 0,
-                        decigrams: dp.product.decigrams,
-                        delivery: delivery,
-                        product: dp.product,
-                        step: step.name
-                    });
-                }
-                const product = products.get(productHash);
-                if (undefined === product) {
-                    continue;
-                }
-                product.qty += dp.qty;
-                product.done = activities.value
-                    .filter(a =>
-                        a.delivery?.id === delivery.id &&
-                        a.step.product?.id === dp.product.id &&
-                        selectedSteps.value.includes(a.step.name) &&
-                        a.year === year.value &&
-                        a.week === week.value
-                    )
-                    .reduce((i, dp) => i + dp.qty, 0)
-            }
-        }
-
-        return x;
-    }, new Map<number, Map<string, { step: string, qty: number, done: number, decigrams: number, delivery: Delivery, product: Product }>>());
+    return plannedService.getPlanned(deliveries.value, selectedSteps.value, year.value, week.value)
 });
 
 const weekDayTotal = function (weekDay: number) {
@@ -131,7 +79,7 @@ const weekTotal = computed(function () {
                 <h5>{{ weekDay.label }} ({{ weekDayTotal(weekDay.value) }})<br>
                     {{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
-                    <i :class="stepService.getIcon(dp.step)">{{ dp.step }}</i>
+                    <i :class="stepService.getIcon(dp.stepName)">{{ dp.stepName }}</i>
                     {{ dp.product.name }}: {{ dp.qty }} ({{ dp.qty * dp.decigrams / 10 }}g)
                     <ProgressBar :value="(dp.done / dp.qty) * 100">
                         {{ dp.done }} / {{ dp.qty }}
