@@ -70,6 +70,7 @@ class Product
     
     #[Groups(['delivery-list', 'product'])]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OrderBy(['sort' => 'ASC'])]
     private Collection $steps;
     
     #[Groups(['delivery-list', 'product', 'product-edit'])]

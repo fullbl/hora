@@ -36,9 +36,16 @@ class ProductMapper
                 AbstractNormalizer::GROUPS => ['product-edit'],
             ]
         );
-        foreach ($newProduct->getSteps()->filter(fn (Step $step): bool => false === array_search($step->getId(), array_column($data['steps'], 'id'), true)) as $step) {
+        foreach ($newProduct->getSteps()->filter(function (Step $step) use ($data): bool {
+            $stepKey = array_search($step->getId(), array_column($data['steps'], 'id'), true);
+            if (false === $stepKey) {
+                return false;
+            }
+            return $data['steps'][$stepKey]['sort'] !== $step->getSort();
+        }) as $step) {
             $newProduct->removeStep($step);
         }
+        die();
         foreach ($data['steps'] as $stepData) {
             if (isset($stepData['id'])) {
                 $step = $this->em->find(Step::class, $stepData['id']);

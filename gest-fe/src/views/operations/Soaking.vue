@@ -15,18 +15,15 @@ const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
 const planner = new Planner()
 onMounted(async () => {
-    (await planner.load()).groupByProduct()
+    (await planner.load()).flatPlanned()
 });
 
 const deliveryGroups = computed(() => {
-    return planner.getPlanned(
-        deliveries.value,
-        activities.value,
-        ['soaking'],
-        date.value.getFullYear(),
-        getWeekNumber(date.value),
-        date.value.getDay()
-    ).get(date.value.getDay())
+    return planner.groupByProduct(
+        planner
+            .setDates(date.value.getFullYear(), getWeekNumber(date.value))
+            .filter(['soaking'], date.value.getDay())
+    )
 });
 
 </script>
@@ -40,15 +37,18 @@ const deliveryGroups = computed(() => {
         </div>
     </div>
     <div class="flex flex-row flex-wrap justify-content-between">
-        <div class="card" v-for="[a, g] in deliveryGroups" style="width: 25em">
-            <h2>{{ g.delivery.customer?.fullName }}</h2>
-            {{ g.stepName }} {{ g.qty }} {{ g.product.name }}
-            <ProgressBar :value="(g.done / g.qty) * 100">
-                {{ g.done }} / {{ g.qty }}
-            </ProgressBar>
-    
-            <ActivityButton type="soaking" :baseProducts="[{qty: g.qty - g.done, product: g.product}]" :year="date.getFullYear()" :week="getWeekNumber(date)"
-                :delivery="g.delivery" />
+        <div class="card" v-for="[name, planned] in deliveryGroups" style="width: 25em">
+            <h2>{{ name }}</h2>
+
+            <div v-for="p in planned">
+                {{ p.stepName }} {{ p.qty }} {{ p.delivery.customer?.fullName }}
+                <ProgressBar :value="(p.done / p.qty) * 100">
+                    {{ p.done }} / {{ p.qty }}
+                </ProgressBar>
+        
+                <ActivityButton type="soaking" :baseProducts="[{qty: p.qty - p.done, product: p.product}]" :year="date.getFullYear()" :week="getWeekNumber(date)"
+                    :delivery="p.delivery" />
+            </div>
         </div>
     </div>
 </template>

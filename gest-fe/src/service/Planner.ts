@@ -52,7 +52,11 @@ export default class Planner {
             while (date < getDate(year, week, 0)) {
                 date.setDate(date.getDate() + 7);
             }
-            return { ...p, date: date };
+            return {
+                ...p,
+                date: date,
+                done: this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.stepName && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0)
+            };
         });
 
         return this;
@@ -62,10 +66,20 @@ export default class Planner {
         return this.planned.value.filter((p) => {
             return undefined !== p.date && p.delivery.weeks.includes(getWeekNumber(p.date)) && selectedSteps.includes(p.stepName) && (undefined === day || day === p.date.getDay());
         });
-
     }
 
-    groupByWeekAndProduct(planned: Planned[]) {
+    groupByProduct(planned: Planned[]) {
+        return planned.reduce((g, p) => {
+            const productHash = p.product.name;
+            const products = g.get(productHash) ?? [];
+            products.push(p);
+            g.set(productHash, products);
+
+            return g;
+        }, new Map<string, Planned[]>());
+    }
+
+    groupByWeekDayAndProduct(planned: Planned[]) {
         return planned.reduce((g, p) => {
             const weekDayHash = p.date?.getDay() ?? 100;
             const products = g.get(weekDayHash) ?? new Map();
@@ -77,57 +91,6 @@ export default class Planner {
             g.set(weekDayHash, products);
 
             return g;
-        }, new Map<number, Map<string, Planned>>());
-    }
-
-    getPlanned(deliveries: Delivery[], activities: Activity[], selectedSteps: string[], year: number, week: number, day?: number) {
-        return deliveries.reduce(function (x, delivery) {
-            const date = getDate(year, week, delivery.harvestWeekDay);
-            for (const dp of delivery.deliveryProducts) {
-                for (const step of dp.product.steps?.toReversed() ?? []) {
-                    if (!selectedSteps.includes(step.name)) {
-                        continue;
-                    }
-                    date.setMinutes(date.getMinutes() - step.minutes);
-                    while (date < getDate(year, week, 0)) {
-                        date.setDate(date.getDate() + 7);
-                    }
-                    if (!delivery.weeks.includes(getWeekNumber(date))) {
-                        continue;
-                    }
-                    if (undefined !== day && day !== date.getDay()) {
-                        continue;
-                    }
-                    const dateHash = date.getDay();
-                    if (!x.has(dateHash)) {
-                        x.set(dateHash, new Map());
-                    }
-                    const products = x.get(dateHash);
-                    if (undefined === products) {
-                        continue;
-                    }
-
-                    const productHash = '' + dp.product.id + step.id;
-                    if (!products.has(productHash)) {
-                        products.set(productHash, {
-                            qty: 0,
-                            done: 0,
-                            decigrams: dp.product.decigrams,
-                            delivery: delivery,
-                            product: dp.product,
-                            stepName: step.name
-                        });
-                    }
-                    const product = products.get(productHash);
-                    if (undefined === product) {
-                        continue;
-                    }
-                    product.qty += dp.qty;
-                    product.done = activities.filter((a) => a.delivery?.id === delivery.id && a.step.product?.id === dp.product.id && selectedSteps.includes(a.step.name) && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0);
-                }
-            }
-
-            return x;
         }, new Map<number, Map<string, Planned>>());
     }
 }

@@ -17,7 +17,7 @@ onMounted(async () => {
 });
 
 const deliveryGroups = computed(() => {
-    return planner.groupByWeekAndProduct(
+    return planner.groupByWeekDayAndProduct(
         planner
             .setDates(year.value, week.value)
             .filter(['blackout'])
