@@ -36,7 +36,7 @@ const divideMap = {
 
 <template>
     <div>
-        <h2>Steps</h2>
+        <h3>Steps</h3>
         <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="addNew" />
         <OrderList v-model="steps" dataKey="sort">
             <template #item="slotProps">
