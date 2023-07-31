@@ -70,7 +70,7 @@ export default class Planner {
 
     filter(selectedSteps: string[], day?: number) {
         return this.planned.value.filter((p) => {
-            return undefined !== p.date && p.delivery.weeks.includes(getWeekNumber(p.date)) && selectedSteps.includes(p.stepName) && (undefined === day || day === p.date.getDay());
+            return undefined !== p.deliveryDate && p.delivery.weeks.includes(getWeekNumber(p.deliveryDate)) && selectedSteps.includes(p.stepName) && (undefined === day || day === p.date.getDay());
         });
     }
 
