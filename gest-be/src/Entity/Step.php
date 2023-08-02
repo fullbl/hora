@@ -18,19 +18,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Step
 {
     public const STEP_SOAKING = 'soaking';
-    public const STEP_PLANTING = 'planting';
+    public const STEP_PREACTIVATION = 'preactivation';
     public const STEP_BLACKOUT = 'blackout';
     public const STEP_LIGHT = 'light';
-    public const STEP_SHIPPING = 'shipping';
-    public const STEP_PAYMENT = 'payment';
 
     public const STEP_TYPES = [
         self::STEP_SOAKING,
-        self::STEP_PLANTING,
+        self::STEP_PREACTIVATION,
         self::STEP_BLACKOUT,
         self::STEP_LIGHT,
-        self::STEP_SHIPPING,
-        self::STEP_PAYMENT,
     ];
 
     #[Groups(['delivery-list', 'activity-list', 'product'])]

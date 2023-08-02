@@ -23,7 +23,7 @@ const service: StepService = {
     },
     getNew() {
         return {
-            name: '',
+            name: 'soaking',
             minutes: 0,
             params: {},
             sort: 1
@@ -32,27 +32,21 @@ const service: StepService = {
     getTypes() {
         return [
             { label: 'Soaking', value: 'soaking' },
-            { label: 'Planting', value: 'planting' },
+            { label: 'Preactivation', value: 'preactivation' },
             { label: 'Blackout', value: 'blackout' },
             { label: 'Light', value: 'light' },
-            { label: 'Shipping', value: 'shipping' },
-            { label: 'Payment', value: 'payment' }
         ];
     },
     getIcon(type) {
         switch (type) {
             case 'soaking':
                 return 'pi pi-arrow-circle-down';
-            case 'planting':
-                return 'pi pi-download';
+            case 'preactivation':
+                return 'pi pi-compass'
             case 'light':
                 return 'pi pi-sun';
             case 'blackout':
                 return 'pi pi-moon';
-            case 'shipping':
-                return 'pi pi-car';
-            case 'payment':
-                return 'pi pi-money-bill';
         }
 
         return '';

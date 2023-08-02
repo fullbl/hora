@@ -3,7 +3,7 @@ import type Product from "./product";
 export default interface Step {
     id?: number,
     product?: Product,
-    name: string,
+    name: 'soaking'|'preactivation'|'light'|'blackout',
     minutes: number,
     params: object,
     sort: number,

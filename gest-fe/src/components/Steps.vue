@@ -28,7 +28,7 @@ const steps = computed({
 
 const divideMap = {
     soaking: 'hours',
-    planting: 'hours',
+    preactivation: 'hours',
     light: 'days',
     blackout: 'days',
 }
