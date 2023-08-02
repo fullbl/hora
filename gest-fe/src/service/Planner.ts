@@ -34,7 +34,7 @@ export default class Planner {
                             decigrams: dp.product.decigrams,
                             delivery: delivery,
                             product: dp.product,
-                            stepName: s.name,
+                            step: s,
                             minutesBeforeHarvest: minutes
                         };
                     });
@@ -61,7 +61,7 @@ export default class Planner {
                 date: date,
                 harvestDate: harvestDate,
                 deliveryDate: deliveryDate,
-                done: this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.stepName && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0)
+                done: this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0)
             };
         });
 
@@ -70,7 +70,7 @@ export default class Planner {
 
     filter(selectedSteps: string[], day?: number) {
         return this.planned.value.filter((p) => {
-            return undefined !== p.deliveryDate && p.delivery.weeks.includes(getWeekNumber(p.deliveryDate)) && selectedSteps.includes(p.stepName) && (undefined === day || day === p.date.getDay());
+            return undefined !== p.deliveryDate && p.delivery.weeks.includes(getWeekNumber(p.deliveryDate)) && selectedSteps.includes(p.step.name) && (undefined === day || day === p.date.getDay());
         });
     }
 
@@ -89,7 +89,7 @@ export default class Planner {
         return planned.reduce((g, p) => {
             const weekDayHash = p.date?.getDay() ?? 100;
             const products = g.get(weekDayHash) ?? new Map();
-            const productHash = p.product.id + p.stepName;
+            const productHash = p.product.id + p.step.name;
             let qty = p.qty
             if (products.has(productHash)) {
                 qty += products.get(productHash)?.qty ?? 0;

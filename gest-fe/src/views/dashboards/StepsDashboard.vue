@@ -79,8 +79,13 @@ const weekTotal = computed(function () {
                     {{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
                     <QtyHolder :qty="dp.qty">
-                        <i :class="stepService.getIcon(dp.stepName)">{{ dp.stepName }}</i>
+                        <i :class="stepService.getIcon(dp.step.name)"/>
+                        {{ dp.step.name }}
                         {{ dp.product.name }}
+                        <br>
+                        <i v-if="'soaking' === dp.step.name">
+                            {{ dp.step.minutes / 60 }} hours
+                        </i>
                     </QtyHolder>
                     <ProgressHolder :dp="dp" />
                 </div>
