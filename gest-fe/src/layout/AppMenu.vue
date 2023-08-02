@@ -17,7 +17,7 @@ const model = ref([
         label: 'Dashboards',
         items: [
             { label: 'Steps Dashboard', icon: 'pi pi-check-square', to: '/dashboards/steps' },
-            { label: 'Planting Dashboard', icon: stepService.getIcon('planting'), to: '/dashboards/planting' },
+            { label: 'Planting Dashboard', icon: 'pi pi-fw pi-download', to: '/dashboards/planting' },
             { label: 'Harvest Dashboard', icon: 'pi pi-fw pi-upload', to: '/dashboards/harvest' },
             { label: 'Delivery Dashboard', icon: stepService.getIcon('shipping'), to: '/dashboards/delivery' },
             { label: 'Payment Dashboard', icon: stepService.getIcon('payment'), to: '/dashboards/payment' },
