@@ -66,7 +66,7 @@ const dayTotal = function (weekDay: number) {
                 <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
-                    <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g)</QtyHolder>
+                    <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g{{ dp.product.weight ? ' + weight' : '' }})</QtyHolder>
                     <ProgressHolder :dp="dp" />
                 </div>
             </div>
