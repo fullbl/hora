@@ -171,7 +171,7 @@ const nextDelivery = function (item: Delivery) {
                             {{ weekDays.find(d => d.value === slotProps.data.harvestWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true" headerStyle="min-width:10rem;">
+                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Delivery</span>
                             {{ weekDays.find(d => d.value === slotProps.data.deliveryWeekDay)?.label }}
@@ -183,7 +183,7 @@ const nextDelivery = function (item: Delivery) {
                             {{ slotProps.data.customer?.fullName }}
                         </template>
                     </Column>
-                    <Column header="Next Delivery" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                    <Column header="Next Delivery" :sortable="true" headerStyle="min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Next Delivery</span>
                             {{ nextDelivery(slotProps.data)?.toLocaleDateString() }}
@@ -196,26 +196,26 @@ const nextDelivery = function (item: Delivery) {
                                 d.qty).join(', ') }}
                         </template>
                     </Column>
-                    <Column field="customer.zone" header="Zone" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="customer.zone" header="Zone" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Zone</span>
                             {{ slotProps.data.customer?.zone }}
                         </template>
                     </Column>
-                    <Column field="notes" header="Notes" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="notes" header="Notes" :sortable="true" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Notes</span>
                             {{ slotProps.data.notes ?? '' }}
                         </template>
                     </Column>
-                    <Column field="price" header="Price" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="price" header="Price" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Price</span>
                             {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i +
                                 (p.product.price ?? 0) / 100 * p.qty, 0) - (slotProps.data.customer?.discount ?? 0, 0) }}€
                         </template>
                     </Column>
-                    <Column header="Quantity" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column header="Quantity" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Quantity</span>
                             {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i + p.qty, 0) }}
