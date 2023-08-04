@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, type PropType } from 'vue';
 import logService from '@/service/LogService';
 import type Log from '@/interfaces/log'
 const props = defineProps({
@@ -8,8 +8,8 @@ const props = defineProps({
         type: String,
     },
     entityId: {
-        required: false,
-        type: Number,
+        required: true,
+        type: Number as PropType<number | null>
     },
 })
 

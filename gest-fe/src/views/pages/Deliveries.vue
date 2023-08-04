@@ -27,7 +27,8 @@ const {
 const { getWeekNumber, weeks, weekDays, getDate } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
-const logEntity = ref(null);
+const logEntity = ref(null)
+const nextOnly = ref(false)
 
 onMounted(async () => {
     customers.value = (await userService.getAll())
@@ -111,8 +112,10 @@ const selectWeeks = function (type: string) {
         case 'suspend':
             single.value.weeks = single.value.weeks.filter((x => x <= getWeekNumber(new Date())))
             break
-        case 'next':
-            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x).filter((x => x >= getWeekNumber(new Date())))
+    }
+
+    if (nextOnly.value) {
+        single.value.weeks = single.value.weeks.filter((x => x >= getWeekNumber(new Date())))
     }
 }
 
@@ -168,15 +171,13 @@ const nextDelivery = function (item: Delivery) {
                             {{ weekDays.find(d => d.value === slotProps.data.harvestWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column field="deliveryWeekDay" header="Delivery" :sortable="true" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Delivery</span>
                             {{ weekDays.find(d => d.value === slotProps.data.deliveryWeekDay)?.label }}
                         </template>
                     </Column>
-                    <Column field="customer.fullName" header="Customer" :sortable="true"
-                        headerStyle="width:14%; min-width:8rem;">
+                    <Column field="customer.fullName" header="Customer" :sortable="true" headerStyle="min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Customer</span>
                             {{ slotProps.data.customer?.fullName }}
@@ -188,8 +189,7 @@ const nextDelivery = function (item: Delivery) {
                             {{ nextDelivery(slotProps.data)?.toLocaleDateString() }}
                         </template>
                     </Column>
-                    <Column field="deliveryProducts" header="Products" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column field="deliveryProducts" header="Products" :sortable="true" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Products</span>
                             {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' +
@@ -235,81 +235,85 @@ const nextDelivery = function (item: Delivery) {
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Delivery Details" :modal="true"
+                <Dialog v-model:visible="dialog" :style="{ width: '60rem' }" header="Delivery Details" :modal="true"
                     class="p-fluid" v-if="'undefined' !== typeof single">
+                    <div class="formgrid grid">
 
-                    <div class="field">
-                        <label for="name">Harvest WeekDay</label>
-                        <Dropdown id="type" v-model="single.harvestWeekDay" :options="weekDays" optionLabel="label"
-                            optionValue="value" placeholder="Select a WeekDay"
-                            :class="{ 'p-invalid': isInvalid('harvestWeekDay') }">
-                        </Dropdown>
-                    </div>
-                    <div class="field">
-                        <label for="name">Delivery WeekDay</label>
-                        <Dropdown id="type" v-model="single.deliveryWeekDay" :options="weekDays" optionLabel="label"
-                            optionValue="value" placeholder="Select a WeekDay"
-                            :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }">
-                        </Dropdown>
-                    </div>
-                    <div class="field">
-                        <label for="name">Weeks</label>
-                        <div class="mb-3 p-buttonset">
-                            <Button label="even" @click="selectWeeks('even')" />
-                            <Button label="odd" @click="selectWeeks('odd')" />
-                            <Button label="all" @click="selectWeeks('all')" />
-                            <Button label="suspend" @click="selectWeeks('suspend')" />
-                            <Button label="next" @click="selectWeeks('next')" />
+                        <div class="field col-3">
+                            <label for="customer">Customer</label>
+                            <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
+                                dataKey="id" placeholder="Select a Customer" showClear filter
+                                :class="{ 'p-invalid': isInvalid('customer') }">
+                            </Dropdown>
                         </div>
-                        <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
-                            placeholder="Select Weeks" class="md:w-20rem w-full"
-                            :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
-                    </div>
+                        <div class="field col-3">
+                            <label for="name">Harvest WeekDay</label>
+                            <Dropdown id="type" v-model="single.harvestWeekDay" :options="weekDays" optionLabel="label"
+                                optionValue="value" placeholder="Select a WeekDay"
+                                :class="{ 'p-invalid': isInvalid('harvestWeekDay') }">
+                            </Dropdown>
+                        </div>
+                        <div class="field col-3">
+                            <label for="name">Delivery WeekDay</label>
+                            <Dropdown id="type" v-model="single.deliveryWeekDay" :options="weekDays" optionLabel="label"
+                                optionValue="value" placeholder="Select a WeekDay"
+                                :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }">
+                            </Dropdown>
+                        </div>
 
-                    <div class="field">
-                        <label for="customer" class="mb-3">Customer</label>
-                        <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
-                            dataKey="id" placeholder="Select a Customer" showClear filter
-                            :class="{ 'p-invalid': isInvalid('customer') }">
-                        </Dropdown>
-                    </div>
+                        <div class="field col-3">
+                            <label for="paymentMethod">Payment method</label>
+                            <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"
+                                :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
+                        </div>
 
-                    <div class="field">
-                        <label for="products" class="mb-3">Products</label>
+                        <div class="field col-12">
+                            <label for="notes">Notes</label>
+                            <InputText id="notes" v-model="single.notes" :class="{ 'p-invalid': isInvalid('notes') }" />
+                        </div>
 
-                        <Button label="Add" icon="pi pi-plus"
-                            @click="single.deliveryProducts.push({ product: productService.getNew(), qty: 0 })" />
-                        <DataTable :value="single.deliveryProducts">
-                            <Column field="product.name" header="Product">
-                                <template #body="slotProps">
-                                    <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id"
-                                        :options="products" />
-                                </template>
-                            </Column>
-                            <Column field="product.type" header="Type" />
-                            <Column field="qty" header="Quantity">
-                                <template #body="slotProps">
-                                    <InputNumber v-model="slotProps.data.qty" showButtons />
-                                </template>
-                            </Column>
-                            <Column header="x">
-                                <template #body="slotProps">
-                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                                        @click="single.deliveryProducts = single.deliveryProducts.filter(dp => dp !== slotProps.data)" />
-                                </template>
-                            </Column>
-                        </DataTable>
-                    </div>
+                        <div class="field col-6">
+                            <label for="products">Products</label>
 
-                    <div class="field">
-                        <label for="notes" class="mb-3">Notes</label>
-                        <InputText id="notes" v-model="single.notes" :class="{ 'p-invalid': isInvalid('notes') }" />
-                    </div>
+                            <Button label="Add" icon="pi pi-plus"
+                                @click="single.deliveryProducts.push({ product: productService.getNew(), qty: 0, delivery: single })" />
+                            <DataTable :value="single.deliveryProducts">
+                                <Column field="product.name" header="Product">
+                                    <template #body="slotProps">
+                                        <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id"
+                                            :options="products" />
+                                    </template>
+                                </Column>
+                                <Column field="product.type" header="Type" />
+                                <Column field="qty" header="Quantity">
+                                    <template #body="slotProps">
+                                        <InputNumber v-model="slotProps.data.qty" showButtons />
+                                    </template>
+                                </Column>
+                                <Column header="x">
+                                    <template #body="slotProps">
+                                        <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                                            @click="single.deliveryProducts = single.deliveryProducts.filter(dp => dp !== slotProps.data)" />
+                                    </template>
+                                </Column>
+                            </DataTable>
+                        </div>
 
-                    <div class="field">
-                        <label for="paymentMethod" class="mb-3">Payment method</label>
-                        <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"
-                            :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
+                        <div class="field col-6">
+                            <label for="name">Weeks</label>
+                            <div class="p-buttonset mb-3">
+                                <Button label="even" @click="selectWeeks('even')" />
+                                <Button label="odd" @click="selectWeeks('odd')" />
+                                <Button label="all" @click="selectWeeks('all')" />
+                                <Button label="suspend" @click="selectWeeks('suspend')" />
+                            </div>
+                            <div class="mb-3">
+                                <InputSwitch v-model="nextOnly" />Future only
+                            </div>
+                            <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
+                                placeholder="Select Weeks" class="md:w-20rem w-full p-focus"
+                                :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
+                        </div>
                     </div>
 
                     <template #footer>
@@ -329,7 +333,7 @@ const nextDelivery = function (item: Delivery) {
                     </template>
                 </Dialog>
 
-                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null"/>
+                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
 
 
             </div>
