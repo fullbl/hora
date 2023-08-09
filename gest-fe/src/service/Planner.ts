@@ -8,8 +8,18 @@ import type Step from '@/interfaces/step';
 import { ref } from 'vue';
 
 const { getWeekNumber, getDate, weekDays } = useDates();
-
+if (![].toReversed) {
+    Array.prototype.toReversed = function ()
+    {
+        for (var i=(this.length - 1),arr=[]; i>=0; --i) {
+            arr.push(this[i]);
+        }
+        
+        return arr;
+    };
+}
 export default class Planner {
+    
     deliveries: Delivery[] = [];
     activities: Activity[] = [];
     planned = ref([] as Planned[]);
@@ -50,7 +60,7 @@ export default class Planner {
             const harvestDate = getDate(year, week, p.delivery.harvestWeekDay);
             const deliveryDate = getDate(year, week, p.delivery.deliveryWeekDay);
             const date = new Date(harvestDate.getTime());
-            date.setMinutes(date.getMinutes() - p.minutesBeforeHarvest);
+            date.setMinutes(harvestDate.getMinutes() - p.minutesBeforeHarvest);
             while (date < getDate(year, week, 0)) {
                 date.setDate(date.getDate() + 7);
                 deliveryDate.setDate(deliveryDate.getDate() + 7);
@@ -58,9 +68,9 @@ export default class Planner {
             }
             return {
                 ...p,
-                date: date,
-                harvestDate: harvestDate,
-                deliveryDate: deliveryDate,
+                date,
+                harvestDate,
+                deliveryDate,
                 done: this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0)
             };
         });
@@ -70,20 +80,10 @@ export default class Planner {
 
     filter(selectedSteps: string[], day?: number) {
         return this.planned.value.filter((p) => {
-            return undefined !== p.deliveryDate && p.delivery.weeks.includes(getWeekNumber(p.deliveryDate)) && selectedSteps.includes(p.step.name) && (undefined === day || day === p.date.getDay());
+            return undefined !== p.deliveryDate && p.delivery.weeks.includes(getWeekNumber(p.deliveryDate)) && selectedSteps.includes(p.step.name) && (undefined === day || day === p.date?.getDay());
         });
     }
 
-    groupByProduct(planned: Planned[]) {
-        return planned.reduce((g, p) => {
-            const productHash = p.product.name;
-            const products = g.get(productHash) ?? [];
-            products.push(p);
-            g.set(productHash, products);
-
-            return g;
-        }, new Map<string, Planned[]>());
-    }
 
     groupByWeekDayAndProduct(planned: Planned[]) {
         return planned.reduce((g, p) => {

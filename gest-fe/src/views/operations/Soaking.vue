@@ -1,29 +1,51 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 
-import type Delivery from '@/interfaces/delivery';
 import { useDates } from '../composables/dates';
 import type Calendar from 'primevue/calendar';
 import ActivityButton from '@/components/ActivityButton.vue';
-import type Activity from '@/interfaces/activity';
 import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
 
 const date = ref(new Date)
-const { getWeekNumber } = useDates();
+const { getWeekNumber } = useDates()
 
 const planner = new Planner()
+
 onMounted(async () => {
     (await planner.load()).flatPlanned()
 });
 
-const deliveryGroups = computed(() => {
-    return planner.groupByProduct(
-        planner
-            .setDates(date.value.getFullYear(), getWeekNumber(date.value))
-            .filter(['soaking'], date.value.getDay())
-    )
-});
+const box = ref()
+const time = ref()
+
+const soakingTime = computed(() => time.value ? time.value.toLocaleString() : '')
+
+const products = computed(() => {
+    const dayAfter = new Date(date.value.getTime())
+    dayAfter.setDate(date.value.getDate() + 1)
+    return planner
+        .setDates(dayAfter.getFullYear(), getWeekNumber(dayAfter))
+        .filter(
+            ['soaking'],
+            dayAfter.getDay()
+        ).reduce((x, p) => {
+            if (!p.product.id) {
+                return x;
+            }
+
+            const val = x.get(p.product.id) ?? { qty: 0, grams: 0, done: 0 }
+            x.set(p.product.id, {
+                name: p.product.name,
+                grams: (p.product.decigrams / 10 * p.qty) + val.qty,
+                hours: p.step.minutes / 60,
+                qty: val.qty + p.qty,
+                done: val.done + p.done
+            })
+
+            return x
+        }, new Map<number, { name: string, qty: number, done: number, grams: number, hours: number }>)
+})
 
 </script>
 
@@ -34,27 +56,34 @@ const deliveryGroups = computed(() => {
             <Calendar v-model="date" />
             <Button @click="date = new Date(date.getTime() + 24 * 60 * 60 * 1000)">&gt;</Button>
         </div>
+        <div>{{ date.toLocaleDateString(undefined, { weekday: 'long' }) }}</div>
     </div>
-    <div class="flex flex-row flex-wrap justify-content-between">
-        <div class="card" v-for="[name, planned] in deliveryGroups" style="width: 25em">
-            <h2>{{ name }}</h2>
 
-            <div class="card" v-for="p in planned">
-                <QtyHolder :qty="p.qty + ''">
-                    {{ p.delivery.customer?.fullName }}
-                </QtyHolder>
-                <p>
-                    Harvest: {{ p.harvestDate?.toLocaleDateString() }}
-                    <br>
-                    Delivery: {{ p.deliveryDate?.toLocaleDateString() }}
-                </p>
-                <ProgressBar :value="(p.done / p.qty) * 100">
-                    {{ p.done }} / {{ p.qty }}
-                </ProgressBar>
+    <div class="flex flex-row flex-wrap justify-content-start">
+        <div class="card mr-5" v-for="[id, p] in products" style="width: 25em">
+            <h2>{{ p.name }}</h2>
+            <QtyHolder :qty="p.qty" class="mr-2">
+                {{ p.grams }} grams
+            </QtyHolder>
+            <QtyHolder :qty="p.hours">
+                hours
+            </QtyHolder>
+            <ProgressBar :value="(p.done / p.qty) * 100">
+                {{ p.done }} / {{ p.qty }}
+            </ProgressBar>
+            <ActivityButton type="soaking" :baseProducts="[{ qty: p.qty - p.done, product: p.product }]"
+                :year="date.getFullYear()" :week="getWeekNumber(date)" :delivery="p.delivery" />
 
-                <ActivityButton type="soaking" :baseProducts="[{ qty: p.qty - p.done, product: p.product }]"
-                    :year="date.getFullYear()" :week="getWeekNumber(date)" :delivery="p.delivery" />
-            </div>
+        </div>
+
+        <div class="field">
+            <label for="box">Box</label>
+            <InputNumber type="number" v-model="box" required autofocus />
+        </div>
+        <div class="field">
+            <label for="box">Planting tim</label>
+            <Calendar type="number" v-model="time" timeOnly required autofocus />
+            Soaking time: {{ soakingTime }}
         </div>
     </div>
 </template>
