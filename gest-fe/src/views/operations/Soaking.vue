@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-
 import { useDates } from '../composables/dates';
 import type Calendar from 'primevue/calendar';
-import ActivityButton from '@/components/ActivityButton.vue';
 import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
+import { useDialog } from '../composables/dialog';
+import dataService from '@/service/DataService';
+import type Step from '@/interfaces/step';
+import type Delivery from '@/interfaces/delivery';
 
+interface Soaking { name: string, step: Step, deliveries: Delivery[], qty: number, done: number, grams: number, hours: number }
+
+const { dialog, deleteDialog, hideDialog } = useDialog();
 const date = ref(new Date)
 const { getWeekNumber } = useDates()
-
 const planner = new Planner()
 
 onMounted(async () => {
@@ -18,34 +22,81 @@ onMounted(async () => {
 
 const box = ref()
 const time = ref()
+const single = ref<Soaking>()
+const soakingTime = computed(() => {
+    if (!time.value || !single.value) {
+        return
+    }
 
-const soakingTime = computed(() => time.value ? time.value.toLocaleString() : '')
+    const dayAfter = new Date(time.value.getTime())
+    dayAfter.setDate(time.value.getDate() + 1)
+    dayAfter.setHours(time.value.getHours() - single.value.hours)
 
-const products = computed(() => {
-    const dayAfter = new Date(date.value.getTime())
-    dayAfter.setDate(date.value.getDate() + 1)
+    return dayAfter
+})
+
+const planned = computed(() => {
     return planner
-        .setDates(dayAfter.getFullYear(), getWeekNumber(dayAfter))
+        .setDates(date.value.getFullYear(), getWeekNumber(date.value))
         .filter(
             ['soaking'],
-            dayAfter.getDay()
-        ).reduce((x, p) => {
-            if (!p.product.id) {
-                return x;
-            }
-
-            const val = x.get(p.product.id) ?? { qty: 0, grams: 0, done: 0 }
-            x.set(p.product.id, {
-                name: p.product.name,
-                grams: (p.product.decigrams / 10 * p.qty) + val.qty,
-                hours: p.step.minutes / 60,
-                qty: val.qty + p.qty,
-                done: val.done + p.done
-            })
-
-            return x
-        }, new Map<number, { name: string, qty: number, done: number, grams: number, hours: number }>)
+            date.value.getDay()
+        )
 })
+
+const products = computed(() => {
+    return planned.value.reduce((x, p) => {
+        if (!p.product.id) {
+            return x;
+        }
+
+        const val = x.get(p.product.id) ?? {
+            qty: 0,
+            grams: 0,
+            done: 0,
+            deliveries: [] as Delivery[],
+            steps: [] as Step[]
+        }
+        val.deliveries.push(p.delivery)
+
+        x.set(p.product.id, {
+            name: p.product.name,
+            step: p.step,
+            deliveries: val.deliveries,
+            grams: (p.product.decigrams / 10 * p.qty) + val.qty,
+            hours: p.step.minutes / 60,
+            qty: val.qty + p.qty,
+            done: val.done + p.done,
+        })
+
+        return x
+    }, new Map<number, Soaking>)
+})
+
+function select(p: Soaking) {
+    dialog.value = true
+    single.value = p
+}
+
+async function save() {
+    try {
+        await dataService.post(import.meta.env.VITE_API_URL + 'soaking', {
+            box: box.value,
+            time: soakingTime.value,
+            deliveries: single.value?.deliveries.map(d => d.id),
+            step: single.value?.step.id,
+            qty: single.value?.qty,
+            week: getWeekNumber(date.value),
+            year: date.value.getFullYear()
+        })
+        window.location.reload()
+    }
+    catch (e) {
+        alert('error')
+    }
+
+
+}
 
 </script>
 
@@ -56,11 +107,11 @@ const products = computed(() => {
             <Calendar v-model="date" />
             <Button @click="date = new Date(date.getTime() + 24 * 60 * 60 * 1000)">&gt;</Button>
         </div>
-        <div>{{ date.toLocaleDateString(undefined, { weekday: 'long' }) }}</div>
+        <h1>{{ date.toLocaleDateString(undefined, { weekday: 'long' }) }}</h1>
     </div>
 
     <div class="flex flex-row flex-wrap justify-content-start">
-        <div class="card mr-5" v-for="[id, p] in products" style="width: 25em">
+        <div class="card mr-5" v-for="[id, p] in products" @click="select(p)" style="width: 25em">
             <h2>{{ p.name }}</h2>
             <QtyHolder :qty="p.qty" class="mr-2">
                 {{ p.grams }} grams
@@ -71,19 +122,23 @@ const products = computed(() => {
             <ProgressBar :value="(p.done / p.qty) * 100">
                 {{ p.done }} / {{ p.qty }}
             </ProgressBar>
-            <ActivityButton type="soaking" :baseProducts="[{ qty: p.qty - p.done, product: p.product }]"
-                :year="date.getFullYear()" :week="getWeekNumber(date)" :delivery="p.delivery" />
-
         </div>
 
-        <div class="field">
-            <label for="box">Box</label>
-            <InputNumber type="number" v-model="box" required autofocus />
-        </div>
-        <div class="field">
-            <label for="box">Planting tim</label>
-            <Calendar type="number" v-model="time" timeOnly required autofocus />
-            Soaking time: {{ soakingTime }}
-        </div>
+        <Dialog v-model:visible="dialog" style="width: 40rem" header="Soaking Details" :modal="true">
+            <div class="field col-4">
+                <label for="box">Water Box #</label>
+                <InputNumber type="number" v-model="box" required autofocus />
+                <label for="box">Planting time</label>
+                <Calendar type="number" v-model="time" timeOnly required autofocus />
+                <div v-if="soakingTime">
+                    Soaking time: {{ soakingTime.toLocaleString() }}
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
+                <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save" />
+            </template>
+        </Dialog>
     </div>
 </template>

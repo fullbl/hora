@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Service;
+
+use DateTime;
+use Exception;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+class HAService
+{
+    public function __construct(
+        private HttpClientInterface $client,
+        private UrlGeneratorInterface $urlGenerator,
+        private string $url,
+        private string $token
+    ) {
+    }
+
+    public function enqueueScript(DateTime $time, array $activities, string $script, string $name): bool
+    {
+        $id = rand(0, 999999);
+        try {
+            $response = $this->client->request(
+                'POST',
+                $this->url . '/api/config/automation/config/' . $id,
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->token,
+                    ],
+                    'json' => [
+                        'alias' => $name,
+                        'trigger' => [
+                            [
+                                'platform' => 'template',
+                                'value_template' => "now().strftime('%Y-%m-%d %H:%M:%S') == '" . $time->format('Y-m-d H:i:00') . "'",
+                            ],
+                        ],
+                        'action' => [
+                            [
+                                'service' => $script,
+                            ],
+                            [
+                                'service' => 'rest_command.symfony_soaking',
+                                'data' => [
+                                    'ids' => array_map(fn ($a) => ['id' => $a], $activities)
+                                ],
+                            ],
+                            [
+
+                                'service' => 'automation.turn_off',
+                                'entity_id' => 'automation.' . $id
+                            ]
+                        ],
+                    ],
+                ],
+            );
+            $response->getContent();
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+}

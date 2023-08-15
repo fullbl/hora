@@ -11,11 +11,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
 {
-    private const STATUS_PLANNED = 'planned';
-    private const STATUS_WORKING = 'working';
-    private const STATUS_DONE = 'done';
-    private const STATUS_CANCELED = 'canceled';
-    private const STATUS_ERROR = 'error';
+    public const STATUS_PLANNED = 'planned';
+    public const STATUS_WORKING = 'working';
+    public const STATUS_DONE = 'done';
+    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_ERROR = 'error';
     private const STATUSES = [
         self::STATUS_PLANNED,
         self::STATUS_WORKING,

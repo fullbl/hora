@@ -4,7 +4,7 @@ interface DataService {
     post<T>(url: string, postData: object): Promise<T>
     put<T>(url: string, postData: object): Promise<T>
     get<T>(url: string): Promise<T>
-    delete(url: string): Promise<T>
+    delete<T>(url: string): Promise<T>
     token: string | null
 }
 

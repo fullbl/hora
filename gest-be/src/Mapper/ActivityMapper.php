@@ -20,6 +20,23 @@ class ActivityMapper
     ) {
     }
 
+    public function fromArray(array $data): Activity
+    {
+        $activity = new Activity();
+        $activity
+        ->setExecuter($this->security->getUser())
+        ->setExecutionTime(new \DateTimeImmutable)
+        ->setWorkableUntil(new \DateTimeImmutable($data['time']))
+        ->setDelivery($this->em->getReference(Delivery::class, $data['delivery']))
+        ->setStep($this->em->getReference(Step::class, $data['step']))
+        ->setYear(($data['year']))
+        ->setWeek(($data['week']))
+        ->setQty(($data['qty']))
+        ->setStatus(Activity::STATUS_PLANNED)
+        ;
+        return $activity;
+    }
+
     public function fromRequest(Request $request): Activity
     {
         $activity = new Activity();
