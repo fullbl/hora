@@ -9,7 +9,7 @@ const props = defineProps({
     },
     entityId: {
         required: true,
-        type: Number as PropType<number | null>
+        validator: (v: any) => typeof v === 'number' || v === null,
     },
 })
 
@@ -20,7 +20,7 @@ const visible = computed(() =>
 )
 
 watch(() => props.entityId, async () => {
-    if (undefined === props.entityId || null === props.entityId) {
+    if ('number' !== typeof props.entityId) {
         return [];
     }
     logs.value = await logService.getByEntity(props.entityName, props.entityId)
