@@ -1,7 +1,7 @@
 import type Service from '@/interfaces/service';
 import dataService from './DataService';
 import userService from './UserService';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 
 const service: Service<Delivery> = {
     async delete(delivery) {

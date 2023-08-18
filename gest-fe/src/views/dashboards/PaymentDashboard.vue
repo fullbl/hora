@@ -5,7 +5,7 @@ import activityService from '@/service/ActivityService';
 import deliveryService from '@/service/DeliveryService';
 import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import type Product from '@/interfaces/product';

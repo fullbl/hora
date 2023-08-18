@@ -7,7 +7,7 @@ import QtyHolder from '@/components/QtyHolder.vue';
 import { useDialog } from '../composables/dialog';
 import dataService from '@/service/DataService';
 import type Step from '@/interfaces/step';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 
 interface Soaking { name: string, step: Step, deliveries: Delivery[], qty: number, done: number, grams: number, hours: number }
 

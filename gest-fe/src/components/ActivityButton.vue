@@ -8,7 +8,7 @@ import type Dropdown from 'primevue/dropdown';
 import { computed, onMounted, ref, type PropType } from "vue";
 import { useDialog } from '@/views/composables/dialog';
 import { useToast } from 'primevue/usetoast';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 
 const toast = useToast();
 const {dialog, hideDialog} = useDialog();

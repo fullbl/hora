@@ -5,7 +5,7 @@ import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import type Product from '@/interfaces/product';
 import ProgressHolder from '@/components/ProgressHolder.vue';

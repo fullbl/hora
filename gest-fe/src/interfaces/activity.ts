@@ -1,4 +1,4 @@
-import type Delivery from "./delivery";
+import type {Delivery} from "./delivery";
 import type Product from "./product";
 import type Step from "./step";
 import type User from "./user";

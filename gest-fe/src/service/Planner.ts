@@ -1,5 +1,5 @@
 import type Activity from '@/interfaces/activity';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 import type Planned from '@/interfaces/planned';
 import { useDates } from '@/views/composables/dates';
 import deliveryService from '@/service/DeliveryService';

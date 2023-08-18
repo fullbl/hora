@@ -12,7 +12,7 @@ import type { TreeNode } from 'primevue/tree';
 import type Product from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import type Delivery from '@/interfaces/delivery';
+import type {Delivery} from '@/interfaces/delivery';
 import Logger from '@/components/Logger.vue';
 
 const {
@@ -85,11 +85,23 @@ const selectedWeeks = computed({
 
 })
 
-const getNumber = (item: Delivery) =>
-    parseInt(data.value?.filter(d => d.customer?.id === item.customer?.id).findIndex(d => d.id === item.id)) + 1
+const getCustomerNumber = (item: Delivery) =>
+    (data.value?.filter(d => d.customer?.id === item.customer?.id).findIndex(d => d.id === item.id) ?? 0) + 1
+
+const addProduct = () => {
+    if (undefined !== single.value) {
+        const { deliveryProducts, ...rest} = single.value
+        single.value.deliveryProducts.push({ product: productService.getNew(), qty: 0, delivery: rest })
+    }
+}
+const removeProduct = (dp: DeliveryProduct) => {
+    if (undefined !== single.value) {
+        single.value.deliveryProducts = single.value.deliveryProducts.filter(_dp => _dp !== dp)
+    }
+}
 
 const preSave = function () {
-    if (0 >= single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0)) {
+    if (0 >= (single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0) ?? 0)) {
         alert('Product quantity is 0!');
     }
     save()
@@ -162,7 +174,7 @@ const nextDelivery = function (item: Delivery) {
                     </Column>
                     <Column header="#" :sortable="true">
                         <template #body="slotProps">
-                            {{ getNumber(slotProps.data) }}
+                            {{ getCustomerNumber(slotProps.data) }}
                         </template>
                     </Column>
                     <Column field="harvestWeekDay" header="Harvest" :sortable="true">
@@ -275,8 +287,7 @@ const nextDelivery = function (item: Delivery) {
                         <div class="field col-6">
                             <label for="products">Products</label>
 
-                            <Button label="Add" icon="pi pi-plus"
-                                @click="single.deliveryProducts.push({ product: productService.getNew(), qty: 0, delivery: single })" />
+                            <Button label="Add" icon="pi pi-plus" @click="addProduct" />
                             <DataTable :value="single.deliveryProducts">
                                 <Column field="product.name" header="Product">
                                     <template #body="slotProps">
@@ -293,7 +304,7 @@ const nextDelivery = function (item: Delivery) {
                                 <Column header="x">
                                     <template #body="slotProps">
                                         <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                                            @click="single.deliveryProducts = single.deliveryProducts.filter(dp => dp !== slotProps.data)" />
+                                            @click="removeProduct(slotProps.data)" />
                                     </template>
                                 </Column>
                             </DataTable>

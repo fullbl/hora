@@ -1,7 +1,7 @@
 import type DeliveryProduct from "./deliveryProduct";
 import type User from "./user"
 
-export default interface Delivery {
+interface Delivery {
     id?: number,
     harvestWeekDay: number,
     deliveryWeekDay: number,
@@ -11,3 +11,14 @@ export default interface Delivery {
     notes: string,
     paymentMethod?: string
 }
+interface DeliveryWithoutProducts {
+    id?: number,
+    harvestWeekDay: number,
+    deliveryWeekDay: number,
+    weeks: Array<number>,
+    customer?: User,
+    notes: string,
+    paymentMethod?: string
+}
+
+export type {Delivery, DeliveryWithoutProducts}
