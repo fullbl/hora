@@ -1,6 +1,6 @@
 import type Step from "./step";
 
-export default interface Product {
+export interface Product {
     id?: number,
     name: string,
     type: string,
@@ -10,3 +10,13 @@ export default interface Product {
     steps?: Step[],
     weight: boolean
 }
+
+export interface WaterBox extends Product {
+    type: 'water-box',
+}
+
+export interface Seed extends Product {
+    type: 'seed'
+}
+
+export default Product

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useDates } from '../composables/dates';
 import type Calendar from 'primevue/calendar';
 import Planner from '@/service/Planner';
@@ -9,47 +9,62 @@ import dataService from '@/service/DataService';
 import productService from '@/service/ProductService';
 import type Step from '@/interfaces/step';
 import type { Delivery } from '@/interfaces/delivery';
-import type Product from '@/interfaces/product';
+import type { WaterBox } from '@/interfaces/product';
 
-interface Soaking { name: string, step: Step, deliveries: Delivery[], qty: number, done: number, grams: number, hours: number }
+interface Soaking {
+    name: string,
+    step: Step,
+    deliveries: Delivery[],
+    qty: number,
+    done: number,
+    grams: number,
+    hours: number
+}
 
-const { dialog, deleteDialog, hideDialog } = useDialog();
+interface Selected {
+    box?: WaterBox,
+    plantingTime?: Date,
+    soakingTime?: Date,
+    soakings: Soaking[]
+}
+
+const { dialog, hideDialog } = useDialog();
 const date = ref(new Date)
 const { getWeekNumber } = useDates()
 const planner = new Planner()
-const boxes = ref<Product[]>([])
+const boxes = ref<WaterBox[]>([])
 
 onMounted(async () => {
     (await planner.load()).flatPlanned()
-    boxes.value = await productService.getAll()
+    boxes.value = await productService.getWaterBoxes()
 });
 
-const selected = ref<string[]>([])
+const single = ref<Selected>({ soakings: [], plantingTime: new Date })
 
-function select(p: Soaking) {
-    if (selected.value.filter(x => x === p.name).length > 0) {
-        selected.value = selected.value.filter(x => x !== p.name)
+function select(s: Soaking) {
+    if (single.value.soakings.filter(x => x.name === s.name).length > 0) {
+        single.value.soakings = single.value.soakings.filter(x => x.name !== s.name)
     }
     else {
-        selected.value = selected.value.concat([p.name])
+        single.value.soakings = single.value.soakings.concat([s])
     }
 }
 
-
-const box = ref()
-const time = ref()
-const single = ref<Soaking>()
-
-const soakingTime = computed(() => {
-    if (!time.value || !single.value) {
+watch(single.value, (a) => {
+    if (!single.value?.plantingTime) {
         return
     }
 
-    const dayAfter = new Date(time.value.getTime())
-    dayAfter.setDate(time.value.getDate() + 1)
-    dayAfter.setHours(time.value.getHours() - single.value.hours)
+    const dayAfter = new Date(single.value.plantingTime.getTime())
+    dayAfter.setDate(single.value.plantingTime.getDate() + 1)
+    const hours = single.value.soakings[0].hours
+    dayAfter.setHours(
+        single.value.plantingTime.getHours() - hours - (single.value.box?.decigrams ?? 0) //decigrams used as minutes
+    )
 
-    return dayAfter
+    if(single.value.soakingTime?.getTime() !== dayAfter.getTime()){
+        single.value.soakingTime = dayAfter
+    }
 })
 
 const planned = computed(() => {
@@ -94,7 +109,7 @@ const products = computed(() => {
 async function save() {
     try {
         await dataService.post(import.meta.env.VITE_API_URL + 'soaking', {
-            box: box.value,
+            box: single.value?.box,
             time: soakingTime.value,
             deliveries: single.value?.deliveries.map(d => d.id),
             step: single.value?.step.id,
@@ -122,13 +137,13 @@ async function save() {
         </div>
         <div class="flex justify-content-between mt-2">
             <h1>{{ date.toLocaleDateString(undefined, { weekday: 'long' }) }}</h1>
-            <Button @click="dialog = true" v-show="selected.length > 0">SOAK</Button>
+            <Button @click="dialog = true" v-show="single.soakings.length > 0">SOAK</Button>
         </div>
     </div>
 
     <div class="flex flex-row flex-wrap justify-content-start">
-        <div class="card mr-5" :class="selected.filter(x => x === p.name).length > 0 ? 'border-primary' : ''" v-for="[id, p] in products" @click="select(p)"
-            style="width: 25em">
+        <div class="card mr-5" :class="single.soakings.filter(x => x.name === p.name).length > 0 ? 'border-primary' : ''"
+            v-for="[id, p] in products" @click="select(p)" style="width: 25em">
             <h2>{{ p.name }}</h2>
             <QtyHolder :qty="p.qty" class="mr-2">
                 {{ p.grams }} grams
@@ -141,14 +156,20 @@ async function save() {
             </ProgressBar>
         </div>
 
-        <Dialog v-model:visible="dialog" style="width: 40rem" header="Soaking Details" :modal="true">
-            <div class="field col-4">
+        <Dialog v-model:visible="dialog" header="Soaking Details" :modal="true" class="p-fluid">
+            <div class="field">
                 <label for="box">Water Box #</label>
-                <InputNumber type="number" v-model="box" required autofocus />
+                <Dropdown v-model="single.box" :options="boxes" optionLabel="name" dataKey="id"
+                    placeholder="Select a Water Box" showClear filter>
+                </Dropdown>
+            </div>
+            <div class="field">
                 <label for="box">Planting time</label>
-                <Calendar type="number" v-model="time" timeOnly required autofocus />
-                <div v-if="soakingTime">
-                    Soaking time: {{ soakingTime.toLocaleString() }}
+                <Calendar type="number" v-model="single.plantingTime" timeOnly required autofocus />
+            </div>
+            <div class="field">
+                <div v-if="single.soakingTime">
+                    Soaking time: {{ single.soakingTime.toLocaleString() }}
                 </div>
             </div>
 
@@ -161,7 +182,7 @@ async function save() {
 </template>
 
 <style>
-    .card {
-        cursor: pointer;
-    }
+.card {
+    cursor: pointer;
+}
 </style>

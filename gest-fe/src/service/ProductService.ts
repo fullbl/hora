@@ -1,13 +1,25 @@
 import type Service from '@/interfaces/service';
 import dataService from './DataService';
 import type Product from '@/interfaces/product';
+import type { Seed, WaterBox } from '@/interfaces/product';
 
-const service: Service<Product> = {
+
+interface ProductService extends Service<Product> {
+    getSeeds(): Promise<Seed[]>,
+    getWaterBoxes(): Promise<WaterBox[]>
+}
+const service: ProductService = {
     async delete(product) {
         return await dataService.delete(import.meta.env.VITE_API_URL + 'products/' + product.id);
     },
     async getAll() {
         return await dataService.get(import.meta.env.VITE_API_URL + 'products');
+    },
+    async getSeeds() {
+        return await dataService.get<Seed[]>(import.meta.env.VITE_API_URL + 'seeds');
+    },
+    async getWaterBoxes() {
+        return await dataService.get<WaterBox[]>(import.meta.env.VITE_API_URL + 'water_boxes');
     },
     async save(product) {
         if(product.steps){

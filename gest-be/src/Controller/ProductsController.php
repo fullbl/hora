@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Mapper\ProductMapper;
 use App\Repository\LogRepository;
 use App\Repository\ProductRepository;
@@ -23,6 +24,22 @@ class ProductsController extends AbstractController
         private ValidatorInterface $validator,
         private LogRepository $logRepo
     ) {
+    }
+
+    #[Route('/water_boxes', methods: ['GET'], name: 'water_boxes_list')]
+    public function waterBoxes(): JsonResponse
+    {
+        return $this->json($this->repo->findBy(['type' => Product::TYPE_WATER_BOX]), Response::HTTP_OK, [], [
+            'groups' => 'product'
+        ]);
+    }
+
+    #[Route('/seeds', methods: ['GET'], name: 'seeds_list')]
+    public function seeds(): JsonResponse
+    {
+        return $this->json($this->repo->findBy(['type' => Product::TYPE_SEED]), Response::HTTP_OK, [], [
+            'groups' => 'product'
+        ]);
     }
 
     #[Route('/products', methods: ['GET'], name: 'products_list')]
