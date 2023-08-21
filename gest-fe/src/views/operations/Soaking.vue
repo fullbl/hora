@@ -6,8 +6,10 @@ import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
 import { useDialog } from '../composables/dialog';
 import dataService from '@/service/DataService';
+import productService from '@/service/ProductService';
 import type Step from '@/interfaces/step';
 import type { Delivery } from '@/interfaces/delivery';
+import type Product from '@/interfaces/product';
 
 interface Soaking { name: string, step: Step, deliveries: Delivery[], qty: number, done: number, grams: number, hours: number }
 
@@ -15,14 +17,29 @@ const { dialog, deleteDialog, hideDialog } = useDialog();
 const date = ref(new Date)
 const { getWeekNumber } = useDates()
 const planner = new Planner()
+const boxes = ref<Product[]>([])
 
 onMounted(async () => {
     (await planner.load()).flatPlanned()
+    boxes.value = await productService.getAll()
 });
+
+const selected = ref<string[]>([])
+
+function select(p: Soaking) {
+    if (selected.value.filter(x => x === p.name).length > 0) {
+        selected.value = selected.value.filter(x => x !== p.name)
+    }
+    else {
+        selected.value = selected.value.concat([p.name])
+    }
+}
+
 
 const box = ref()
 const time = ref()
-const single = ref<Soaking[]>([])
+const single = ref<Soaking>()
+
 const soakingTime = computed(() => {
     if (!time.value || !single.value) {
         return
@@ -73,14 +90,6 @@ const products = computed(() => {
     }, new Map<number, Soaking>)
 })
 
-function select(p: Soaking) {
-    if (single.value.filter(x => x.name === p.name).length > 0) {
-        single.value = single.value.filter(x => x.name !== p.name)
-    }
-    else {
-        single.value = single.value.concat([p])
-    }
-}
 
 async function save() {
     try {
@@ -113,12 +122,12 @@ async function save() {
         </div>
         <div class="flex justify-content-between mt-2">
             <h1>{{ date.toLocaleDateString(undefined, { weekday: 'long' }) }}</h1>
-            <Button @click="dialog = true" v-show="single.length > 0">SOAK</Button>
+            <Button @click="dialog = true" v-show="selected.length > 0">SOAK</Button>
         </div>
     </div>
 
     <div class="flex flex-row flex-wrap justify-content-start">
-        <div class="card mr-5" :class="single.filter(x => x.name === p.name).length > 0 ? 'border-primary' : ''" v-for="[id, p] in products" @click="select(p)"
+        <div class="card mr-5" :class="selected.filter(x => x === p.name).length > 0 ? 'border-primary' : ''" v-for="[id, p] in products" @click="select(p)"
             style="width: 25em">
             <h2>{{ p.name }}</h2>
             <QtyHolder :qty="p.qty" class="mr-2">
