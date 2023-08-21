@@ -24,7 +24,7 @@ const statuses = [
 const products = ref<Array<Product>>([])
 
 onMounted(async () => {
-    products.value = await productService.getAll()
+    products.value = await productService.getSeeds()
 });
 
 </script>

@@ -58,11 +58,10 @@ watch(single.value, (a) => {
     const dayAfter = new Date(single.value.plantingTime.getTime())
     dayAfter.setDate(single.value.plantingTime.getDate() + 1)
     const hours = single.value.soakings[0].hours
-    dayAfter.setHours(
-        single.value.plantingTime.getHours() - hours - (single.value.box?.decigrams ?? 0) //decigrams used as minutes
-    )
+    dayAfter.setHours(single.value.plantingTime.getHours() - hours)
+    dayAfter.setMinutes(single.value.plantingTime.getMinutes() - (single.value.box?.decigrams ?? 0)) //decigrams used as minutes
 
-    if(single.value.soakingTime?.getTime() !== dayAfter.getTime()){
+    if (single.value.soakingTime?.getTime() !== dayAfter.getTime()) {
         single.value.soakingTime = dayAfter
     }
 })

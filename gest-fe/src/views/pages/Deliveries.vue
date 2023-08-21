@@ -33,7 +33,7 @@ const nextOnly = ref(false)
 onMounted(async () => {
     customers.value = (await userService.getAll())
         .filter(u => u.roles.includes('ROLE_CUSTOMER'))
-    products.value = (await productService.getAll())
+    products.value = (await productService.getSeeds())
 });
 
 const selectedWeeks = computed({
