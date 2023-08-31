@@ -52,11 +52,11 @@ export function useDataView<T>(service: Service<T>) {
         },
         hideDialog,
         editData(data: T) {
-            single.value = { ...data };
+            single.value = JSON.parse(JSON.stringify(data));
             dialog.value = true;
         },
         cloneData(data: T) {
-            single.value = { ...data };
+            single.value = JSON.parse(JSON.stringify(data));
             delete single.value.id
             dialog.value = true;
         },
