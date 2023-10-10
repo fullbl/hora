@@ -44,6 +44,9 @@ class ActivitiesController extends AbstractController
         $data = $request->toArray();
         $soakingTime = new \DateTime($data['time']);
         $activities = [];
+
+        
+
         foreach ($data['soakings'] as $soaking) {
             foreach ($soaking['deliveries'] as $delivery) {
                 $activity = $this->mapper->fromArray([
@@ -54,22 +57,29 @@ class ActivitiesController extends AbstractController
                     'week' => $data['week'],
                     'qty' => $soaking['qty'],
                     'status' => Activity::STATUS_PLANNED,
+                    
                 ]);
                 $this->repo->save($activity, true);
-                $activities[] = $activity->getId();
+                $activities[] = $activity;
             }
         }
-        if (!$hAService->enqueueScript(
+
+        $scriptId = $hAService->enqueueScript(
             $soakingTime,
             $activities,
             'script.pompa_' . $data['box'],
             sprintf('Pompa %s %s', $data['box'], $soakingTime->format('Y-m-d H:i'))
-        )) {
+        );
+
+        if (null === $scriptId) {
             return $this->json(['status' => 'error'], 400);
         }
 
-
-        if (isset($activity)) {
+        foreach($activities as $activity){
+            $activity->setData([
+                'script' => $scriptId,
+                'box' => $data['box'],
+            ]);
             $this->repo->save($activity, true);
         }
 

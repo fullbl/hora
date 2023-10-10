@@ -1,3 +1,4 @@
+import type Activity from './activity';
 import type {Delivery} from './delivery';
 import type Product from './product';
 import type Step from './step';
@@ -13,4 +14,5 @@ export default interface Planned {
     date?: Date;
     harvestDate?: Date;
     deliveryDate?: Date;
+    activities?: Activity[];
 }

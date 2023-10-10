@@ -69,6 +69,10 @@ class Activity
     #[Assert\Choice(self::STATUSES)]
     #[Assert\NotNull]
     private ?string $status = null;
+
+    #[Groups(['activity-list'])]
+    #[ORM\Column(type: Types::JSON, options: ['default' => '{}'])]
+    private array $data = [];
     
     #[Groups(['activity-list'])]
     #[ORM\Column(type: Types::SMALLINT)]
@@ -170,6 +174,18 @@ class Activity
     public function setStatus(string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function setData(array $data): Activity
+    {
+        $this->data = $data;
 
         return $this;
     }

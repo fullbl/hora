@@ -19,6 +19,10 @@ interface Soaking {
     done: number;
     grams: number;
     hours: number;
+    data: {
+        box?: number;
+        script?: number;
+    };
 }
 
 interface Selected {
@@ -80,7 +84,8 @@ const products = computed(() => {
             grams: 0,
             done: 0,
             deliveries: [] as Delivery[],
-            steps: [] as Step[]
+            steps: [] as Step[],
+            data: {} as any
         };
         val.deliveries.push(p.delivery);
 
@@ -91,7 +96,12 @@ const products = computed(() => {
             grams: (p.product.decigrams / 10) * p.qty + val.qty,
             hours: p.step.minutes / 60,
             qty: val.qty + p.qty,
-            done: val.done + p.done
+            done: val.done + p.done,
+            data: p.activities?.reduce((y, a) => {
+                y.box = a.data.box;
+                y.script = a.data.script;
+                return y;
+            }, val.data)
         });
 
         return x;
@@ -147,6 +157,8 @@ async function save() {
             <QtyHolder :qty="p.qty" class="mr-2"> {{ p.grams }} grams </QtyHolder>
             <QtyHolder :qty="p.hours"> hours </QtyHolder>
             <ProgressBar :value="(p.done / p.qty) * 100"> {{ p.done }} / {{ p.qty }} </ProgressBar>
+            <div v-if="p.data.box">Water box: {{ p.data.box }}</div>
+            <div v-if="p.data.script">Script id: {{ p.data.script }}</div>
         </div>
 
         <Dialog v-model:visible="dialog" header="Soaking Details" :modal="true" class="p-fluid">

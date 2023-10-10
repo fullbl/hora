@@ -2,9 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\Activity;
 use DateTime;
 use Exception;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -18,7 +18,10 @@ class HAService
     ) {
     }
 
-    public function enqueueScript(DateTime $time, array $activities, string $script, string $name): bool
+    /**
+     * @param array<Activity> $activities
+     */
+    public function enqueueScript(DateTime $time, array $activities, string $script, string $name): ?int
     {
         $id = rand(0, 999999);
         try {
@@ -44,7 +47,7 @@ class HAService
                             [
                                 'service' => 'rest_command.symfony_soaking',
                                 'data' => [
-                                    'ids' => array_map(fn ($a) => ['id' => $a], $activities)
+                                    'ids' => array_map(fn (Activity $a): array => ['id' => $a->getId()], $activities)
                                 ],
                             ],
                             [
@@ -57,9 +60,10 @@ class HAService
                 ],
             );
             $response->getContent();
-            return true;
+            
+            return $id;
         } catch (Exception $e) {
-            return false;
+            return null;
         }
     }
 }

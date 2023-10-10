@@ -66,12 +66,14 @@ export default class Planner {
                 deliveryDate.setDate(deliveryDate.getDate() + 7);
                 harvestDate.setDate(harvestDate.getDate() + 7);
             }
+            const activities = this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week);
             return {
                 ...p,
                 date,
                 harvestDate,
                 deliveryDate,
-                done: this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week).reduce((i, dp) => i + dp.qty, 0)
+                done: activities.reduce((i, dp) => i + dp.qty, 0),
+                activities
             };
         });
 
