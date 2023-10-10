@@ -24,12 +24,12 @@ class ActivitiesController extends AbstractController
         private ValidatorInterface $validator
     ) {
     }
-    
+
     #[Route('/ha/soaking', methods: ['POST'], name: 'activities_soaking_trigger')]
     public function soakingTrigger(Request $request): JsonResponse
     {
         $ids = $request->toArray()['ids'] ?? [];
-        foreach($ids as $id){
+        foreach ($ids as $id) {
             $activity = $this->repo->find($id);
             $activity->setStatus(Activity::STATUS_DONE);
             $this->repo->save($activity, true);
@@ -44,18 +44,20 @@ class ActivitiesController extends AbstractController
         $data = $request->toArray();
         $soakingTime = new \DateTime($data['time']);
         $activities = [];
-        foreach ($data['deliveries'] as $delivery) {
-            $activity = $this->mapper->fromArray([
-                'time' => $data['time'],
-                'delivery' => $delivery,
-                'step' => $data['step'],
-                'year' => $data['year'],
-                'week' => $data['week'],
-                'qty' => $data['qty'],
-                'status' => Activity::STATUS_PLANNED,
-            ]);
-            $this->repo->save($activity, true);
-            $activities[] = $activity->getId();
+        foreach ($data['soakings'] as $soaking) {
+            foreach ($soaking['deliveries'] as $delivery) {
+                $activity = $this->mapper->fromArray([
+                    'time' => $data['time'],
+                    'delivery' => $delivery,
+                    'step' => $soaking['step'],
+                    'year' => $data['year'],
+                    'week' => $data['week'],
+                    'qty' => $soaking['qty'],
+                    'status' => Activity::STATUS_PLANNED,
+                ]);
+                $this->repo->save($activity, true);
+                $activities[] = $activity->getId();
+            }
         }
         if (!$hAService->enqueueScript(
             $soakingTime,

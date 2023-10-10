@@ -1,10 +1,5 @@
 export default [
-    {
-        path: '/dashboards/storage',
-        name: 'storage-dashboard',
-        component: () => import('@/views/dashboards/StorageDashboard.vue'),
-        meta: { auth: 'ROLE_OPERATOR' }
-    },
+   
     {
         path: '/dashboards/steps',
         name: 'steps-dashboard',
