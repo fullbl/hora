@@ -54,7 +54,7 @@ class ProductsController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $product = $this->mapper->fromRequest($request);
-        $errors = $this->validator->validate($product);
+        $errors = $this->validator->validate($product, null, [$request->toArray()['type']]);
         if ($errors->count() > 0) {
 
             return $this->json(

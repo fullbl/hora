@@ -52,14 +52,14 @@ class Product
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
-    #[Assert\NotNull]
+    #[Assert\NotNull(groups: ['seeds'])]
     private ?int $decigrams = null;
     
     #[Groups(['delivery-list', 'product', 'product-edit'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
-    #[Assert\NotNull]
+    #[Assert\NotNull(groups: ['seeds'])]
     private ?int $days = null;
     
     #[Groups(['delivery-list', 'product', 'product-edit'])]

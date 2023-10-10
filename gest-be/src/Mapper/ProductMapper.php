@@ -45,7 +45,7 @@ class ProductMapper
         }) as $step) {
             $newProduct->removeStep($step);
         }
-        foreach ($data['steps'] as $stepData) {
+        foreach ($data['steps'] ?? [] as $stepData) {
             if (isset($stepData['id'])) {
                 $step = $this->em->find(Step::class, $stepData['id']);
                 $step = $this->serializer->deserialize(
