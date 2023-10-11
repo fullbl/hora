@@ -24,7 +24,7 @@ const {
     isInvalid
 } = useDataView(deliveryService)
 
-const { getWeekNumber, weeks, weekDays, getDate } = useDates()
+const { getWeekNumber, weeks, weekDays, getDate, locale } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
 const logEntity = ref(null)
@@ -198,7 +198,7 @@ const nextDelivery = function (item: Delivery) {
                     <Column header="Next Delivery" :sortable="true" headerStyle="min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Next Delivery</span>
-                            {{ nextDelivery(slotProps.data)?.toLocaleDateString() }}
+                            {{ nextDelivery(slotProps.data)?.toLocaleDateString(locale) }}
                         </template>
                     </Column>
                     <Column field="deliveryProducts" header="Products" :sortable="true" headerStyle="min-width:10rem;">

@@ -11,6 +11,7 @@ interface useDates {
     getDate(year: number, week: number, weekDay: number): Date;
     weekDays: Array<{ label: string; value: number }>;
     weeks: Array<HoraTreeNode>;
+    locale: string;
 }
 
 export function useDates(): useDates {
@@ -160,6 +161,7 @@ export function useDates(): useDates {
                     { key: '53', label: '53 (31)' }
                 ]
             }
-        ]
+        ],
+        locale: 'it-IT'
     };
 }

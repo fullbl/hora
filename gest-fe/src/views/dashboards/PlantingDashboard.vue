@@ -7,7 +7,7 @@ import Planner from '@/service/Planner';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import QtyHolder from '@/components/QtyHolder.vue';
 
-const { getWeekNumber, getDate, weekDays } = useDates();
+const { getWeekNumber, getDate, weekDays, locale } = useDates();
 
 const today = new Date();
 const week = ref(getWeekNumber(today));
@@ -63,7 +63,7 @@ const dayTotal = function (weekDay: number) {
     <div class="card">
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of  weekDays ">
-                <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString() }}</h5>
+                <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString(locale) }}</h5>
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
                 <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
                     <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g{{ dp.product.weight ? ' + weight' : '' }})</QtyHolder>

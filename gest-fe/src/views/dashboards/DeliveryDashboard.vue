@@ -8,14 +8,13 @@ import type {Delivery} from '@/interfaces/delivery';
 import type Product from '@/interfaces/product';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
-import type Step from '@/interfaces/step';
 import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
 
-const { getWeekNumber, getDate, weekDays } = useDates();
+const { getWeekNumber, getDate, weekDays, locale } = useDates();
 
 const today = new Date();
 const week = ref(getWeekNumber(today));
@@ -114,7 +113,7 @@ const zoneTotal = function (customers: Map<string, Map<string, { qty: number, do
     return totals;
 }
 
-const weekDayTotal = function (weekDay: number) {
+const dayTotal = function (weekDay: number) {
     let totals = 0;
     const zones = deliveryGroups.value.get(weekDay)
     if (undefined === zones) {
@@ -131,7 +130,7 @@ const weekDayTotal = function (weekDay: number) {
 const weekTotal = computed(function () {
     let totals = 0;
     for (let i = 0; i < 6; i++) {
-        totals += weekDayTotal(i);
+        totals += dayTotal(i);
     }
 
     return totals;
@@ -143,14 +142,20 @@ const weekTotal = computed(function () {
     <div class="card">
         <input type="number" v-model="year" placeholder="year" />
         <input type="number" v-model="week" min="1" max="53" placeholder="week" />
-        Total: {{ weekTotal }}
     </div>
+
+    <div class="card">
+        Week total: {{ weekTotal }}
+    </div>
+
     <Toast />
 
     <div class="card">
         <div class="grid">
             <div style="width:14.28%" v-for="weekDay of weekDays">
-                <h5>{{ weekDay.label }}: {{ weekDayTotal(weekDay.value) }}</h5>
+                <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString(locale) }}</h5>
+                <b>Day total: {{ dayTotal(weekDay.value) }}</b>
+
                 <div>
                     <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)"
                         :header="zone + ': ' + zoneTotal(customers)" toggleable collapsed>

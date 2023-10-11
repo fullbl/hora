@@ -34,7 +34,7 @@ interface Selected {
 
 const { dialog, hideDialog } = useDialog();
 const date = ref(new Date());
-const { getWeekNumber } = useDates();
+const { getWeekNumber, locale } = useDates();
 const planner = new Planner();
 const boxes = ref<WaterBox[]>([]);
 
@@ -146,7 +146,7 @@ async function save() {
             <Button @click="date = new Date(date.getTime() + 24 * 60 * 60 * 1000)">&gt;</Button>
         </div>
         <div class="flex justify-content-between mt-2">
-            <h1>{{ date.toLocaleDateString(undefined, { weekday: 'long' }) }}</h1>
+            <h1>{{ date.toLocaleDateString(locale, { weekday: 'long' }) }}</h1>
             <Button @click="dialog = true" v-show="single.soakings.length > 0">SOAK</Button>
         </div>
     </div>
