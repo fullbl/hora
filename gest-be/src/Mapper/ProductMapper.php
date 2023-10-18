@@ -39,12 +39,13 @@ class ProductMapper
         foreach ($newProduct->getSteps()->filter(function (Step $step) use ($data): bool {
             $stepKey = array_search($step->getId(), array_column($data['steps'], 'id'), true);
             if (false === $stepKey) {
-                return false;
+                return true;
             }
             return $data['steps'][$stepKey]['sort'] !== $step->getSort();
         }) as $step) {
             $newProduct->removeStep($step);
         }
+        
         foreach ($data['steps'] ?? [] as $stepData) {
             if (isset($stepData['id'])) {
                 $step = $this->em->find(Step::class, $stepData['id']);
