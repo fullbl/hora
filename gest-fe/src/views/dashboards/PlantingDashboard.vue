@@ -6,6 +6,7 @@ import Toast from 'primevue/toast';
 import Planner from '@/service/Planner';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import QtyHolder from '@/components/QtyHolder.vue';
+import YearWeek from '@/components/YearWeek.vue';
 
 const { getWeekNumber, getDate, weekDays, locale } = useDates();
 
@@ -50,8 +51,7 @@ const dayTotal = function (weekDay: number) {
 
 <template>
     <div class="card">
-        <input type="number" v-model="year" placeholder="year" />
-        <input type="number" v-model="week" min="1" max="53" placeholder="week" />
+        <YearWeek v-model:year="year" v-model:week="week" />
     </div>
 
     <div class="card">

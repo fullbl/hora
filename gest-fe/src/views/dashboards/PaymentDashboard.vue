@@ -9,6 +9,7 @@ import type {Delivery} from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import type Product from '@/interfaces/product';
+import YearWeek from '@/components/YearWeek.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -56,8 +57,7 @@ const payments = computed(() => {
 
 <template>
     <div class="card">
-        <input type="number" v-model="year" placeholder="year" />
-        <input type="number" v-model="week" min="1" max="53" placeholder="week" />
+        <YearWeek v-model:year="year" v-model:week="week" />
     </div>
 
     <Toast />

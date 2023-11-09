@@ -13,8 +13,7 @@ const props = defineProps({
         default: 'minutes',
         required: true,
         validator: (v: string) => ['days', 'hours', 'minutes'].includes(v)
-    }
-    
+    }    
 })
 
 const emit = defineEmits(['update:modelValue'])

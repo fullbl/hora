@@ -10,6 +10,7 @@ import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
+import YearWeek from '@/components/YearWeek.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -140,8 +141,7 @@ const weekTotal = computed(function () {
 
 <template>
     <div class="card">
-        <input type="number" v-model="year" placeholder="year" />
-        <input type="number" v-model="week" min="1" max="53" placeholder="week" />
+        <YearWeek v-model:year="year" v-model:week="week" />
     </div>
 
     <div class="card">
