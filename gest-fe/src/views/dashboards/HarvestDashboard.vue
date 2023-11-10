@@ -182,7 +182,7 @@ const groupNames = computed(function () {
                                 {{ groupName }} {{ groupWeekTotal(weekDay.value, groupName) }}
                             </template>
                             <p v-for="[name, dp] in Array.from(products).sort(([x, a],[y, b]) => a.product.name.localeCompare(b.product.name))">
-                                <QtyHolder :qty="dp.qty">{{ dp.product.name }}</QtyHolder>
+                                <QtyHolder :qty="dp.qty">{{ name }}</QtyHolder>
                                 <ProgressHolder :dp="dp" />
                             </p>
                         </Panel>
