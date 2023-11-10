@@ -3,7 +3,9 @@ import userService from '@/service/UserService';
 import { useDataView } from '../composables/dataView'
 import Logger from '@/components/Logger.vue';
 import { ref } from 'vue';
-const { filters, data, single, save, openNew, editData, dialog, hideDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(userService);
+const { filters, data, single, save, openNew, editData, 
+    dialog, hideDialog, showDialog, deleteDialog, 
+    confirmDelete, deleteData, isInvalid } = useDataView(userService);
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Operator', value: 'ROLE_OPERATOR' },
@@ -111,7 +113,7 @@ const logEntity = ref(null);
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="User Details" :modal="true"
+                <Dialog v-model:visible="showDialog" :style="{ width: '450px' }" :header="dialog" :modal="true"
                     v-if="single" class="p-fluid">
 
                     <div class="field">

@@ -9,7 +9,7 @@ const {
     filters, 
     data, single, save, 
     openNew, editData, 
-    dialog, hideDialog, 
+    dialog, hideDialog, showDialog,
     deleteDialog, confirmDelete, deleteData,
     isInvalid
 } = useDataView(orderService)
@@ -90,7 +90,7 @@ onMounted(async () => {
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '450px' }" header="Single Details" :modal="true"
+                <Dialog v-model:visible="showDialog" :style="{ width: '450px' }" :header="dialog" :modal="true"
                     class="p-fluid" v-if="'undefined' !== typeof single">
 
                     <div class="field">

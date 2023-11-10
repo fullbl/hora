@@ -32,7 +32,7 @@ interface Selected {
     soakings: Soaking[];
 }
 
-const { dialog, hideDialog } = useDialog();
+const { dialog, hideDialog, showDialog } = useDialog();
 const date = ref(new Date());
 const { getWeekNumber, locale } = useDates();
 const planner = new Planner();
@@ -147,7 +147,7 @@ async function save() {
         </div>
         <div class="flex justify-content-between mt-2">
             <h1>{{ date.toLocaleDateString(locale, { weekday: 'long' }) }}</h1>
-            <Button @click="dialog = true" v-show="single.soakings.length > 0">SOAK</Button>
+            <Button @click="dialog = 'Soak'" v-show="single.soakings.length > 0">SOAK</Button>
         </div>
     </div>
 
@@ -161,7 +161,8 @@ async function save() {
             <div v-if="p.data.script">Script id: {{ p.data.script }}</div>
         </div>
 
-        <Dialog v-model:visible="dialog" header="Soaking Details" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="showDialog" header="Soaking Details" :modal="true" class="p-fluid">
+            <h2>{{ dialog }}</h2>
             <div v-for="s in single.soakings">
                 <p>{{ s.name }}: {{ s.grams }} grams ({{ s.hours }} hours)</p>
             </div>

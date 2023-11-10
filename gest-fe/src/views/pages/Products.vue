@@ -6,7 +6,9 @@ import { computed, ref } from 'vue';
 import Logger from '@/components/Logger.vue';
 import type Step from '@/interfaces/step';
 import Checkbox from 'primevue/checkbox';
-const { filters, data, single, save, openNew, editData, dialog, hideDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(productService);
+const { filters, data, single, save, openNew, editData, 
+    dialog, hideDialog, showDialog, deleteDialog, 
+    confirmDelete, deleteData, isInvalid } = useDataView(productService);
 
 const logEntity = ref(null);
 
@@ -135,7 +137,7 @@ const price = computed({
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" v-if="single" style="width: 40rem" header="Product Details" :modal="true" class="p-fluid">
+                <Dialog v-model:visible="showDialog" v-if="single" style="width: 40rem" :header="dialog" :modal="true" class="p-fluid">
                     <div class="formgrid grid">
                         <div class="field col-6">
                             <label for="name">Name</label>

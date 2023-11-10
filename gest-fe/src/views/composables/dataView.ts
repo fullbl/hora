@@ -12,7 +12,7 @@ export function useDataView<T>(service: Service<T>) {
     const data = ref<Array<T>>();
     const single = ref<T>();
     const toast = useToast();
-    const {dialog, deleteDialog, hideDialog} = useDialog();
+    const {dialog, deleteDialog, hideDialog, showDialog} = useDialog();
     const violations = ref([]);
     const filters = ref({
         global: { value: '', matchMode: 'contains' }
@@ -30,6 +30,7 @@ export function useDataView<T>(service: Service<T>) {
         filters,
         dialog,
         deleteDialog,
+        showDialog,
         async save() {
             if ('undefined' === typeof single.value || null === single.value) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
@@ -40,7 +41,7 @@ export function useDataView<T>(service: Service<T>) {
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Object Updated/Created', life: 3000 });
                 single.value = service.getNew();
                 data.value = await service.getAll();
-                dialog.value = false;
+                hideDialog();
             } catch (e) {
                 violations.value = e.violations;
                 toast.add({ severity: 'error', summary: 'Error', detail: e.message ?? e.detail ?? 'Generic error', life: 3000 });
@@ -48,19 +49,19 @@ export function useDataView<T>(service: Service<T>) {
         },
         openNew() {
             single.value = service.getNew();
-            dialog.value = true;
+            dialog.value = 'New';
         },
         hideDialog,
         editData(data: T) {
             single.value = JSON.parse(JSON.stringify(data));
-            dialog.value = true;
+            dialog.value = 'Edit';
         },
         cloneData(data: T) {
             single.value = JSON.parse(JSON.stringify(data));
             if(single.value){
                 delete single.value.id
             }
-            dialog.value = true;
+            dialog.value = 'Clone';
         },
         confirmDelete(data: T) {
             single.value = data;

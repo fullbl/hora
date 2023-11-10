@@ -20,7 +20,7 @@ const {
     filters,
     data, single, save,
     openNew: _openNew, editData: _editData, cloneData,
-    dialog, hideDialog,
+    dialog, hideDialog,showDialog,
     deleteDialog, confirmDelete, deleteData,
     isInvalid
 } = useDataView(deliveryService)
@@ -258,7 +258,7 @@ const nextDelivery = function (item: Delivery) {
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="dialog" :style="{ width: '60rem' }" header="Delivery Details" :modal="true"
+                <Dialog v-model:visible="showDialog" :style="{ width: '60rem' }" :header="dialog" :modal="true"
                     class="p-fluid" v-if="'undefined' !== typeof single">
                     <div class="formgrid grid">
 
