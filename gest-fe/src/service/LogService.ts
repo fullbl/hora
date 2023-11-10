@@ -1,4 +1,3 @@
-import type Service from '@/interfaces/service';
 import dataService from './DataService';
 import type Log from '@/interfaces/log';
 

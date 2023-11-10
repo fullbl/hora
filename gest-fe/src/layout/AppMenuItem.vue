@@ -27,7 +27,7 @@ const props = defineProps({
 });
 
 const isActiveMenu = ref(false);
-const itemKey = ref(null);
+const itemKey = ref('');
 
 onBeforeMount(() => {
     itemKey.value = props.parentItemKey ? props.parentItemKey + '-' + props.index : String(props.index);

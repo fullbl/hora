@@ -39,7 +39,7 @@ const service: ActivityService = {
             week: getWeekNumber(today),
             status: 'planned',
             step: stepService.getNew(),
-            qty: 0
+            qty: 0,
         };
     }
 };

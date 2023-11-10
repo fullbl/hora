@@ -57,7 +57,9 @@ export function useDataView<T>(service: Service<T>) {
         },
         cloneData(data: T) {
             single.value = JSON.parse(JSON.stringify(data));
-            delete single.value.id
+            if(single.value){
+                delete single.value.id
+            }
             dialog.value = true;
         },
         confirmDelete(data: T) {

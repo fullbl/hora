@@ -1,16 +1,16 @@
+import type { weekNumber, year } from "./dates";
 import type {Delivery} from "./delivery";
-import type Product from "./product";
 import type Step from "./step";
 import type User from "./user";
 
 export default interface Activity {
     id?: number,
     delivery?: Delivery,
-    year: number,
-    week: number,
+    year: year,
+    week: weekNumber,
     step: Step,
     status: string,
-    data: {
+    data?: {
         box?: number,
         script?: number,
     },

@@ -9,6 +9,7 @@ import { computed, onMounted, ref, type PropType } from "vue";
 import { useDialog } from '@/views/composables/dialog';
 import { useToast } from 'primevue/usetoast';
 import type {Delivery} from '@/interfaces/delivery';
+import type { weekNumber, year } from '@/interfaces/dates';
 
 const toast = useToast();
 const {dialog, hideDialog} = useDialog();
@@ -34,11 +35,11 @@ const props = defineProps({
     },
     year: {
         required: true,
-        type: Number,
+        type: Number as PropType<year>,
     },
     week: {
         required: true,
-        type: Number,
+        type: Number as PropType<weekNumber>,
     },
     delivery: {
         required: true,

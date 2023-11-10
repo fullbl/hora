@@ -1,4 +1,5 @@
 import type { TreeNode } from 'primevue/tree';
+import type { weekDay, weekNumber, year } from '@/interfaces/dates';
 
 interface HoraTreeNode extends TreeNode {
     key: string;
@@ -7,33 +8,38 @@ interface HoraTreeNode extends TreeNode {
 }
 
 interface useDates {
-    getWeekNumber(d: Date): number;
-    getDate(year: number, week: number, weekDay: number): Date;
-    weekDays: Array<{ label: string; value: number }>;
+    getWeekNumber(d: Date): weekNumber;
+    getDate(year: year, week: weekNumber, weekDay: weekDay): Date;
+    getWeekDay(date: Date): weekDay;
+    weekDays: Array<{ label: string; value: weekDay }>;
     weeks: Array<HoraTreeNode>;
     locale: string;
 }
 
 export function useDates(): useDates {
+    const getWeekDay = (date: Date): weekDay => {
+        return date.getDay() === 0 ? 7 : (date.getDay() as weekDay);
+    }
     return {
-        getWeekNumber(d: Date): number {
+        getWeekNumber: function (d: Date): weekNumber {
             const onejan = new Date(d.getFullYear(), 0, 1);
-            return Math.ceil(((d.getTime() - onejan.getTime()) / 86400000 + onejan.getDay() + 1) / 7);
+            return Math.ceil(((d.getTime() - onejan.getTime()) / 86400000 + getWeekDay(onejan)) / 7) as weekNumber;
         },
-        getDate(year: number, week: number, weekDay: number) {
+        getDate: function (year: year, week: weekNumber, weekDay: weekDay) {
             const date = new Date(year, 0, 1 + (week - 1) * 7);
-            date.setDate(date.getDate() + (weekDay - date.getDay()));
+            date.setDate(date.getDate() + (weekDay - getWeekDay(date)));
 
             return date;
         },
+        getWeekDay,
         weekDays: [
-            { label: 'Sunday', value: 0 },
             { label: 'Monday', value: 1 },
             { label: 'Tuesday', value: 2 },
             { label: 'Wednesday', value: 3 },
             { label: 'Thursday', value: 4 },
             { label: 'Friday', value: 5 },
             { label: 'Saturday', value: 6 },
+            { label: 'Sunday', value: 7 }
         ],
         weeks: [
             {

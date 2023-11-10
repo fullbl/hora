@@ -25,6 +25,7 @@ const service: Service<User> = {
             vatNumber: '',
             email: '',
             address: '',
+            discount: 0,
             deliveries: [],
             suspensions: []
         };

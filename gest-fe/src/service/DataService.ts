@@ -59,7 +59,7 @@ const service: DataService = {
     async get<T>(url: string): Promise<T> {
         return helper.call(url, 'GET');
     },
-    async delete(url: string): Promise<T> {
+    async delete<T>(url: string): Promise<T> {
         return await helper.call(url, 'DELETE');
     },
     token: null
