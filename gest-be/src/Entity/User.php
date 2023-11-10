@@ -85,6 +85,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $zone = null;
     
     #[Groups(['delivery-list'])]
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(max: 50)]
+    private ?string $subZone = null;
+    
+    #[Groups(['delivery-list'])]
     #[ORM\Column(options: ['default' => 0])]
     #[Assert\Type('integer')]
     #[Assert\GreaterThanOrEqual(0)]
@@ -305,6 +310,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setZone(?string $zone): self
     {
         $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getSubZone(): ?string
+    {
+        return $this->subZone;
+    }
+
+    public function setSubZone(?string $subZone): self
+    {
+        $this->subZone = $subZone;
 
         return $this;
     }

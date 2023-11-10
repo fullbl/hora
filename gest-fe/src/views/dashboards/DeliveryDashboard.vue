@@ -42,17 +42,25 @@ const deliveryGroups = computed(() => {
             if (!delivery.customer || undefined === weekDay) {
                 continue;
             }
-            if (!weekDay.has(delivery.customer?.zone ?? '')) {
-                weekDay.set(delivery.customer?.zone ?? '', new Map());
+            if (!weekDay.has(delivery.customer.zone ?? '')) {
+                weekDay.set(delivery.customer.zone ?? '', new Map());
             }
             const zone = weekDay.get(delivery.customer?.zone ?? '');
             if (undefined === zone) {
                 continue;
             }
-            if (!zone.has(delivery.customer?.fullName)) {
-                zone.set(delivery.customer.fullName, new Map());
+            if (!zone.has(delivery.customer.subZone ?? '')) {
+                zone.set(delivery.customer.subZone ?? '', new Map());
             }
-            const customer = zone.get(delivery.customer.fullName);
+
+            const subZone = zone.get(delivery.customer.subZone ?? '');
+            if (undefined === subZone) {
+                continue;
+            }
+            if (!subZone.has(delivery.customer.fullName)) {
+                subZone.set(delivery.customer.fullName, new Map());
+            }
+            const customer = subZone.get(delivery.customer.fullName);
 
             customer?.set(
                 dp.product.name,
@@ -74,7 +82,7 @@ const deliveryGroups = computed(() => {
         }
 
         return x;
-    }, new Map<number, Map<string, Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>>>());
+    }, new Map<number, Map<string, Map<string, Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>>>>());
 });
 
 const zoneTotals = function (customers: Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>) {
@@ -94,6 +102,7 @@ const zoneTotals = function (customers: Map<string, Map<string, { qty: number, d
 }
 
 
+
 const customerTotal = function (products: Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>) {
     let totals = 0;
 
@@ -104,11 +113,21 @@ const customerTotal = function (products: Map<string, { qty: number, done: numbe
     return totals;
 }
 
-const zoneTotal = function (customers: Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>) {
+const subZoneTotal = function (customers: Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>) {
     let totals = 0
 
     customers.forEach(function (x) {
         totals += customerTotal(x);
+    });
+
+    return totals;
+}
+
+const zoneTotal = function (subZones: Map<string, Map<string, Map<string, { qty: number, done: number, delivery: Delivery, product: Product }>>>) {
+    let totals = 0
+
+    subZones.forEach(function (x) {
+        totals += subZoneTotal(x);
     });
 
     return totals;
@@ -157,18 +176,20 @@ const weekTotal = computed(function () {
                 <b>Day total: {{ dayTotal(weekDay.value) }}</b>
 
                 <div>
-                    <Panel v-for="[zone, customers] in deliveryGroups.get(weekDay.value)"
-                        :header="zone + ': ' + zoneTotal(customers)" toggleable collapsed>
+                    <Panel v-for="[zone, subZones] in deliveryGroups.get(weekDay.value)"
+                        :header="zone + ': ' + zoneTotal(subZones)" toggleable collapsed>
+                        <Panel v-for="[subZone, customers] in subZones" :header="subZone + ': ' + subZoneTotal(customers)"  toggleable collapsed>
                         <p v-for="[product, qty] in Array.from(zoneTotals(customers)).sort(([x,a],[y,b]) => x.localeCompare(y))" class="m-0">
                             <QtyHolder :qty="qty">{{ product }}</QtyHolder>
                         </p>
                         <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotal(products)"
-                            toggleable collapsed>
-                            <p v-for="[name, dp] in Array.from(products).sort(([x,a], [y,b]) => x.localeCompare(y))" class="m-0">
-                                <QtyHolder :qty="dp.qty">{{ name }}</QtyHolder>
-                                <ProgressHolder :dp="dp" />
+                        toggleable collapsed>
+                        <p v-for="[name, dp] in Array.from(products).sort(([x,a], [y,b]) => x.localeCompare(y))" class="m-0">
+                            <QtyHolder :qty="dp.qty">{{ name }}</QtyHolder>
+                            <ProgressHolder :dp="dp" />
                             </p>
                         </Panel>
+                    </Panel>
                     </Panel>
                 </div>
             </div>

@@ -89,6 +89,12 @@ const logEntity = ref(null);
                             {{ slotProps.data.zone }}
                         </template>
                     </Column>
+                    <Column field="subZone" header="SubZone" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">SubZone</span>
+                            {{ slotProps.data.subZone }}
+                        </template>
+                    </Column>
                     <Column field="roles" header="Roles" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Roles</span>
@@ -160,6 +166,11 @@ const logEntity = ref(null);
                     <div class="field">
                         <label for="zone">Zone</label>
                         <InputText id="zone" v-model="single.zone" :class="{ 'p-invalid': isInvalid('zone') }" />
+                    </div>
+
+                    <div class="field">
+                        <label for="subZone">SubZone</label>
+                        <InputText id="subZone" v-model="single.subZone" :class="{ 'p-invalid': isInvalid('subZone') }" />
                     </div>
 
                     <div class="field">

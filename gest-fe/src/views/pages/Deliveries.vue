@@ -225,6 +225,12 @@ const nextDelivery = function (item: Delivery) {
                             {{ slotProps.data.customer?.zone }}
                         </template>
                     </Column>
+                    <Column field="customer.subZone" header="SubZone" :sortable="true">
+                        <template #body="slotProps">
+                            <span class="p-column-title">SubZone</span>
+                            {{ slotProps.data.customer?.subZone }}
+                        </template>
+                    </Column>
                     <Column field="notes" header="Notes" :sortable="true" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Notes</span>

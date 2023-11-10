@@ -33,6 +33,8 @@ class UserMapper
             ->setFullName($data['fullName'])
             ->setRoles($data['roles'])
             ->setStatus($data['status'])
-            ->setZone($data['zone'] ?? null);
+            ->setZone($data['zone'] ?? null)
+            ->setSubZone($data['subZone'] ?? null)
+        ;
     }
 }
