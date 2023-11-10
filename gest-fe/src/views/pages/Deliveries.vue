@@ -14,11 +14,12 @@ import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import type {Delivery} from '@/interfaces/delivery';
 import Logger from '@/components/Logger.vue';
+import type { weekNumber } from '@/interfaces/dates';
 
 const {
     filters,
     data, single, save,
-    openNew, editData, cloneData,
+    openNew: _openNew, editData: _editData, cloneData,
     dialog, hideDialog,
     deleteDialog, confirmDelete, deleteData,
     isInvalid
@@ -29,6 +30,15 @@ const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
 const logEntity = ref(null)
 const nextOnly = ref(false)
+
+const openNew = () => {
+    nextOnly.value = false
+    _openNew()
+}
+const editData = (item: Delivery) => {
+    nextOnly.value = false
+    _editData(item)
+}
 
 onMounted(async () => {
     customers.value = (await userService.getAll())
@@ -46,14 +56,15 @@ const selectedWeeks = computed({
             let partialChecked = false
             let checked = true
             for (const week of month.children) {
-                if (single.value.weeks.includes(parseInt(week.key))) {
+                const weekNumber = parseInt(week.key) as weekNumber
+                if (single.value.weeks.includes(weekNumber)) {
                     partialChecked = true
                 }
                 else {
                     checked = false
                 }
                 _weeks[week.key] = {
-                    checked: single.value.weeks.includes(parseInt(week.key)),
+                    checked: single.value.weeks.includes(weekNumber),
                     partialChecked: false
                 }
             }
@@ -74,10 +85,10 @@ const selectedWeeks = computed({
         if ('undefined' === typeof single.value) {
             return;
         }
-        let _weeks = [];
+        let _weeks = [] as Array<weekNumber>;
         for (let i = 1; i <= 52; i++) {
             if (weeksTree.hasOwnProperty(i) && weeksTree[i].checked) {
-                _weeks.push(i);
+                _weeks.push(i as weekNumber);
             }
         }
         single.value.weeks = _weeks
@@ -119,7 +130,7 @@ const selectWeeks = function (type: string) {
             single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52]
             break
         case 'all':
-            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x)
+            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x as weekNumber)
             break
         case 'suspend':
             single.value.weeks = single.value.weeks.filter((x => x <= getWeekNumber(new Date())))
