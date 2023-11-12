@@ -15,6 +15,7 @@ import Button from 'primevue/button';
 import type {Delivery} from '@/interfaces/delivery';
 import Logger from '@/components/Logger.vue';
 import type { weekNumber } from '@/interfaces/dates';
+import Tree from 'primevue/tree';
 
 const {
     filters,
@@ -338,8 +339,8 @@ const nextDelivery = function (item: Delivery) {
                             <div class="mb-3">
                                 <InputSwitch v-model="nextOnly" />Future only
                             </div>
-                            <TreeSelect v-model="selectedWeeks" :options="weeks" selectionMode="checkbox"
-                                placeholder="Select Weeks" class="md:w-20rem w-full p-focus"
+                            <Tree v-model:selectionKeys="selectedWeeks" :value="weeks" selectionMode="checkbox"
+                                class="md:w-20rem w-full p-focus" display="chip"
                                 :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
                         </div>
                     </div>

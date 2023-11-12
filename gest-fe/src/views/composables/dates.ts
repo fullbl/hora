@@ -23,7 +23,7 @@ export function useDates(): useDates {
     return {
         getWeekNumber: function (d: Date): weekNumber {
             const onejan = new Date(d.getFullYear(), 0, 1);
-            return Math.ceil(((d.getTime() - onejan.getTime()) / 86400000 + getWeekDay(onejan)) / 7) as weekNumber;
+            return Math.ceil(((d.getTime() - onejan.getTime()) / 86400000 + onejan.getDay() - 1) / 7) as weekNumber;
         },
         getDate: function (year: year, week: weekNumber, weekDay: weekDay) {
             const date = new Date(year, 0, 1 + (week - 1) * 7);
