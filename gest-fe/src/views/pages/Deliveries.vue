@@ -340,7 +340,7 @@ const nextDelivery = function (item: Delivery) {
                                 <InputSwitch v-model="nextOnly" />Future only
                             </div>
                             <Tree v-model:selectionKeys="selectedWeeks" :value="weeks" selectionMode="checkbox"
-                                class="md:w-20rem w-full p-focus" display="chip"
+                                class="p-focus" display="chip"
                                 :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
                         </div>
                     </div>
