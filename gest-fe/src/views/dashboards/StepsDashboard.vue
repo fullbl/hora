@@ -26,6 +26,7 @@ onMounted(async () => {
 const deliveryGroups = computed(() => {
     return planner.groupByWeekDayAndProduct(planner.setDates(year.value, week.value).filter(selectedSteps.value));
 });
+debugger
 
 const weekDayTotal = function (weekDay: number) {
     let totals = 0;

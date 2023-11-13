@@ -1,5 +1,8 @@
 import type { TreeNode } from 'primevue/tree';
-import type { weekDay, weekNumber, year } from '@/interfaces/dates';
+import dayjs from 'dayjs';
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import weekDay from 'dayjs/plugin/weekday'
+import 'dayjs/locale/it'
 
 interface HoraTreeNode extends TreeNode {
     key: string;
@@ -8,28 +11,27 @@ interface HoraTreeNode extends TreeNode {
 }
 
 interface useDates {
-    getWeekNumber(d: Date): weekNumber;
-    getDate(year: year, week: weekNumber, weekDay: weekDay): Date;
-    getWeekDay(date: Date): weekDay;
-    weekDays: Array<{ label: string; value: weekDay }>;
+    getWeekNumber(d: Date): number;
+    getDate(year: number, week: number, weekDay: number): Date;
+    getWeekDay(date: Date): number;
+    weekDays: Array<{ label: string; value: number }>;
     weeks: Array<HoraTreeNode>;
     locale: string;
 }
+dayjs.locale('it')
+dayjs.extend(weekOfYear)
+dayjs.extend(weekDay)
 
 export function useDates(): useDates {
-    const getWeekDay = (date: Date): weekDay => {
-        return date.getDay() === 0 ? 7 : (date.getDay() as weekDay);
+    const getWeekDay = (date: Date): number => {
+        return dayjs(date).weekday() + 1;
     }
     return {
-        getWeekNumber: function (d: Date): weekNumber {
-            const onejan = new Date(d.getFullYear(), 0, 1);
-            return Math.ceil(((d.getTime() - onejan.getTime()) / 86400000 + onejan.getDay() - 1) / 7) as weekNumber;
+        getWeekNumber: function (d: Date): number {
+            return dayjs(d).week();
         },
-        getDate: function (year: year, week: weekNumber, weekDay: weekDay) {
-            const date = new Date(year, 0, 1 + (week - 1) * 7);
-            date.setDate(date.getDate() + (weekDay - getWeekDay(date)));
-
-            return date;
+        getDate: function (year: number, week: number, weekDay: number) {
+            return dayjs().year(year).week(week).weekday(weekDay - 1).toDate();
         },
         getWeekDay,
         weekDays: [

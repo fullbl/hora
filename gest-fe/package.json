@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "chart.js": "^4.4.0",
+        "dayjs": "^1.11.10",
         "primeflex": "^3.2.1",
         "primeicons": "^6.0.1",
         "primevue": "^3.22.1",
