@@ -23,14 +23,14 @@ class Delivery
 
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::SMALLINT, name: 'week_day')]
-    #[Assert\Range(min: 1, max: 7)]
+    #[Assert\Range(min: 0, max: 6)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $harvestWeekDay = null;
 
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::SMALLINT, options: ["default" => 1])]
-    #[Assert\Range(min: 1, max: 7)]
+    #[Assert\Range(min: 0, max: 6)]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $deliveryWeekDay = null;
