@@ -68,61 +68,61 @@ const price = computed({
                         </div>
                     </template>
 
-                    <Column field="id" header="Id" :sortable="true">
+                    <Column field="id" header="Id" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Id</span>
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="name" header="Name" :sortable="true">
+                    <Column field="name" header="Name" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
-                    <Column field="type" header="Type" :sortable="true">
+                    <Column field="type" header="Type" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Type</span>
                             {{ slotProps.data.type }}
                         </template>
                     </Column>
-                    <Column field="weight" header="Weight" :sortable="true">
+                    <Column field="weight" header="Weight" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Weight</span>
                             {{ slotProps.data.weight ? 'Yes' : 'No' }}
                         </template>
                     </Column>
-                    <Column field="decigrams" header="Decigrams" :sortable="true">
+                    <Column field="decigrams" header="Decigrams" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Decigrams</span>
                             {{ slotProps.data.decigrams }}
                         </template>
                     </Column>
-                    <Column field="days" header="Days" :sortable="true">
+                    <Column field="days" header="Days" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Days</span>
                             {{ slotProps.data.days }}
                         </template>
                     </Column>
-                    <Column field="price" header="Price" :sortable="true">
+                    <Column field="price" header="Price" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Price</span>
                             {{ (slotProps.data.price ?? 0) / 100 }} €
                         </template>
                     </Column>
-                    <Column header="Soaking hours" :sortable="true">
+                    <Column header="Soaking hours">
                         <template #body="slotProps">
                             <span class="p-column-title">Soaking hours</span>
                             {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
                         </template>
                     </Column>
-                    <Column header="Blackout days" :sortable="true">
+                    <Column header="Blackout days">
                         <template #body="slotProps">
                             <span class="p-column-title">Blackout days</span>
                             {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'blackout').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
                         </template>
                     </Column>
-                    <Column header="Light days" :sortable="true">
+                    <Column header="Light days">
                         <template #body="slotProps">
                             <span class="p-column-title">Light days</span>
                             {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'light').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
