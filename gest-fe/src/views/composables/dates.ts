@@ -27,7 +27,6 @@ export function useDates(): useDates {
             return [...Array(7).keys()].map((weekDay) => dayjs().year(year).week(week).weekday(weekDay));
         },
         getWeeks(year: number) {
-            year = 2024
             let firstDayOfWeek = dayjs().year(year).startOf('year');
             let lastDayOfWeek = firstDayOfWeek.weekday(6);
             const months: Array<HoraTreeNode> = [];
