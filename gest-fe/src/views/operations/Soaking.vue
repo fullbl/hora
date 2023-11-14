@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { useDates } from '../composables/dates';
 import type Calendar from 'primevue/calendar';
 import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
@@ -10,6 +9,7 @@ import productService from '@/service/ProductService';
 import type Step from '@/interfaces/step';
 import type { Delivery } from '@/interfaces/delivery';
 import type { WaterBox } from '@/interfaces/product';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface Soaking {
     name: string;
@@ -27,14 +27,20 @@ interface Soaking {
 
 interface Selected {
     box?: WaterBox;
-    plantingTime?: Date;
-    soakingTime?: Date;
+    plantingTime?: Dayjs;
+    soakingTime?: Dayjs;
     soakings: Soaking[];
 }
 
 const { dialog, hideDialog, showDialog } = useDialog();
-const date = ref(new Date());
-const { getWeekNumber, locale } = useDates();
+const date = ref(dayjs());
+const showDate = computed({
+    get: () => date.value.toDate(),
+    set: (val: Date) => {
+        date.value = dayjs(val);
+    }
+    
+});
 const planner = new Planner();
 const boxes = ref<WaterBox[]>([]);
 
@@ -43,7 +49,7 @@ onMounted(async () => {
     boxes.value = await productService.getWaterBoxes();
 });
 
-const single = ref<Selected>({ soakings: [], plantingTime: new Date() });
+const single = ref<Selected>({ soakings: [], plantingTime: dayjs() });
 
 function select(s: Soaking) {
     if (single.value.soakings.filter((x) => x.name === s.name).length > 0) {
@@ -58,19 +64,20 @@ watch(single.value, (a) => {
         return;
     }
 
-    const dayAfter = new Date(single.value.plantingTime.getTime());
-    dayAfter.setDate(single.value.plantingTime.getDate() + 1);
+    let dayAfter = single.value.plantingTime.add(1, 'day');
     const hours = single.value.soakings[0].hours;
-    dayAfter.setHours(single.value.plantingTime.getHours() - hours);
-    dayAfter.setMinutes(single.value.plantingTime.getMinutes() - (single.value.box?.decigrams ?? 0)); //decigrams used as minutes
+    dayAfter = dayAfter.subtract(hours, 'hours');
+    dayAfter = dayAfter.subtract((single.value.box?.decigrams ?? 0), 'minutes'); //decigrams used as minutes
 
-    if (single.value.soakingTime?.getTime() !== dayAfter.getTime()) {
+    if (!dayAfter.isSame(single.value.soakingTime)) {
         single.value.soakingTime = dayAfter;
     }
 });
 
 const planned = computed(() => {
-    return planner.setDates(date.value.getFullYear(), getWeekNumber(date.value)).filter(['soaking'], date.value.getDay());
+    return planner
+        .setDates(date.value.year(), date.value.week())
+        .filter(['soaking'], date.value.weekday());
 });
 
 const products = computed(() => {
@@ -98,8 +105,8 @@ const products = computed(() => {
             qty: val.qty + p.qty,
             done: val.done + p.done,
             data: p.activities?.reduce((y, a) => {
-                y.box = a.data.box;
-                y.script = a.data.script;
+                y.box = a.data?.box;
+                y.script = a.data?.script;
                 return y;
             }, val.data)
         });
@@ -127,8 +134,8 @@ async function save() {
                 step: s.step.id,
                 qty: s.qty
             })),
-            week: getWeekNumber(date.value),
-            year: date.value.getFullYear()
+            week: date.value.week(),
+            year: date.value.year()
         });
         window.location.reload();
     } catch (e) {
@@ -141,12 +148,12 @@ async function save() {
 <template>
     <div class="card">
         <div class="p-inputgroup flex-1">
-            <Button @click="date = new Date(date.getTime() - 24 * 60 * 60 * 1000)">&lt;</Button>
-            <Calendar v-model="date" />
-            <Button @click="date = new Date(date.getTime() + 24 * 60 * 60 * 1000)">&gt;</Button>
+            <Button @click="date = date.subtract(1, 'day')">&lt;</Button>
+            <Calendar v-model="showDate" />
+            <Button @click="date = date.add(1,'day')">&gt;</Button>
         </div>
         <div class="flex justify-content-between mt-2">
-            <h1>{{ date.toLocaleDateString(locale, { weekday: 'long' }) }}</h1>
+            <h1>{{ date.format('dddd') }}</h1>
             <Button @click="dialog = 'Soak'" v-show="single.soakings.length > 0">SOAK</Button>
         </div>
     </div>

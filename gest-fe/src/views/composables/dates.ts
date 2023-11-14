@@ -28,7 +28,7 @@ export function useDates(): useDates {
         },
         getWeeks(year: number) {
             let firstDayOfWeek = dayjs().year(year).startOf('year');
-            let lastDayOfWeek = firstDayOfWeek.day() === 0 ? firstDayOfWeek : firstDayOfWeek.add(7 - firstDayOfWeek.day(), 'day');
+            let lastDayOfWeek = firstDayOfWeek.weekday() === 0 ? firstDayOfWeek : firstDayOfWeek.add(7 - firstDayOfWeek.weekday(), 'day');
             const months: Array<HoraTreeNode> = [];
 
             while(lastDayOfWeek.year() === year) {
