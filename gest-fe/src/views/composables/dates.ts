@@ -11,30 +11,20 @@ interface HoraTreeNode extends TreeNode {
 interface useDates {
     getWeekNumber(d: Date): number;
     getDate(year: number, week: number, weekDay: number): Dayjs;
-    getWeekDay(date: Date): number;
     getWeekDates(year: number, week: number): Array<Dayjs>;
     getWeeks(year: number): Array<HoraTreeNode>;
 }
 
 export function useDates(): useDates {
-    const getWeekDay = (date: Date): number => {
-        return dayjs(date).weekday();
-    }
-    const getDate = function (year: number, week: number, weekDay: number) {
-        return dayjs().year(year).week(week).weekday(weekDay);
-    }
     return {
         getWeekNumber: function (d: Date): number {
             return dayjs(d).week();
         },
-        getWeekDay,
-        getDate,
+        getDate(year: number, week: number, weekDay: number) {
+            return dayjs().year(year).week(week).weekday(weekDay);
+        },
         getWeekDates(year: number, week: number) {
-            const weekDates: Array<Dayjs> = [];
-            for (let i = 1; i <= 7; i++) {
-                weekDates.push(getDate(year, week, i));
-            }
-            return weekDates;
+            return [...Array(7).keys()].map((weekDay) => dayjs().year(year).week(week).weekday(weekDay));
         },
         getWeeks(year: number) {
             let firstDayOfWeek = dayjs().year(year).startOf('year');
