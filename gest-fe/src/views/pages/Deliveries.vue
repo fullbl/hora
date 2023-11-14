@@ -43,7 +43,6 @@ const nextDelivery = function (item: Delivery) {
 
 const data = computed(() => _data.value?.map((d: Delivery) => {
     d.nextDelivery = nextDelivery(d)?.valueOf()
-    console.log(d.nextDelivery)
     return d
 }))
 

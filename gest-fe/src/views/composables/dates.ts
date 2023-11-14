@@ -27,21 +27,22 @@ export function useDates(): useDates {
             return [...Array(7).keys()].map((weekDay) => dayjs().year(year).week(week).weekday(weekDay));
         },
         getWeeks(year: number) {
+            year = 2024
             let firstDayOfWeek = dayjs().year(year).startOf('year');
-            let lastDayOfWeek = firstDayOfWeek.weekday() === 0 ? firstDayOfWeek : firstDayOfWeek.add(7 - firstDayOfWeek.weekday(), 'day');
+            let lastDayOfWeek = firstDayOfWeek.weekday(6);
             const months: Array<HoraTreeNode> = [];
 
             while(lastDayOfWeek.year() === year) {
-                if (undefined === months[lastDayOfWeek.month()]) {
+                if (undefined === months[firstDayOfWeek.month()]) {
                     months.push ({
-                        key: lastDayOfWeek.format('MMM'),
-                        label: lastDayOfWeek.format('MMMM'),
+                        key: firstDayOfWeek.format('MMM'),
+                        label: firstDayOfWeek.format('MMMM'),
                         children: []
                     });
                 }
-                months[lastDayOfWeek.month()].children.push({
-                    key: lastDayOfWeek.format('w'),
-                    label: lastDayOfWeek.format(
+                months[firstDayOfWeek.month()].children.push({
+                    key: firstDayOfWeek.format('w'),
+                    label: firstDayOfWeek.format(
                         'w (' +
                         firstDayOfWeek.format('D') +
                         '-' +
@@ -49,8 +50,8 @@ export function useDates(): useDates {
                         ')'
                     )
                 });
-                lastDayOfWeek = lastDayOfWeek.add(1, 'week');
-                firstDayOfWeek = firstDayOfWeek.add(1, 'week');
+                lastDayOfWeek = lastDayOfWeek.add(1, 'week').weekday(6);
+                firstDayOfWeek = firstDayOfWeek.add(1, 'week').weekday(0);
 
             }
             return months;  
