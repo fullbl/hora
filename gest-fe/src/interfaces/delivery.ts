@@ -1,3 +1,4 @@
+import type { Dayjs } from "dayjs";
 import type DeliveryProduct from "./deliveryProduct";
 import type User from "./user"
 
@@ -9,7 +10,8 @@ interface Delivery {
     customer?: User,
     deliveryProducts: Array<DeliveryProduct>,
     notes: string,
-    paymentMethod?: string
+    paymentMethod?: string,
+    nextDelivery?: number
 }
 interface DeliveryWithoutProducts {
     id?: number,
