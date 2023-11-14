@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import type { weekDay, year } from '@/interfaces/dates';
 import InputNumber from 'primevue/inputnumber';
 
 const props = defineProps({
     year: {
         type: Number,
         required: true,
-        validator: (y: year) => y > 2000 && y < 2100
+        validator: (y: number) => y > 2000 && y < 2100
     },
     week: {
         type: Number,
         required: true,
-        validator: (w: weekDay) => w > 0 && w < 54
+        validator: (w: number) => w > 0 && w < 54
     }    
 })
 

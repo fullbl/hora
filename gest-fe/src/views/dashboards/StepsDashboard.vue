@@ -9,12 +9,13 @@ import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
+import dayjs from 'dayjs';
 
-const { getWeekNumber, getDate, weekDays, locale } = useDates();
+const { getWeekDates } = useDates();
 
-const today = new Date();
-const week = ref(getWeekNumber(today));
-const year = ref(today.getFullYear());
+const today = dayjs();
+const week = ref(today.week());
+const year = ref(today.year());
 const selectedSteps = ref(['soaking']);
 const steps = stepService.getTypes();
 const planner = new Planner();
@@ -26,7 +27,6 @@ onMounted(async () => {
 const deliveryGroups = computed(() => {
     return planner.groupByWeekDayAndProduct(planner.setDates(year.value, week.value).filter(selectedSteps.value));
 });
-debugger
 
 const weekDayTotal = function (weekDay: number) {
     let totals = 0;
@@ -70,12 +70,10 @@ const weekTotal = computed(function () {
 
     <div class="card">
         <div class="grid">
-            <div style="width: 14.28%" v-for="weekDay of weekDays">
-                <h5>
-                    {{ weekDay.label }} ({{ weekDayTotal(weekDay.value) }})<br />
-                    {{ getDate(year, week, weekDay.value).toLocaleDateString(locale) }}
-                </h5>
-                <div v-for="[name, dp] in deliveryGroups.get(weekDay.value)">
+            <div style="width: 14.28%" v-for="date of getWeekDates(year, week)">
+                <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
+
+                <div v-for="[name, dp] in deliveryGroups.get(date.weekday())">
                     <QtyHolder :qty="dp.qty">
                         <i :class="stepService.getIcon(dp.step.name)" />
                         {{ dp.step.name }}

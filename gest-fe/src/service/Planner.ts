@@ -6,9 +6,8 @@ import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
 import type Step from '@/interfaces/step';
 import { ref } from 'vue';
-import type { weekDay, weekNumber, year } from '@/interfaces/dates';
 
-const { getWeekNumber, getDate, getWeekDay } = useDates();
+const { getDate } = useDates();
 if (!Array.prototype.toReversed) {
     Array.prototype.toReversed = function () {
         for (var i = this.length - 1, arr = []; i >= 0; --i) {
@@ -55,16 +54,15 @@ export default class Planner {
         return this;
     }
 
-    setDates(year: year, week: weekNumber) {
+    setDates(year: number, week: number) {
         this.planned.value = this.planned.value.map((p) => {
             const harvestDate = getDate(year, week, p.delivery.harvestWeekDay);
             const deliveryDate = getDate(year, week, p.delivery.deliveryWeekDay);
-            const date = new Date(harvestDate.getTime());
-            date.setMinutes(harvestDate.getMinutes() - p.minutesBeforeHarvest);
+            let date = harvestDate.clone().subtract(p.minutesBeforeHarvest, 'minute');
             while (date < getDate(year, week, 1)) {
-                date.setDate(date.getDate() + 7);
-                deliveryDate.setDate(deliveryDate.getDate() + 7);
-                harvestDate.setDate(harvestDate.getDate() + 7);
+                date = date.week(date.week() + 1);
+                deliveryDate.week(deliveryDate.week() + 1);
+                harvestDate.week(harvestDate.week() + 1);
             }
             const activities = this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week);
             return {
@@ -80,9 +78,12 @@ export default class Planner {
         return this;
     }
 
-    filter(selectedSteps: string[], day?: weekDay) {
+    filter(selectedSteps: string[], day?: number) {
         return this.planned.value.filter((p) => {
-            return undefined !== p.deliveryDate && p.delivery.weeks.includes(getWeekNumber(p.deliveryDate)) && selectedSteps.includes(p.step.name) && (undefined === day || (undefined !== p.date && day === getWeekDay(p.date)));
+            return undefined !== p.deliveryDate && 
+                p.delivery.weeks.includes(p.deliveryDate.week()) && 
+                selectedSteps.includes(p.step.name) && 
+                (undefined === day || (undefined !== p.date && day === p.date.week()));
         });
     }
 
@@ -91,7 +92,7 @@ export default class Planner {
             if (undefined === p.date) {
                 return g;
             }
-            let weekDayHash = getWeekDay(p.date);
+            let weekDayHash = p.date.weekday();
             const products = g.get(weekDayHash) ?? new Map();
             const productHash = p.product.id + p.step.name;
             let qty = p.qty;

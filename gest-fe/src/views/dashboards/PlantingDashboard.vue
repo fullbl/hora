@@ -7,12 +7,13 @@ import Planner from '@/service/Planner';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import QtyHolder from '@/components/QtyHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
+import dayjs from 'dayjs';
 
-const { getWeekNumber, getDate, weekDays, locale } = useDates();
+const { getWeekDates } = useDates();
 
-const today = new Date();
-const week = ref(getWeekNumber(today));
-const year = ref(today.getFullYear());
+const today = dayjs();
+const week = ref(today.week());
+const year = ref(today.year());
 const planner = new Planner
 
 onMounted(async () => {
@@ -62,10 +63,10 @@ const dayTotal = function (weekDay: number) {
 
     <div class="card">
         <div class="grid">
-            <div style="width:14.28%" v-for="weekDay of  weekDays ">
-                <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString(locale) }}</h5>
-                <b>Day total: {{ dayTotal(weekDay.value) }}</b>
-                <div v-for="[name, dp] in deliveryGroups.get(weekDay.value) ">
+            <div style="width:14.28%" v-for="date of getWeekDates(year, week)">
+                <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
+                <b>Day total: {{ dayTotal(date.weekday()) }}</b>
+                <div v-for="[name, dp] in deliveryGroups.get(date.weekday()) ">
                     <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g{{ dp.product.weight ? ' + weight' : '' }})</QtyHolder>
                     <ProgressHolder :dp="dp" />
                 </div>

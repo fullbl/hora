@@ -1,11 +1,10 @@
 <script setup lang="ts">
-
-const props = defineProps({
+defineProps({
     qty: {
         required: true,
-        type: Number,
+        type: Number
     }
-})
+});
 </script>
 
 <template>

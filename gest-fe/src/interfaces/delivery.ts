@@ -1,12 +1,11 @@
 import type DeliveryProduct from "./deliveryProduct";
 import type User from "./user"
-import type {weekDay, weekNumber} from "@/interfaces/dates";
 
 interface Delivery {
     id?: number,
-    harvestWeekDay: weekDay,
-    deliveryWeekDay: weekDay,
-    weeks: Array<weekNumber>,
+    harvestWeekDay: number,
+    deliveryWeekDay: number,
+    weeks: Array<number>,
     customer?: User,
     deliveryProducts: Array<DeliveryProduct>,
     notes: string,
@@ -14,9 +13,9 @@ interface Delivery {
 }
 interface DeliveryWithoutProducts {
     id?: number,
-    harvestWeekDay: weekDay,
-    deliveryWeekDay: weekDay,
-    weeks: Array<weekNumber>,
+    harvestWeekDay: number,
+    deliveryWeekDay: number,
+    weeks: Array<number>,
     customer?: User,
     notes: string,
     paymentMethod?: string

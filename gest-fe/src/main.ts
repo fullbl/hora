@@ -101,7 +101,13 @@ import TreeSelect from 'primevue/treeselect';
 import TreeTable from 'primevue/treetable';
 import TriStateCheckbox from 'primevue/tristatecheckbox';
 import VirtualScroller from 'primevue/virtualscroller';
-
+import dayjs from 'dayjs';
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import weekDay from 'dayjs/plugin/weekday'
+import localeData from 'dayjs/plugin/localeData';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import AdvancedFormat from 'dayjs/plugin/advancedFormat';
+import 'dayjs/locale/it'
 import '@/assets/styles.scss';
 
 authService.load();
@@ -111,6 +117,17 @@ app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);
+
+app.use({
+    install: () => {
+        dayjs.locale('it')
+        dayjs.extend(weekOfYear)
+        dayjs.extend(weekDay)
+        dayjs.extend(localeData)
+        dayjs.extend(customParseFormat)
+        dayjs.extend(AdvancedFormat)
+    }
+});
 
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);

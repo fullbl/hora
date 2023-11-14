@@ -11,15 +11,17 @@ import type Product from '@/interfaces/product';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import QtyHolder from '@/components/QtyHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
+import dayjs from 'dayjs';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
 
-const { getWeekNumber, getDate, weekDays } = useDates();
+const { getDate, getWeekDates } = useDates();
 
-const today = new Date();
-const week = ref(getWeekNumber(today));
-const year = ref(today.getFullYear());
+const today = dayjs();
+const week = ref(today.week());
+const year = ref(today.year());
+
 const groupMode = ref('customer');
 
 onMounted(async () => {
@@ -34,7 +36,7 @@ const deliveryGroups = computed(() => {
         }
 
         const harvestDate = getDate(year.value, week.value, delivery.harvestWeekDay);
-        if (!delivery.weeks.includes(getWeekNumber(harvestDate))) {
+        if (!delivery.weeks.includes(harvestDate.week())) {
             return x;
         }
 
@@ -171,15 +173,15 @@ const groupNames = computed(function () {
 
     <div class="card">
         <div class="grid">
-            <div v-for="weekDay of weekDays">
-                <div v-if="dayTotal(weekDay.value) > 0">
-                    <h5>{{ weekDay.label }}</h5>
-                    <b>Day total: {{ dayTotal(weekDay.value) }}</b>
+            <div v-for="date of getWeekDates(year,week)">
+                <div v-if="dayTotal(date.weekday()) > 0">
+                    <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
+                    <b>Day total: {{ dayTotal(date.weekday()) }}</b>
                     <div class="flex flex-wrap justify-content-between">
-                        <Panel v-for="[groupName, products] in deliveryGroups.get(weekDay.value)" :header="groupName"
+                        <Panel v-for="[groupName, products] in deliveryGroups.get(date.weekday())" :header="groupName"
                             toggleable>
                             <template #header>
-                                {{ groupName }} {{ groupWeekTotal(weekDay.value, groupName) }}
+                                {{ groupName }} {{ groupWeekTotal(date.weekday(), groupName) }}
                             </template>
                             <p v-for="[name, dp] in Array.from(products).sort(([x, a],[y, b]) => a.product.name.localeCompare(b.product.name))">
                                 <QtyHolder :qty="dp.qty">{{ name }}</QtyHolder>

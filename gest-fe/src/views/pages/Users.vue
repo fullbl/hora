@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import userService from '@/service/UserService';
-import { useDataView } from '../composables/dataView'
+import { useDataView } from '../composables/dataView';
 import Logger from '@/components/Logger.vue';
 import { ref } from 'vue';
-const { filters, data, single, save, openNew, editData, 
-    dialog, hideDialog, showDialog, deleteDialog, 
-    confirmDelete, deleteData, isInvalid } = useDataView(userService);
+const { filters, data, single, save, openNew, editData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(userService);
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
     { label: 'Operator', value: 'ROLE_OPERATOR' },
@@ -13,10 +11,9 @@ const roles = [
 ];
 const statuses = [
     { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' },
+    { label: 'Inactive', value: 'inactive' }
 ];
 const logEntity = ref(null);
-
 </script>
 
 <template>
@@ -32,10 +29,17 @@ const logEntity = ref(null);
                     </template>
                 </Toolbar>
 
-                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
+                <DataTable
+                    :value="data"
+                    dataKey="id"
+                    :paginator="true"
+                    :rows="10"
+                    :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data" responsiveLayout="scroll">
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data"
+                    responsiveLayout="scroll"
+                >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">Manage Users</h5>
@@ -70,8 +74,7 @@ const logEntity = ref(null);
                             {{ slotProps.data.email }}
                         </template>
                     </Column>
-                    <Column field="vatNumber" header="VAT Number" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
+                    <Column field="vatNumber" header="VAT Number" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">VAT Number</span>
                             {{ slotProps.data.vatNumber }}
@@ -109,53 +112,42 @@ const logEntity = ref(null);
                     </Column>
                     <Column headerStyle="min-width:12rem;">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                                @click="editData(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                                @click="confirmDelete(slotProps.data)" />
-                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary ml-2"
-                                @click="logEntity = slotProps.data.id" />
+                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editData(slotProps.data)" />
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="confirmDelete(slotProps.data)" />
+                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary ml-2" @click="logEntity = slotProps.data.id" />
                         </template>
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="showDialog" :style="{ width: '450px' }" :header="dialog" :modal="true"
-                    v-if="single" class="p-fluid">
-
+                <Dialog v-model:visible="showDialog" :style="{ width: '450px' }" :header="dialog" :modal="true" v-if="single" class="p-fluid">
                     <div class="field">
                         <label for="username">Username</label>
-                        <InputText id="username" v-model.trim="single.username" required autofocus
-                            :class="{ 'p-invalid': isInvalid('username') }" />
+                        <InputText id="username" v-model.trim="single.username" required autofocus :class="{ 'p-invalid': isInvalid('username') }" />
                     </div>
 
                     <div class="field">
                         <label for="fullName">FullName</label>
-                        <InputText id="fullName" v-model.trim="single.fullName" required autofocus
-                            :class="{ 'p-invalid': isInvalid('fullName') }" />
+                        <InputText id="fullName" v-model.trim="single.fullName" required autofocus :class="{ 'p-invalid': isInvalid('fullName') }" />
                     </div>
 
                     <div class="field">
                         <label for="vatNumber">VAT Number</label>
-                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required autofocus
-                            :class="{ 'p-invalid': isInvalid('vatNumber') }" />
+                        <InputText id="vatNumber" v-model.trim="single.vatNumber" required autofocus :class="{ 'p-invalid': isInvalid('vatNumber') }" />
                     </div>
 
                     <div class="field">
                         <label for="sdi">SDI Number</label>
-                        <InputText id="sdi" v-model.trim="single.sdi" required autofocus
-                            :class="{ 'p-invalid': isInvalid('sdi') }" />
+                        <InputText id="sdi" v-model.trim="single.sdi" required autofocus :class="{ 'p-invalid': isInvalid('sdi') }" />
                     </div>
 
                     <div class="field">
                         <label for="email">E-mail</label>
-                        <InputText type="email" id="email" v-model.trim="single.email" required autofocus
-                            :class="{ 'p-invalid': isInvalid('email') }" />
+                        <InputText type="email" id="email" v-model.trim="single.email" required autofocus :class="{ 'p-invalid': isInvalid('email') }" />
                     </div>
 
                     <div class="field">
                         <label for="address">Address</label>
-                        <InputText type="address" id="address" v-model.trim="single.address" required autofocus
-                            :class="{ 'p-invalid': isInvalid('address') }" />
+                        <InputText type="address" id="address" v-model.trim="single.address" required autofocus :class="{ 'p-invalid': isInvalid('address') }" />
                     </div>
 
                     <div class="field">
@@ -175,22 +167,17 @@ const logEntity = ref(null);
 
                     <div class="field">
                         <label for="discount">Discount</label>
-                        <InputNumber id="discount" v-model="single.discount"
-                            :class="{ 'p-invalid': isInvalid('discount') }" />
+                        <InputNumber id="discount" v-model="single.discount" :class="{ 'p-invalid': isInvalid('discount') }" />
                     </div>
 
                     <div class="field">
                         <label for="roles" class="mb-3">Roles</label>
-                        <MultiSelect id="roles" v-model="single.roles" :options="roles" optionLabel="label"
-                            optionValue="value" placeholder="Select a Role">
-                        </MultiSelect>
+                        <MultiSelect id="roles" v-model="single.roles" :options="roles" optionLabel="label" optionValue="value" placeholder="Select a Role"> </MultiSelect>
                     </div>
 
                     <div class="field">
                         <label for="status" class="mb-3">Status</label>
-                        <Dropdown id="status" v-model="single.status" :options="statuses" optionLabel="label"
-                            optionValue="value" placeholder="Select a Status">
-                        </Dropdown>
+                        <Dropdown id="status" v-model="single.status" :options="statuses" optionLabel="label" optionValue="value" placeholder="Select a Status"> </Dropdown>
                     </div>
 
                     <template #footer>
@@ -202,7 +189,10 @@ const logEntity = ref(null);
                 <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="single">Are you sure you want to delete <b>{{ single.username }}</b>?</span>
+                        <span v-if="single"
+                            >Are you sure you want to delete <b>{{ single.username }}</b
+                            >?</span
+                        >
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
@@ -211,9 +201,9 @@ const logEntity = ref(null);
                 </Dialog>
 
                 <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
-
             </div>
+        </div>
     </div>
-</div></template>
+</template>
 
 <style scoped lang="scss"></style>

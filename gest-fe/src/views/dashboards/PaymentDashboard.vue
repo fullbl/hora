@@ -3,22 +3,22 @@ import { computed, onMounted, ref } from 'vue';
 import activityService from '@/service/ActivityService';
 
 import deliveryService from '@/service/DeliveryService';
-import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
 import type {Delivery} from '@/interfaces/delivery';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import type Product from '@/interfaces/product';
 import YearWeek from '@/components/YearWeek.vue';
+import dayjs from 'dayjs';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
 
-const { getWeekNumber, getDate, weekDays } = useDates();
+const { getDate } = useDates();
 
-const today = new Date();
-const week = ref(getWeekNumber(today));
-const year = ref(today.getFullYear());
+const today = dayjs();
+const week = ref(today.week());
+const year = ref(today.year());
 
 onMounted(async () => {
     deliveries.value = await deliveryService.getAll()
@@ -29,7 +29,7 @@ onMounted(async () => {
 const payments = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
         const deliveryDate = getDate(year.value, week.value, delivery.deliveryWeekDay);
-        if (!delivery.weeks.includes(getWeekNumber(deliveryDate))) {
+        if (!delivery.weeks.includes(deliveryDate.week())) {
             return x;
         }
         const amount = delivery.deliveryProducts.reduce((i, p) => i + (p.product.price ?? 0) / 100 * p.qty, 0) - (delivery.customer?.discount ?? 0)

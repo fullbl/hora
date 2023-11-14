@@ -19,8 +19,8 @@ const service: Service<Delivery> = {
     },
     getNew() {
         return {
-            harvestWeekDay: 1,
-            deliveryWeekDay: 1,
+            harvestWeekDay: 0,
+            deliveryWeekDay: 0,
             customer: userService.getNew(),
             deliveryProducts: [],
             weeks: [],

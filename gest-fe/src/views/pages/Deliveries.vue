@@ -14,8 +14,8 @@ import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import type {Delivery} from '@/interfaces/delivery';
 import Logger from '@/components/Logger.vue';
-import type { weekNumber } from '@/interfaces/dates';
 import Tree from 'primevue/tree';
+import dayjs from 'dayjs';
 
 const {
     filters,
@@ -26,11 +26,12 @@ const {
     isInvalid
 } = useDataView(deliveryService)
 
-const { getWeekNumber, weeks, weekDays, getDate, locale } = useDates()
+const { getWeeks, getDate } = useDates()
 const customers = ref<Array<User>>([])
 const products = ref<Array<Product>>([])
 const logEntity = ref(null)
 const nextOnly = ref(false)
+const weeks = getWeeks(dayjs().year())
 
 const openNew = () => {
     nextOnly.value = false
@@ -57,7 +58,7 @@ const selectedWeeks = computed({
             let partialChecked = false
             let checked = true
             for (const week of month.children) {
-                const weekNumber = parseInt(week.key) as weekNumber
+                const weekNumber = parseInt(week.key)
                 if (single.value.weeks.includes(weekNumber)) {
                     partialChecked = true
                 }
@@ -86,16 +87,18 @@ const selectedWeeks = computed({
         if ('undefined' === typeof single.value) {
             return;
         }
-        let _weeks = [] as Array<weekNumber>;
+        let _weeks = [];
         for (let i = 1; i <= 52; i++) {
             if (weeksTree.hasOwnProperty(i) && weeksTree[i].checked) {
-                _weeks.push(i as weekNumber);
+                _weeks.push(i);
             }
         }
         single.value.weeks = _weeks
     }
 
 })
+
+const weekDays = dayjs.weekdays().map((w, i) => ({ label: w, value: i + 1 }))
 
 const getCustomerNumber = (item: Delivery) =>
     (data.value?.filter(d => d.customer?.id === item.customer?.id).findIndex(d => d.id === item.id) ?? 0) + 1
@@ -131,22 +134,22 @@ const selectWeeks = function (type: string) {
             single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52]
             break
         case 'all':
-            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x as weekNumber)
+            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x)
             break
         case 'suspend':
-            single.value.weeks = single.value.weeks.filter((x => x <= getWeekNumber(new Date())))
+            single.value.weeks = single.value.weeks.filter((x => x <= dayjs().week()))
             break
     }
 
     if (nextOnly.value) {
-        single.value.weeks = single.value.weeks.filter((x => x >= getWeekNumber(new Date())))
+        single.value.weeks = single.value.weeks.filter((x => x >= dayjs().week()))
     }
 }
 
 const nextDelivery = function (item: Delivery) {
     const today = new Date
     return item.weeks.map(w => getDate(today.getFullYear(), w, item.deliveryWeekDay))
-        .filter(d => d >= new Date())[0]
+        .filter(d => d >= dayjs())[0]
 }
 </script>
 
@@ -170,7 +173,7 @@ const nextDelivery = function (item: Delivery) {
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">Manage Deliveries</h5>
-                            <Button @click="data = data?.filter(d => nextDelivery(d) > new Date())">active only</Button>
+                            <Button @click="data = data?.filter(d => nextDelivery(d) > dayjs())">active only</Button>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText v-model="filters.global.value" placeholder="Search..." />
@@ -192,13 +195,13 @@ const nextDelivery = function (item: Delivery) {
                     <Column field="harvestWeekDay" header="Harvest" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Harvest</span>
-                            {{ weekDays.find(d => d.value === slotProps.data.harvestWeekDay)?.label }}
+                            {{ dayjs().weekday(slotProps.data.harvestWeekDay).format('dddd') }}
                         </template>
                     </Column>
                     <Column field="deliveryWeekDay" header="Delivery" :sortable="true">
                         <template #body="slotProps">
                             <span class="p-column-title">Delivery</span>
-                            {{ weekDays.find(d => d.value === slotProps.data.deliveryWeekDay)?.label }}
+                            {{ dayjs().weekday(slotProps.data.deliveryWeekDay).format('dddd') }}
                         </template>
                     </Column>
                     <Column field="customer.fullName" header="Customer" :sortable="true" headerStyle="min-width:8rem;">
@@ -210,7 +213,7 @@ const nextDelivery = function (item: Delivery) {
                     <Column header="Next Delivery" :sortable="true" headerStyle="min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Next Delivery</span>
-                            {{ nextDelivery(slotProps.data)?.toLocaleDateString(locale) }}
+                            {{ nextDelivery(slotProps.data)?.format('dddd DD/MM/YYYY') }}
                         </template>
                     </Column>
                     <Column field="deliveryProducts" header="Products" :sortable="true" headerStyle="min-width:10rem;">

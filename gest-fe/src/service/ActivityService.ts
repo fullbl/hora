@@ -1,10 +1,9 @@
+import dayjs from 'dayjs';
 import dataService from './DataService';
 import stepService from './StepService';
 import type Activity from '@/interfaces/activity';
 import type Service from '@/interfaces/service';
-import { useDates } from '@/views/composables/dates';
 
-const { getWeekNumber } = useDates();
 interface ActivityService extends Service<Activity>{
     saveBatch(activities: Activity[]): Promise<Activity[]>;
 }
@@ -33,10 +32,10 @@ const service: ActivityService = {
         }
     },
     getNew() {
-        const today = new Date();
+        const today = dayjs();
         return {
-            year: today.getFullYear(),
-            week: getWeekNumber(today),
+            year: today.year(),
+            week: today.week(),
             status: 'planned',
             step: stepService.getNew(),
             qty: 0,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import type Activity from '@/interfaces/activity'
 import type Product from '@/interfaces/product'
 import productService from '@/service/ProductService'
@@ -9,7 +10,6 @@ import { computed, onMounted, ref, type PropType } from "vue"
 import { useDialog } from '@/views/composables/dialog'
 import { useToast } from 'primevue/usetoast'
 import type {Delivery} from '@/interfaces/delivery'
-import type { weekNumber, year } from '@/interfaces/dates'
 
 const toast = useToast()
 const {dialog, hideDialog, showDialog} = useDialog()
@@ -35,11 +35,11 @@ const props = defineProps({
     },
     year: {
         required: true,
-        type: Number as PropType<year>,
+        type: Number as PropType<number>,
     },
     week: {
         required: true,
-        type: Number as PropType<weekNumber>,
+        type: Number as PropType<number>,
     },
     delivery: {
         required: true,

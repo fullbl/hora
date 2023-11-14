@@ -3,9 +3,7 @@ import { useLayout } from '@/layout/composables/layout';
 
 const { onMenuToggle, contextPath } = useLayout();
 
-
 const logoUrl = `${contextPath}layout/images/logo-dark.svg`;
-
 </script>
 
 <template>

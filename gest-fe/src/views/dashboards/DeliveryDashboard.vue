@@ -11,15 +11,16 @@ import Toast from 'primevue/toast';
 import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
+import dayjs from 'dayjs';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
 
-const { getWeekNumber, getDate, weekDays, locale } = useDates();
+const { getDate, getWeekDates } = useDates();
 
-const today = new Date();
-const week = ref(getWeekNumber(today));
-const year = ref(today.getFullYear());
+const today = dayjs();
+const week = ref(today.week());
+const year = ref(today.year());
 
 onMounted(async () => {
     deliveries.value = await deliveryService.getAll()
@@ -33,7 +34,7 @@ const deliveryGroups = computed(() => {
         }
 
         const deliveryDate = getDate(year.value, week.value, delivery.deliveryWeekDay);
-        if (!delivery.weeks.includes(getWeekNumber(deliveryDate))) {
+        if (!delivery.weeks.includes(deliveryDate.week())) {
             return x;
         }
 
@@ -171,12 +172,12 @@ const weekTotal = computed(function () {
 
     <div class="card">
         <div class="grid">
-            <div style="width:14.28%" v-for="weekDay of weekDays">
-                <h5>{{ weekDay.label }}<br>{{ getDate(year, week, weekDay.value).toLocaleDateString(locale) }}</h5>
-                <b>Day total: {{ dayTotal(weekDay.value) }}</b>
+            <div style="width:14.28%" v-for="date of getWeekDates(year,week)">
+                <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
+                <b>Day total: {{ dayTotal(date.weekday() ) }}</b>
 
                 <div>
-                    <Panel v-for="[zone, subZones] in deliveryGroups.get(weekDay.value)"
+                    <Panel v-for="[zone, subZones] in deliveryGroups.get(date.weekday())"
                         :header="zone + ': ' + zoneTotal(subZones)" toggleable collapsed>
                         <Panel v-for="[subZone, customers] in subZones" :header="subZone + ': ' + subZoneTotal(customers)"  toggleable collapsed>
                         <p v-for="[product, qty] in Array.from(zoneTotals(customers)).sort(([x,a],[y,b]) => x.localeCompare(y))" class="m-0">

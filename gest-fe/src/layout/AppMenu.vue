@@ -2,15 +2,15 @@
 import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
-import stepService from '@/service/StepService'
+import stepService from '@/service/StepService';
 const model = ref([
     {
         label: 'HORA',
         items: [
             { label: 'Users', icon: 'pi pi-fw pi-user', to: '/users' },
             { label: 'Products', icon: 'pi pi-fw pi-list', to: '/products' },
-           // { label: 'Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/orders' },
-            { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' },
+            // { label: 'Orders', icon: 'pi pi-fw pi-shopping-cart', to: '/orders' },
+            { label: 'Deliveries', icon: 'pi pi-fw pi-car', to: '/deliveries' }
         ]
     },
     {
@@ -20,16 +20,13 @@ const model = ref([
             { label: 'Planting Dashboard', icon: 'pi pi-fw pi-download', to: '/dashboards/planting' },
             { label: 'Harvest Dashboard', icon: 'pi pi-fw pi-upload', to: '/dashboards/harvest' },
             { label: 'Delivery Dashboard', icon: 'pi pi-fw pi-shopping-cart', to: '/dashboards/delivery' },
-            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-euro', to: '/dashboards/payment' },
+            { label: 'Payment Dashboard', icon: 'pi pi-fw pi-euro', to: '/dashboards/payment' }
         ]
     },
     {
         label: 'Operations',
-        items: [
-            { label: 'Soaking', icon: stepService.getIcon('soaking'), to: '/operations/soaking' },
-        ]
+        items: [{ label: 'Soaking', icon: stepService.getIcon('soaking'), to: '/operations/soaking' }]
     }
-
 ]);
 </script>
 
