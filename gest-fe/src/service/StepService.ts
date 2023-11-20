@@ -4,7 +4,6 @@ import type Service from '@/interfaces/service';
 
 interface StepService extends Service<Step> {
     getTypes(): Array<{ label: string; value: string }>;
-    getIcon(type: string): string;
 }
 
 const service: StepService = {
@@ -32,24 +31,11 @@ const service: StepService = {
     getTypes() {
         return [
             { label: 'Soaking', value: 'soaking' },
+            { label: 'Hot Soaking', value: 'hot_soaking' },
             { label: 'Preactivation', value: 'preactivation' },
             { label: 'Blackout', value: 'blackout' },
             { label: 'Light', value: 'light' },
         ];
-    },
-    getIcon(type) {
-        switch (type) {
-            case 'soaking':
-                return 'pi pi-arrow-circle-down';
-            case 'preactivation':
-                return 'pi pi-compass'
-            case 'light':
-                return 'pi pi-sun';
-            case 'blackout':
-                return 'pi pi-moon';
-        }
-
-        return '';
     }
 };
 

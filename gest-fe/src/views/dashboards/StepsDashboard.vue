@@ -10,13 +10,14 @@ import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
+import Icon from '@/components/Icon.vue';
 
 const { getWeekDates } = useDates();
 
 const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
-const selectedSteps = ref(['soaking']);
+const selectedStep = ref('soaking');
 const steps = stepService.getTypes();
 const planner = new Planner();
 
@@ -25,7 +26,7 @@ onMounted(async () => {
 });
 
 const deliveryGroups = computed(() => {
-    return planner.groupByWeekDayAndProduct(planner.setDates(year.value, week.value).filter(selectedSteps.value));
+    return planner.groupByWeekDayAndProduct(planner.setDates(year.value, week.value).filter([selectedStep.value]));
 });
 
 const weekDayTotal = function (weekDay: number) {
@@ -55,9 +56,9 @@ const weekTotal = computed(function () {
 <template>
     <div class="card">
         <YearWeek v-model:year="year" v-model:week="week" />
-        <SelectButton class="mt-3" v-model="selectedSteps" :options="steps" optionLabel="label" optionValue="value" multiple aria-labelledby="multiple">
+        <SelectButton class="mt-3" v-model="selectedStep" :options="steps" optionLabel="label" optionValue="value" aria-labelledby="multiple">
             <template #option="slotProps">
-                <i :class="stepService.getIcon(slotProps.option.value)"> {{ slotProps.option.value }}</i>
+                <Icon :type="slotProps.option.value" class="mr-2" /><span>{{ slotProps.option.label }}</span>
             </template>
         </SelectButton>
     </div>
@@ -75,7 +76,7 @@ const weekTotal = computed(function () {
 
                 <div v-for="[name, dp] in deliveryGroups.get(date.weekday())">
                     <QtyHolder :qty="dp.qty">
-                        <i :class="stepService.getIcon(dp.step.name)" />
+                        <Icon :type="dp.step.name" />
                         {{ dp.step.name }}
                         {{ dp.product.name }}
                         <br />

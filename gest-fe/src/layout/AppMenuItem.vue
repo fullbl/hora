@@ -2,6 +2,7 @@
 import { ref, onBeforeMount, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useLayout } from '@/layout/composables/layout';
+import Icon from '@/components/Icon.vue';
 
 const route = useRoute();
 
@@ -73,12 +74,12 @@ const checkActiveRoute = (item) => {
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
         <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
+            <Icon v-if="item.icon" :type="item.icon" class="mr-2" />
             <span class="layout-menuitem-text">{{ item.label }}</span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
+            <Icon v-if="item.icon" :type="item.icon" class="mr-2" />
             <span class="layout-menuitem-text">{{ item.label }}</span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </router-link>

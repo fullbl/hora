@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
-import stepService from '@/service/StepService';
 const model = ref([
     {
         label: 'HORA',
@@ -25,7 +24,7 @@ const model = ref([
     },
     {
         label: 'Operations',
-        items: [{ label: 'Soaking', icon: stepService.getIcon('soaking'), to: '/operations/soaking' }]
+        items: [{ label: 'Soaking', icon: 'soaking', to: '/operations/soaking' }]
     }
 ]);
 </script>

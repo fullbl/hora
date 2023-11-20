@@ -8,6 +8,9 @@
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^6.4.2",
+        "@fortawesome/free-solid-svg-icons": "^6.4.2",
+        "@fortawesome/vue-fontawesome": "^3.0.5",
         "chart.js": "^4.4.0",
         "dayjs": "^1.11.10",
         "primeflex": "^3.2.1",

@@ -28,6 +28,7 @@ const steps = computed({
 
 const divideMap = {
     soaking: 'hours',
+    hot_soaking: 'hours',
     preactivation: 'hours',
     light: 'days',
     blackout: 'days',

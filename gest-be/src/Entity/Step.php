@@ -18,12 +18,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Step
 {
     public const STEP_SOAKING = 'soaking';
+    public const STEP_HOT_SOAKING = 'hot_soaking';
     public const STEP_PREACTIVATION = 'preactivation';
     public const STEP_BLACKOUT = 'blackout';
     public const STEP_LIGHT = 'light';
 
     public const STEP_TYPES = [
         self::STEP_SOAKING,
+        self::STEP_HOT_SOAKING,
         self::STEP_PREACTIVATION,
         self::STEP_BLACKOUT,
         self::STEP_LIGHT,

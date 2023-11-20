@@ -116,6 +116,12 @@ const price = computed({
                             {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
                         </template>
                     </Column>
+                    <Column header="Hot soaking hours">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Hot soaking hours</span>
+                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'hot_soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
+                        </template>
+                    </Column>
                     <Column header="Blackout days">
                         <template #body="slotProps">
                             <span class="p-column-title">Blackout days</span>
