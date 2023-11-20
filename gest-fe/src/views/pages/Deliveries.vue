@@ -111,7 +111,7 @@ const selectedWeeks = computed({
 
 })
 
-const weekDays = dayjs.weekdays().map((w, i) => ({ label: w, value: i + 1 }))
+const weekDays = dayjs.weekdays(true).map((w, i) => ({ label: w, value: i }))
 
 const getCustomerNumber = (item: Delivery) =>
     (data.value?.filter(d => d.customer?.id === item.customer?.id).findIndex(d => d.id === item.id) ?? 0) + 1
@@ -158,7 +158,6 @@ const selectWeeks = function (type: string) {
         single.value.weeks = single.value.weeks.filter((x => x >= dayjs().week()))
     }
 }
-
 </script>
 
 <template>
