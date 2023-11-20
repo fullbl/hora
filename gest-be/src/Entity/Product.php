@@ -20,6 +20,7 @@ class Product
     public const TYPE_BLACKOUT_BOX = 'blackout_box';
     public const TYPE_LIGHT_BOX = 'light_box';
     public const TYPE_SHIPPING_BOX = 'shipping_box';
+    public const TYPE_EXTRA = 'extra';
     public const TYPES = [
         self::TYPE_GROUND,
         self::TYPE_SEED,
@@ -28,6 +29,7 @@ class Product
         self::TYPE_BLACKOUT_BOX,
         self::TYPE_LIGHT_BOX,
         self::TYPE_SHIPPING_BOX,
+        self::TYPE_EXTRA,
     ];
 
     #[Groups(['activity-list', 'delivery-list', 'product', 'product-edit'])]

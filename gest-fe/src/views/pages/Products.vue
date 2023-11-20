@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import productService from '@/service/ProductService';
 import { useDataView } from '../composables/dataView';
-import Steps from '@/components/Steps.vue';
-import { computed, ref } from 'vue';
+import {  ref } from 'vue';
 import Logger from '@/components/Logger.vue';
+import Extra from './products/Extra.vue';
+import Seed from './products/Seed.vue';
 import type Step from '@/interfaces/step';
-import Checkbox from 'primevue/checkbox';
+
 const { filters, data, single, save, openNew, editData, 
     dialog, hideDialog, showDialog, deleteDialog, 
     confirmDelete, deleteData, isInvalid } = useDataView(productService);
@@ -19,19 +20,11 @@ const types = [
     { label: 'Water box', value: 'water_box' },
     { label: 'Blackout box', value: 'blackout_box' },
     { label: 'Light box', value: 'light_box' },
-    { label: 'Shipping box', value: 'shipping_box' }
+    { label: 'Shipping box', value: 'shipping_box' },
+    { label: 'Extra', value: 'extra' }
 ];
 
-const price = computed({
-    get(): number {
-        return (single.value?.price ?? 0) / 100;
-    },
-    set(price: number) {
-        if (single.value) {
-            single.value.price = Math.round(price * 100);
-        }
-    }
-});
+
 </script>
 
 <template>
@@ -115,19 +108,7 @@ const price = computed({
                             <span class="p-column-title">Soaking hours</span>
                             {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
                         </template>
-                    </Column>
-                    <Column header="Hot soaking hours">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Hot soaking hours</span>
-                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'hot_soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
-                        </template>
-                    </Column>
-                    <Column header="Blackout days">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Blackout days</span>
-                            {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'blackout').reduce((x: number, s: Step) => x + s.minutes, 0) / 60 / 24) }}
-                        </template>
-                    </Column>
+                    </Column>Object as 
                     <Column header="Light days">
                         <template #body="slotProps">
                             <span class="p-column-title">Light days</span>
@@ -152,34 +133,15 @@ const price = computed({
     
                         <div class="field col-6">
                             <label for="type">Type</label>
-                            <Dropdown id="type" v-model="single.type" :options="types" optionLabel="label" optionValue="value" placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }"> </Dropdown>
+                            <Dropdown id="type" v-model="single.type" :options="types" 
+                                optionLabel="label" optionValue="value" 
+                                placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }" />
                         </div>
                     </div>
-                    <div class="formgrid grid" v-if="'seeds' === single.type">
-                        <div class="field col-3">
-                            <label for="weight">Weight</label>
-                            <Checkbox id="weight" v-model="single.weight" :binary="true" :class="{ 'p-invalid': isInvalid('weight') }" style="display: block" />
-                        </div>
 
-                        <div class="field col-3">
-                            <label for="decigrams">Decigrams</label>
-                            <InputNumber type="number" id="decigrams" v-model="single.decigrams" required autofocus showButtons :class="{ 'p-invalid': isInvalid('decigrams') }" />
-                        </div>
-
-                        <div class="field col-3">
-                            <label for="days">Days</label>
-                            <InputNumber type="number" id="days" v-model="single.days" required autofocus showButtons :class="{ 'p-invalid': isInvalid('days') }" />
-                        </div>
-
-                        <div class="field col-3">
-                            <label for="price">Price</label>
-                            <InputNumber type="number" id="price" mode="currency" currency="EUR" v-model="price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
-                        </div>
-
-                        <div class="field col">
-                            <Steps v-model="single.steps" />
-                        </div>
-                    </div>
+                    <Seed v-if="'seeds' === single.type" :seed="single" :isInvalid="isInvalid" />
+                    <Extra v-if="'extra' === single.type" :extra="single" :isInvalid="isInvalid" />
+                    
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
