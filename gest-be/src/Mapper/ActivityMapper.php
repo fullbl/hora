@@ -26,7 +26,7 @@ class ActivityMapper
         $activity
         ->setExecuter($this->security->getUser())
         ->setExecutionTime(new \DateTimeImmutable)
-        ->setWorkableUntil(new \DateTimeImmutable($data['time']))
+        ->setWorkableUntil(new \DateTimeImmutable($data['time'] ?? null))
         ->setDelivery($this->em->getReference(Delivery::class, $data['delivery']))
         ->setStep($this->em->getReference(Step::class, $data['step']))
         ->setYear(($data['year']))

@@ -1,5 +1,5 @@
 import type {Delivery} from "./delivery";
-import type Step from "./step";
+import type {Step} from "./step";
 import type User from "./user";
 
 export default interface Activity {

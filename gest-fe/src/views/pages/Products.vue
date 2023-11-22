@@ -5,7 +5,7 @@ import {  ref } from 'vue';
 import Logger from '@/components/Logger.vue';
 import Extra from './products/Extra.vue';
 import Seed from './products/Seed.vue';
-import type Step from '@/interfaces/step';
+import type {Step} from '@/interfaces/step';
 
 const { filters, data, single, save, openNew, editData, 
     dialog, hideDialog, showDialog, deleteDialog, 

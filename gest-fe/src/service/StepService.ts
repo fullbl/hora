@@ -1,9 +1,9 @@
 import dataService from './DataService';
-import type Step from '@/interfaces/step';
+import type {Step, StepName} from '@/interfaces/step';
 import type Service from '@/interfaces/service';
 
 interface StepService extends Service<Step> {
-    getTypes(): Array<{ label: string; value: string }>;
+    getTypes(): Array<{ label: string; value: StepName }>;
 }
 
 const service: StepService = {

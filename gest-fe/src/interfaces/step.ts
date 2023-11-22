@@ -1,10 +1,14 @@
 import type Product from "./product";
 
-export default interface Step {
+type StepName = 'soaking' | 'hot_soaking' | 'preactivation' | 'light' | 'blackout'
+
+interface Step {
     id?: number,
     product?: Product,
-    name: 'soaking'|'hot_soaking'|'preactivation'|'light'|'blackout',
+    name: StepName,
     minutes: number,
     params: object,
     sort: number,
 }
+
+export type { StepName, Step };

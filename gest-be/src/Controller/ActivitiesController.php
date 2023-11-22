@@ -45,8 +45,6 @@ class ActivitiesController extends AbstractController
         $soakingTime = new \DateTime($data['time']);
         $activities = [];
 
-        
-
         foreach ($data['soakings'] as $soaking) {
             foreach ($soaking['deliveries'] as $delivery) {
                 $activity = $this->mapper->fromArray([
@@ -81,6 +79,31 @@ class ActivitiesController extends AbstractController
                 'box' => $data['box'],
             ]);
             $this->repo->save($activity, true);
+        }
+
+        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'activity-list']);
+    }
+
+    #[Route('/planting', methods: ['POST'], name: 'activities_planting')]
+    public function planting(Request $request): JsonResponse
+    {
+        $data = $request->toArray();
+        $activities = [];
+
+        foreach ($data['plantings'] as $planting) {
+            foreach ($planting['deliveries'] as $delivery) {
+                $activity = $this->mapper->fromArray([
+                    'delivery' => $delivery,
+                    'step' => $planting['step'],
+                    'year' => $data['year'],
+                    'week' => $data['week'],
+                    'qty' => $planting['qty'],
+                    'status' => Activity::STATUS_PLANNED,
+                    
+                ]);
+                $this->repo->save($activity, true);
+                $activities[] = $activity;
+            }
         }
 
         return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'activity-list']);

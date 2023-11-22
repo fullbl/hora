@@ -4,8 +4,8 @@ import type Planned from '@/interfaces/planned';
 import { useDates } from '@/views/composables/dates';
 import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
-import type Step from '@/interfaces/step';
 import { ref } from 'vue';
+import type { Step, StepName } from '@/interfaces/step';
 
 const { getDate } = useDates();
 if (!Array.prototype.toReversed) {
@@ -78,7 +78,7 @@ export default class Planner {
         return this;
     }
 
-    filter(selectedSteps: string[], day?: number) {
+    filter(selectedSteps: StepName[], day?: number) {
         return this.planned.value.filter((p) => {
             return undefined !== p.deliveryDate && 
                 p.delivery.weeks.includes(p.deliveryDate.week()) && 

@@ -24,7 +24,10 @@ const model = ref([
     },
     {
         label: 'Operations',
-        items: [{ label: 'Soaking', icon: 'soaking', to: '/operations/soaking' }]
+        items: [
+            { label: 'Soaking', icon: 'soaking', to: '/operations/soaking' },
+            { label: 'Planting', icon: 'pi pi-fw pi-download', to: '/operations/planting' }
+        ]
     }
 ]);
 </script>

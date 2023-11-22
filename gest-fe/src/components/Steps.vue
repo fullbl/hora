@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type Step from "@/interfaces/step";
+import type {Step} from "@/interfaces/step";
 import stepService from '@/service/StepService';
 import { computed } from "vue";
 import StepTime from "./StepTime.vue";

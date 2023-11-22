@@ -10,26 +10,20 @@ import type {Step} from '@/interfaces/step';
 import type { Delivery } from '@/interfaces/delivery';
 import type { WaterBox } from '@/interfaces/product';
 import dayjs, { Dayjs } from 'dayjs';
+import Icon from '@/components/Icon.vue';
 
-interface Soaking {
+interface Planting {
     name: string;
     step: Step;
     deliveries: Delivery[];
     qty: number;
     done: number;
     grams: number;
-    hours: number;
-    data: {
-        box?: number;
-        script?: number;
-    };
+    days: number;
 }
 
 interface Selected {
-    box?: WaterBox;
-    plantingTime?: Dayjs;
-    soakingTime?: Dayjs;
-    soakings: Soaking[];
+    plantings: Planting[];
 }
 
 const { dialog, hideDialog, showDialog } = useDialog();
@@ -40,6 +34,7 @@ const showDate = computed({
         date.value = dayjs(val);
     }
 });
+
 const planner = new Planner();
 const boxes = ref<WaterBox[]>([]);
 
@@ -48,43 +43,21 @@ onMounted(async () => {
     boxes.value = await productService.getWaterBoxes();
 });
 
-const single = ref<Selected>({ soakings: [], plantingTime: dayjs() });
+const single = ref<Selected>({ plantings: [] });
 
-function select(s: Soaking) {
-    if (single.value.soakings.filter((x) => x.name === s.name).length > 0) {
-        single.value.soakings = single.value.soakings.filter((x) => x.name !== s.name);
+function select(s: Planting) {
+    if (single.value.plantings.filter((x) => x.name === s.name).length > 0) {
+        single.value.plantings = single.value.plantings.filter((x) => x.name !== s.name);
     } else {
-        single.value.soakings = single.value.soakings.concat([s]);
+        single.value.plantings = single.value.plantings.concat([s]);
     }
 }
 
-watch(single.value, (a) => {
-    if (!single.value?.plantingTime) {
-        return;
-    }
-
-    let dayAfter = single.value.plantingTime.add(1, 'day');
-    if (single.value.soakings.length === 0) {
-        return;
-    }
-    const hours = single.value.soakings[0].hours;
-    dayAfter = dayAfter.subtract(hours, 'hours');
-    dayAfter = dayAfter.subtract(single.value.box?.decigrams ?? 0, 'minutes'); //decigrams used as minutes
-
-    if (!dayAfter.isSame(single.value.soakingTime)) {
-        single.value.soakingTime = dayAfter;
-    }
-});
-const plantingTime = computed(() => {
-    if (single.value.soakings.length === 0) {
-        return;
-    }
-
-    return single.value.plantingTime?.toDate();
-});
 
 const planned = computed(() => {
-    return planner.setDates(date.value.year(), date.value.week()).filter(['soaking'], date.value.weekday());
+    return planner.setDates(date.value.year(), date.value.week()).filter([
+        'light', 'blackout'
+    ], date.value.weekday());
 });
 
 const products = computed(() => {
@@ -99,7 +72,6 @@ const products = computed(() => {
             done: 0,
             deliveries: [] as Delivery[],
             steps: [] as Step[],
-            data: {} as any
         };
         val.deliveries.push(p.delivery);
 
@@ -108,18 +80,13 @@ const products = computed(() => {
             step: p.step,
             deliveries: val.deliveries,
             grams: (p.product.decigrams / 10) * p.qty + val.qty,
-            hours: p.step.minutes / 60,
+            days: p.step.minutes / 60 / 24,
             qty: val.qty + p.qty,
             done: val.done + p.done,
-            data: p.activities?.reduce((y, a) => {
-                y.box = a.data?.box;
-                y.script = a.data?.script;
-                return y;
-            }, val.data)
         });
 
         return x;
-    }, new Map<number, Soaking>());
+    }, new Map<number, Planting>());
 });
 
 async function save() {
@@ -127,16 +94,8 @@ async function save() {
         if (undefined === single.value) {
             return;
         }
-
-        if (undefined === single.value.box) {
-            alert('Please select a water box');
-            return;
-        }
-
-        await dataService.post(import.meta.env.VITE_API_URL + 'soaking', {
-            box: single.value.box.name,
-            time: single.value.soakingTime,
-            soakings: single.value.soakings.map((s) => ({
+        await dataService.post(import.meta.env.VITE_API_URL + 'planting', {
+            plantings: single.value.plantings.map((s) => ({
                 deliveries: s.deliveries.map((d) => d.id),
                 step: s.step.id,
                 qty: s.qty
@@ -161,37 +120,25 @@ async function save() {
         </div>
         <div class="flex justify-content-between mt-2">
             <h1>{{ date.format('dddd') }}</h1>
-            <Button @click="dialog = 'Soak'" v-show="single.soakings.length > 0">SOAK</Button>
+            <Button @click="dialog = 'Plant'" v-show="single.plantings.length > 0">PLANT</Button>
         </div>
     </div>
 
     <div class="flex flex-row flex-wrap justify-content-start">
-        <div class="card mr-5" :class="single.soakings.filter((x) => x.name === p.name).length > 0 ? 'border-primary' : ''" v-for="[id, p] in products" @click="select(p)" style="width: 25em">
+        <div class="card mr-5" :class="single.plantings.filter((x) => x.name === p.name).length > 0 ? 'border-primary' : ''" v-for="[id, p] in products" @click="select(p)" style="width: 25em">
             <h2>{{ p.name }}</h2>
             <QtyHolder :qty="p.qty" class="mr-2"> {{ p.grams }} grams </QtyHolder>
-            <QtyHolder :qty="p.hours"> hours </QtyHolder>
+            <QtyHolder :qty="p.days"> days </QtyHolder>
+            <Icon :type="p.step.name" class="mx-2"/>{{ p.step.name }}
             <ProgressBar :value="(p.done / p.qty) * 100"> {{ p.done }} / {{ p.qty }} </ProgressBar>
-            <div v-if="p.data.box">Water box: {{ p.data.box }}</div>
-            <div v-if="p.data.script">Script id: {{ p.data.script }}</div>
         </div>
 
-        <Dialog v-model:visible="showDialog" header="Soaking Details" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="showDialog" header="Planting Details" :modal="true" class="p-fluid">
             <h2>{{ dialog }}</h2>
-            <div v-for="s in single.soakings">
-                <p>{{ s.name }}: {{ s.grams }} grams ({{ s.hours }} hours)</p>
+            <div v-for="s in single.plantings">
+                <p>{{ s.name }}: {{ s.grams }} grams ({{ s.step.name }}: {{ s.days }} days)</p>
             </div>
             <hr />
-            <div class="field">
-                <label for="box">Water Box #</label>
-                <Dropdown v-model="single.box" :options="boxes" optionLabel="name" dataKey="id" placeholder="Select a Water Box" showClear filter> </Dropdown>
-            </div>
-            <div class="field">
-                <label for="box">Planting time</label>
-                <Calendar type="number" v-model="plantingTime" timeOnly required autofocus />
-            </div>
-            <div class="field">
-                <div v-if="single.soakingTime">Soaking time: {{ single.soakingTime.toLocaleString() }}</div>
-            </div>
 
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />

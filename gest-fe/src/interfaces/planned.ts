@@ -1,7 +1,7 @@
 import type Activity from './activity';
 import type {Delivery} from './delivery';
 import type Product from './product';
-import type Step from './step';
+import type {Step} from './step';
 import type { Dayjs } from 'dayjs';
 
 export default interface Planned {
