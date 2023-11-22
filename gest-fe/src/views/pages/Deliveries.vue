@@ -1,64 +1,63 @@
 <script setup lang="ts">
 import deliveryService from '@/service/DeliveryService';
-import { useDataView } from '../composables/dataView'
+import { useDataView } from '../composables/dataView';
 import type User from '@/interfaces/user';
 import type DeliveryProduct from '@/interfaces/deliveryProduct';
 import { onMounted, ref } from 'vue';
 import userService from '@/service/UserService';
 import productService from '@/service/ProductService';
-import { useDates } from '../composables/dates'
+import { useDates } from '../composables/dates';
 import { computed } from '@vue/reactivity';
 import type { TreeNode } from 'primevue/tree';
 import type Product from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import type {Delivery} from '@/interfaces/delivery';
+import type { Delivery } from '@/interfaces/delivery';
 import Logger from '@/components/Logger.vue';
 import Tree from 'primevue/tree';
 import dayjs from 'dayjs';
 
-const {
-    filters,
-    data: _data, single, save,
-    openNew: _openNew, editData: _editData, cloneData,
-    dialog, hideDialog,showDialog,
-    deleteDialog, confirmDelete, deleteData,
-    isInvalid
-} = useDataView(deliveryService)
+const { filters, data: _data, single, save, openNew: _openNew, editData: _editData, cloneData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(deliveryService);
 
-const { getWeeks, getDate } = useDates()
-const customers = ref<Array<User>>([])
-const products = ref<Array<Product>>([])
-const logEntity = ref(null)
-const nextOnly = ref(false)
-const today = dayjs()
-const year = dayjs().year()
-const weeks = getWeeks(year)
-
+const { getWeeks, getDate } = useDates();
+const customers = ref<Array<User>>([]);
+const products = ref<Array<Product>>([]);
+const logEntity = ref(null);
+const nextOnly = ref(false);
+const activeOnly = ref(false);
+const today = dayjs();
+const year = dayjs().year();
+const weeks = getWeeks(year);
 
 const nextDelivery = function (item: Delivery) {
-    return item.weeks.map(w => getDate(year, w, item.deliveryWeekDay))
-        .filter(d => d >= today)[0]
-}
+    return item.weeks.map((w) => getDate(year, w, item.deliveryWeekDay)).filter((d) => d >= today)[0];
+};
 
-const data = computed(() => _data.value?.map((d: Delivery) => {
-    d.nextDelivery = nextDelivery(d)?.valueOf()
-    return d
-}))
+const data = computed(() => {
+    const rows = _data.value?.map((d: Delivery) => {
+        d.nextDelivery = nextDelivery(d)?.valueOf();
+        return d;
+    });
+
+    if (activeOnly.value) {
+        return rows?.filter((d) => (d.nextDelivery ?? 0) > today.valueOf());
+    }
+
+    return rows;
+});
 
 const openNew = () => {
-    nextOnly.value = false
-    _openNew()
-}
+    nextOnly.value = false;
+    _openNew();
+};
 const editData = (item: Delivery) => {
-    nextOnly.value = false
-    _editData(item)
-}
+    nextOnly.value = false;
+    _editData(item);
+};
 
 onMounted(async () => {
-    customers.value = (await userService.getAll())
-        .filter(u => u.roles.includes('ROLE_CUSTOMER'))
-    products.value = (await productService.getSeeds())
+    customers.value = (await userService.getAll()).filter((u) => u.roles.includes('ROLE_CUSTOMER'));
+    products.value = await productService.getSeeds();
 });
 
 const selectedWeeks = computed({
@@ -68,30 +67,29 @@ const selectedWeeks = computed({
             return _weeks;
         }
         for (const month of weeks) {
-            let partialChecked = false
-            let checked = true
+            let partialChecked = false;
+            let checked = true;
             for (const week of month.children) {
-                const weekNumber = parseInt(week.key)
+                const weekNumber = parseInt(week.key);
                 if (single.value.weeks.includes(weekNumber)) {
-                    partialChecked = true
-                }
-                else {
-                    checked = false
+                    partialChecked = true;
+                } else {
+                    checked = false;
                 }
                 _weeks[week.key] = {
                     checked: single.value.weeks.includes(weekNumber),
                     partialChecked: false
-                }
+                };
             }
 
             if (true === checked) {
-                partialChecked = false
+                partialChecked = false;
             }
 
             _weeks[month.key] = {
                 checked,
                 partialChecked
-            }
+            };
         }
 
         return _weeks;
@@ -106,34 +104,32 @@ const selectedWeeks = computed({
                 _weeks.push(i);
             }
         }
-        single.value.weeks = _weeks
+        single.value.weeks = _weeks;
     }
+});
 
-})
+const weekDays = dayjs.weekdays(true).map((w, i) => ({ label: w, value: i }));
 
-const weekDays = dayjs.weekdays(true).map((w, i) => ({ label: w, value: i }))
-
-const getCustomerNumber = (item: Delivery) =>
-    (data.value?.filter(d => d.customer?.id === item.customer?.id).findIndex(d => d.id === item.id) ?? 0) + 1
+const getCustomerNumber = (item: Delivery) => (data.value?.filter((d) => d.customer?.id === item.customer?.id).findIndex((d) => d.id === item.id) ?? 0) + 1;
 
 const addProduct = () => {
     if (undefined !== single.value) {
-        const { deliveryProducts, ...rest} = single.value
-        single.value.deliveryProducts.push({ product: productService.getNew(), qty: 0, delivery: rest })
+        const { deliveryProducts, ...rest } = single.value;
+        single.value.deliveryProducts.push({ product: productService.getNew(), qty: 0, delivery: rest });
     }
-}
+};
 const removeProduct = (dp: DeliveryProduct) => {
     if (undefined !== single.value) {
-        single.value.deliveryProducts = single.value.deliveryProducts.filter(_dp => _dp !== dp)
+        single.value.deliveryProducts = single.value.deliveryProducts.filter((_dp) => _dp !== dp);
     }
-}
+};
 
 const preSave = function () {
     if (0 >= (single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0) ?? 0)) {
         alert('Product quantity is 0!');
     }
-    save()
-}
+    save();
+};
 
 const selectWeeks = function (type: string) {
     if ('undefined' === typeof single.value) {
@@ -141,23 +137,23 @@ const selectWeeks = function (type: string) {
     }
     switch (type) {
         case 'even':
-            single.value.weeks = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53]
-            break
+            single.value.weeks = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53];
+            break;
         case 'odd':
-            single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52]
-            break
+            single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52];
+            break;
         case 'all':
-            single.value.weeks = (Array.from(Array(53).keys())).map(x => ++x)
-            break
+            single.value.weeks = Array.from(Array(53).keys()).map((x) => ++x);
+            break;
         case 'suspend':
-            single.value.weeks = single.value.weeks.filter((x => x <= dayjs().week()))
-            break
+            single.value.weeks = single.value.weeks.filter((x) => x <= dayjs().week());
+            break;
     }
 
     if (nextOnly.value) {
-        single.value.weeks = single.value.weeks.filter((x => x >= dayjs().week()))
+        single.value.weeks = single.value.weeks.filter((x) => x >= dayjs().week());
     }
-}
+};
 </script>
 
 <template>
@@ -173,14 +169,21 @@ const selectWeeks = function (type: string) {
                     </template>
                 </Toolbar>
 
-                <DataTable :value="data" dataKey="id" :paginator="true" :rows="10" :filters="filters"
+                <DataTable
+                    :value="data"
+                    dataKey="id"
+                    :paginator="true"
+                    :rows="10"
+                    :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data" responsiveLayout="scroll">
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data"
+                    responsiveLayout="scroll"
+                >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">Manage Deliveries</h5>
-                            <Button @click="data = data?.filter(d => nextDelivery(d) > dayjs())">active only</Button>
+                            <Button @click="activeOnly = !activeOnly" :severity="activeOnly ? 'primary' : 'secondary'">active only</Button>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText v-model="filters.global.value" placeholder="Search..." />
@@ -226,8 +229,7 @@ const selectWeeks = function (type: string) {
                     <Column field="deliveryProducts" header="Products" sortable headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Products</span>
-                            {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' +
-                                d.qty).join(', ') }}
+                            {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' + d.qty).join(', ') }}
                         </template>
                     </Column>
                     <Column field="customer.zone" header="Zone" sortable>
@@ -251,8 +253,7 @@ const selectWeeks = function (type: string) {
                     <Column field="price" header="Price">
                         <template #body="slotProps">
                             <span class="p-column-title">Price</span>
-                            {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i +
-                                (p.product.price ?? 0) / 100 * p.qty, 0) - (slotProps.data.customer?.discount ?? 0, 0) }}€
+                            {{ slotProps.data.deliveryProducts.reduce((i: number, p: DeliveryProduct) => i + ((p.product.price ?? 0) / 100) * p.qty, 0) - (slotProps.data.customer?.discount ?? 0, 0) }}€
                         </template>
                     </Column>
                     <Column header="Quantity">
@@ -263,48 +264,32 @@ const selectWeeks = function (type: string) {
                     </Column>
                     <Column headerStyle="min-width:14rem;">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                                @click="editData(slotProps.data)" />
-                            <Button icon="pi pi-copy" class="p-button-rounded p-button-info mr-2"
-                                @click="cloneData(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2"
-                                @click="confirmDelete(slotProps.data)" />
-                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary mr-2"
-                                @click="logEntity = slotProps.data.id" />
+                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editData(slotProps.data)" />
+                            <Button icon="pi pi-copy" class="p-button-rounded p-button-info mr-2" @click="cloneData(slotProps.data)" />
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmDelete(slotProps.data)" />
+                            <Button icon="pi pi-book" class="p-button-rounded p-button-primary mr-2" @click="logEntity = slotProps.data.id" />
                         </template>
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="showDialog" :style="{ width: '60rem' }" :header="dialog" :modal="true"
-                    class="p-fluid" v-if="'undefined' !== typeof single">
+                <Dialog v-model:visible="showDialog" :style="{ width: '60rem' }" :header="dialog" :modal="true" class="p-fluid" v-if="'undefined' !== typeof single">
                     <div class="formgrid grid">
-
                         <div class="field col-3">
                             <label for="customer">Customer</label>
-                            <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName"
-                                dataKey="id" placeholder="Select a Customer" showClear filter
-                                :class="{ 'p-invalid': isInvalid('customer') }">
-                            </Dropdown>
+                            <Dropdown id="customer" v-model="single.customer" :options="customers" optionLabel="fullName" dataKey="id" placeholder="Select a Customer" showClear filter :class="{ 'p-invalid': isInvalid('customer') }"> </Dropdown>
                         </div>
                         <div class="field col-3">
                             <label for="name">Harvest WeekDay</label>
-                            <Dropdown id="type" v-model="single.harvestWeekDay" :options="weekDays" optionLabel="label"
-                                optionValue="value" placeholder="Select a WeekDay"
-                                :class="{ 'p-invalid': isInvalid('harvestWeekDay') }">
-                            </Dropdown>
+                            <Dropdown id="type" v-model="single.harvestWeekDay" :options="weekDays" optionLabel="label" optionValue="value" placeholder="Select a WeekDay" :class="{ 'p-invalid': isInvalid('harvestWeekDay') }"> </Dropdown>
                         </div>
                         <div class="field col-3">
                             <label for="name">Delivery WeekDay</label>
-                            <Dropdown id="type" v-model="single.deliveryWeekDay" :options="weekDays" optionLabel="label"
-                                optionValue="value" placeholder="Select a WeekDay"
-                                :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }">
-                            </Dropdown>
+                            <Dropdown id="type" v-model="single.deliveryWeekDay" :options="weekDays" optionLabel="label" optionValue="value" placeholder="Select a WeekDay" :class="{ 'p-invalid': isInvalid('deliveryWeekDay') }"> </Dropdown>
                         </div>
 
                         <div class="field col-3">
                             <label for="paymentMethod">Payment method</label>
-                            <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']"
-                                :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
+                            <Dropdown id="paymentMethod" v-model="single.paymentMethod" :options="['weekly', 'monthly']" :class="{ 'p-invalid': isInvalid('paymentMethod') }" />
                         </div>
 
                         <div class="field col-12">
@@ -319,8 +304,7 @@ const selectWeeks = function (type: string) {
                             <DataTable :value="single.deliveryProducts">
                                 <Column field="product.name" header="Product">
                                     <template #body="slotProps">
-                                        <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id"
-                                            :options="products" />
+                                        <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id" :options="products" />
                                     </template>
                                 </Column>
                                 <Column field="product.type" header="Type" />
@@ -331,8 +315,7 @@ const selectWeeks = function (type: string) {
                                 </Column>
                                 <Column header="x">
                                     <template #body="slotProps">
-                                        <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                                            @click="removeProduct(slotProps.data)" />
+                                        <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2" @click="removeProduct(slotProps.data)" />
                                     </template>
                                 </Column>
                             </DataTable>
@@ -346,12 +329,8 @@ const selectWeeks = function (type: string) {
                                 <Button label="all" @click="selectWeeks('all')" />
                                 <Button label="suspend" @click="selectWeeks('suspend')" />
                             </div>
-                            <div class="mb-3">
-                                <InputSwitch v-model="nextOnly" />Future only
-                            </div>
-                            <Tree v-model:selectionKeys="selectedWeeks" :value="weeks" selectionMode="checkbox"
-                                class="p-focus" display="chip"
-                                :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
+                            <div class="mb-3"><InputSwitch v-model="nextOnly" />Future only</div>
+                            <Tree v-model:selectionKeys="selectedWeeks" :value="weeks" selectionMode="checkbox" class="p-focus" display="chip" :class="{ 'p-invalid': isInvalid('selectedWeeks') }" />
                         </div>
                     </div>
 
@@ -373,8 +352,6 @@ const selectWeeks = function (type: string) {
                 </Dialog>
 
                 <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
-
-
             </div>
         </div>
     </div>
