@@ -39,7 +39,6 @@ const showDate = computed({
     set: (val: Date) => {
         date.value = dayjs(val);
     }
-    
 });
 const planner = new Planner();
 const boxes = ref<WaterBox[]>([]);
@@ -65,19 +64,27 @@ watch(single.value, (a) => {
     }
 
     let dayAfter = single.value.plantingTime.add(1, 'day');
+    if (single.value.soakings.length === 0) {
+        return;
+    }
     const hours = single.value.soakings[0].hours;
     dayAfter = dayAfter.subtract(hours, 'hours');
-    dayAfter = dayAfter.subtract((single.value.box?.decigrams ?? 0), 'minutes'); //decigrams used as minutes
+    dayAfter = dayAfter.subtract(single.value.box?.decigrams ?? 0, 'minutes'); //decigrams used as minutes
 
     if (!dayAfter.isSame(single.value.soakingTime)) {
         single.value.soakingTime = dayAfter;
     }
 });
+const plantingTime = computed(() => {
+    if (single.value.soakings.length === 0) {
+        return;
+    }
+
+    return single.value.plantingTime?.toDate();
+});
 
 const planned = computed(() => {
-    return planner
-        .setDates(date.value.year(), date.value.week())
-        .filter(['soaking'], date.value.weekday());
+    return planner.setDates(date.value.year(), date.value.week()).filter(['soaking'], date.value.weekday());
 });
 
 const products = computed(() => {
@@ -150,7 +157,7 @@ async function save() {
         <div class="p-inputgroup flex-1">
             <Button @click="date = date.subtract(1, 'day')">&lt;</Button>
             <Calendar v-model="showDate" />
-            <Button @click="date = date.add(1,'day')">&gt;</Button>
+            <Button @click="date = date.add(1, 'day')">&gt;</Button>
         </div>
         <div class="flex justify-content-between mt-2">
             <h1>{{ date.format('dddd') }}</h1>
@@ -180,7 +187,7 @@ async function save() {
             </div>
             <div class="field">
                 <label for="box">Planting time</label>
-                <Calendar type="number" v-model="single.plantingTime" timeOnly required autofocus />
+                <Calendar type="number" v-model="plantingTime" timeOnly required autofocus />
             </div>
             <div class="field">
                 <div v-if="single.soakingTime">Soaking time: {{ single.soakingTime.toLocaleString() }}</div>
