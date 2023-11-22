@@ -1,11 +1,12 @@
 import type Service from '@/interfaces/service';
 import dataService from './DataService';
 import type Product from '@/interfaces/product';
-import type { Seed, WaterBox } from '@/interfaces/product';
+import type { Seed, Extra, WaterBox, Sellable } from '@/interfaces/product';
 
 
 interface ProductService extends Service<Product> {
     getSeeds(): Promise<Seed[]>,
+    getSellable(): Promise<Sellable[]>,
     getWaterBoxes(): Promise<WaterBox[]>
 }
 const service: ProductService = {
@@ -17,6 +18,9 @@ const service: ProductService = {
     },
     async getSeeds() {
         return await dataService.get<Seed[]>(import.meta.env.VITE_API_URL + 'seeds');
+    },
+    async getSellable() {
+        return await dataService.get<Sellable[]>(import.meta.env.VITE_API_URL + 'sellable');
     },
     async getWaterBoxes() {
         return await dataService.get<WaterBox[]>(import.meta.env.VITE_API_URL + 'water_boxes');

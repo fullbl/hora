@@ -19,4 +19,12 @@ export interface Seed extends Product {
     type: 'seed'
 }
 
+export interface Extra extends Product {
+    type: 'extra'
+}
+
+export interface Sellable extends Product {
+    type: 'seed' | 'extra'
+}
+
 export default Product

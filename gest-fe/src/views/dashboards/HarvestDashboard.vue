@@ -41,6 +41,9 @@ const deliveryGroups = computed(() => {
         }
 
         for (const dp of delivery.deliveryProducts) {
+            if(dp.product.type !== 'seeds') {
+                continue;
+            }
             if (!x.has(delivery.harvestWeekDay)) {
                 x.set(delivery.harvestWeekDay, new Map());
             }

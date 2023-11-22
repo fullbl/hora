@@ -9,7 +9,7 @@ import productService from '@/service/ProductService';
 import { useDates } from '../composables/dates';
 import { computed } from '@vue/reactivity';
 import type { TreeNode } from 'primevue/tree';
-import type Product from '@/interfaces/product';
+import type Sellable from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import type { Delivery } from '@/interfaces/delivery';
@@ -21,7 +21,7 @@ const { filters, data: _data, single, save, openNew: _openNew, editData: _editDa
 
 const { getWeeks, getDate } = useDates();
 const customers = ref<Array<User>>([]);
-const products = ref<Array<Product>>([]);
+const products = ref<Array<Sellable>>([]);
 const logEntity = ref(null);
 const nextOnly = ref(false);
 const activeOnly = ref(false);
@@ -57,7 +57,7 @@ const editData = (item: Delivery) => {
 
 onMounted(async () => {
     customers.value = (await userService.getAll()).filter((u) => u.roles.includes('ROLE_CUSTOMER'));
-    products.value = await productService.getSeeds();
+    products.value = await productService.getSellable();
 });
 
 const selectedWeeks = computed({
@@ -115,7 +115,7 @@ const getCustomerNumber = (item: Delivery) => (data.value?.filter((d) => d.custo
 const addProduct = () => {
     if (undefined !== single.value) {
         const { deliveryProducts, ...rest } = single.value;
-        single.value.deliveryProducts.push({ product: productService.getNew(), qty: 0, delivery: rest });
+        single.value.deliveryProducts.push({ product: productService.getNew(), qty: 1, delivery: rest });
     }
 };
 const removeProduct = (dp: DeliveryProduct) => {
