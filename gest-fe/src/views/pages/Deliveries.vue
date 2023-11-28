@@ -29,18 +29,11 @@ const today = dayjs();
 const year = dayjs().year();
 const weeks = getWeeks(year);
 
-const nextDelivery = function (item: Delivery) {
-    return item.weeks.map((w) => getDate(year, w, item.deliveryWeekDay)).filter((d) => d >= today)[0];
-};
-
 const data = computed(() => {
-    const rows = _data.value?.map((d: Delivery) => {
-        d.nextDelivery = nextDelivery(d)?.valueOf();
-        return d;
-    });
+    const rows = _data.value;
 
     if (activeOnly.value) {
-        return rows?.filter((d) => (d.nextDelivery ?? 0) > today.valueOf());
+        return rows?.filter((d) => d.deliveryDate > today);
     }
 
     return rows;
@@ -220,10 +213,16 @@ const selectWeeks = function (type: string) {
                             {{ slotProps.data.customer?.fullName }}
                         </template>
                     </Column>
-                    <Column field="nextDelivery" header="Next Delivery" sortable headerStyle="min-width:8rem;">
+                    <Column field="harvestDate" header="Harvest" sortable headerStyle="min-width:8rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Next Delivery</span>
-                            {{ slotProps.data.nextDelivery ? dayjs(slotProps.data.nextDelivery).format('dddd DD/MM/YYYY') : '' }}
+                            <span class="p-column-title">Harvest</span>
+                            {{ slotProps.data.harvestDate.format('dddd DD/MM/YYYY') }}
+                        </template>
+                    </Column>
+                    <Column field="deliveryDate" header="Delivery" sortable headerStyle="min-width:8rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Delivery</span>
+                            {{ slotProps.data.deliveryDate.format('dddd DD/MM/YYYY') }}
                         </template>
                     </Column>
                     <Column field="deliveryProducts" header="Products" sortable headerStyle="min-width:10rem;">

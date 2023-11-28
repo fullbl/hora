@@ -108,7 +108,7 @@ const types = [
                             <span class="p-column-title">Soaking hours</span>
                             {{ Math.round(slotProps.data.steps.filter((s: Step) => s.name === 'soaking').reduce((x: number, s: Step) => x + s.minutes, 0) / 60) }}
                         </template>
-                    </Column>Object as 
+                    </Column>
                     <Column header="Light days">
                         <template #body="slotProps">
                             <span class="p-column-title">Light days</span>
