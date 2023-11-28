@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\DeliveryRepository;
 use App\Validator\ExistsInWeek;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -36,10 +37,21 @@ class Delivery
     private ?int $deliveryWeekDay = null;
 
     #[Groups(['delivery-list'])]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Assert\NotNull]
+    private ?DateTimeImmutable $harvestDate = null;
+
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Assert\NotNull]
+    private ?DateTimeImmutable $deliveryDate = null;
+    
+    #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::STRING, nullable: true)]
     #[Assert\Length(max:255)]
     private ?string $notes = null;
 
+    /** @deprecated */
     #[Groups(['delivery-list'])]
     #[Assert\NotNull]
     #[Assert\All([
@@ -111,6 +123,31 @@ class Delivery
 
         return $this;
     }
+
+    public function getHarvestDate(): DateTimeImmutable
+    {
+        return $this->harvestDate;
+    }
+
+    public function setHarvestDate(DateTimeImmutable $harvestDate): self
+    {
+        $this->harvestDate = $harvestDate;
+
+        return $this;
+    }
+
+    public function getDeliveryDate(): DateTimeImmutable
+    {
+        return $this->deliveryDate;
+    }
+
+    public function setDeliveryDate(DateTimeImmutable $deliveryDate): self
+    {
+        $this->deliveryDate = $deliveryDate;
+
+        return $this;
+    }
+
     public function getNotes(): ?string
     {
         return $this->notes;
@@ -193,11 +230,17 @@ class Delivery
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function getWeeks(): array
     {
         return array_map(fn($w) => (int)$w, $this->weeks);
     }
 
+    /**
+     * @deprecated
+     */
     public function setWeeks(array $weeks): self
     {
         $this->weeks = $weeks;
