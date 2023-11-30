@@ -17,10 +17,15 @@ const service: Service<Delivery> = {
             });
     },
     async save(delivery) {
+        const data = {
+            ...delivery,
+            deliveryDate: dayjs(delivery.deliveryDate).format('YYYY-MM-DD'),
+            harvestDate: dayjs(delivery.harvestDate).format('YYYY-MM-DD'),
+        }
         if (delivery.id) {
-            return await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, delivery);
+            return await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, data);
         } else {
-            return await dataService.post(import.meta.env.VITE_API_URL + 'deliveries', delivery);
+            return await dataService.post(import.meta.env.VITE_API_URL + 'deliveries', data);
         }
     },
     getNew() {
@@ -33,7 +38,7 @@ const service: Service<Delivery> = {
             deliveryDate: dayjs(),
             notes: '',
         };
-    }
+    },
 };
 
 export default service;

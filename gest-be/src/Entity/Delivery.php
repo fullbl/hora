@@ -9,7 +9,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ExistsInWeek]
@@ -35,15 +37,17 @@ class Delivery
     #[Assert\Type('integer')]
     #[Assert\NotNull]
     private ?int $deliveryWeekDay = null;
-
+    
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotNull]
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     private ?DateTimeImmutable $harvestDate = null;
-
+    
     #[Groups(['delivery-list'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotNull]
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     private ?DateTimeImmutable $deliveryDate = null;
     
     #[Groups(['delivery-list'])]

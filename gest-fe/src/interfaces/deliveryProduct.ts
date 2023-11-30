@@ -3,7 +3,7 @@ import type Product from "./product"
 
 export default interface DeliveryProduct {
     id?: number,
-    delivery: DeliveryWithoutProducts,
+    delivery?: DeliveryWithoutProducts,
     product: Product,
     qty: number,
 }
