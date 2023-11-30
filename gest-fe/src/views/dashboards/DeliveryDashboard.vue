@@ -29,17 +29,19 @@ onMounted(async () => {
 
 const deliveryGroups = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
-        if (!x.has(delivery.deliveryWeekDay)) {
-            x.set(delivery.deliveryWeekDay, new Map());
+        if (!x.has(delivery.deliveryDate.weekday())) {
+            x.set(delivery.deliveryDate.weekday(), new Map());
         }
 
-        const deliveryDate = getDate(year.value, week.value, delivery.deliveryWeekDay);
-        if (!delivery.weeks.includes(deliveryDate.week())) {
+        if (
+            delivery.deliveryDate.year() !== year.value ||
+            delivery.deliveryDate.week() !== week.value
+        ) {
             return x;
         }
 
         for (const dp of delivery.deliveryProducts) {
-            const weekDay = x.get(delivery.deliveryWeekDay);
+            const weekDay = x.get(delivery.deliveryDate.weekday());
             if (!delivery.customer || undefined === weekDay) {
                 continue;
             }

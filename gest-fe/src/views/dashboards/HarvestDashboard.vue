@@ -31,23 +31,26 @@ onMounted(async () => {
 
 const deliveryGroups = computed(() => {
     return deliveries.value.reduce(function (x, delivery) {
-        if (!x.has(delivery.harvestWeekDay)) {
-            x.set(delivery.harvestWeekDay, new Map());
+        if (!x.has(delivery.harvestDate.weekday())) {
+            x.set(delivery.harvestDate.weekday(), new Map());
         }
 
-        const harvestDate = getDate(year.value, week.value, delivery.harvestWeekDay);
-        if (!delivery.weeks.includes(harvestDate.week())) {
+        if (
+            delivery.harvestDate.year() !== year.value ||
+            delivery.harvestDate.week() !== week.value
+        ) {
             return x;
         }
+
 
         for (const dp of delivery.deliveryProducts) {
             if(dp.product.type !== 'seeds') {
                 continue;
             }
-            if (!x.has(delivery.harvestWeekDay)) {
-                x.set(delivery.harvestWeekDay, new Map());
+            if (!x.has(delivery.harvestDate.weekday())) {
+                x.set(delivery.harvestDate.weekday(), new Map());
             }
-            const weekDay = x.get(delivery.harvestWeekDay);
+            const weekDay = x.get(delivery.harvestDate.weekday());
             if (undefined === weekDay) {
                 continue;
             }
@@ -176,7 +179,7 @@ const groupNames = computed(function () {
 
     <div class="card">
         <div class="grid">
-            <div v-for="date of getWeekDates(year,week)">
+            <div v-for="date of getWeekDates(year,week)" class="pr-1">
                 <div v-if="dayTotal(date.weekday()) > 0">
                     <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
                     <b>Day total: {{ dayTotal(date.weekday()) }}</b>

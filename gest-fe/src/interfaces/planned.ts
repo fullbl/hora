@@ -13,7 +13,7 @@ export default interface Planned {
     delivery: Delivery;
     minutesBeforeHarvest: number;
     date?: Dayjs;
-    harvestDate?: Dayjs;
-    deliveryDate?: Dayjs;
+    harvestDate: Dayjs;
+    deliveryDate: Dayjs;
     activities?: Activity[];
 }

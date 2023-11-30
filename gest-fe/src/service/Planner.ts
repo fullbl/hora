@@ -55,9 +55,10 @@ export default class Planner {
     }
 
     setDates(year: number, week: number) {
+        debugger
         this.planned.value = this.planned.value.map((p) => {
-            let harvestDate = getDate(year, week, p.delivery.harvestWeekDay);
-            let deliveryDate = getDate(year, week, p.delivery.deliveryWeekDay);
+            let harvestDate = p.delivery.harvestDate;
+            let deliveryDate = p.delivery.deliveryDate;
             let date = harvestDate.subtract(p.minutesBeforeHarvest, 'minute');
             while (date < getDate(year, week, 1)) {
                 date = date.add(1, 'week')
@@ -74,7 +75,6 @@ export default class Planner {
                 activities
             };
         });
-        console.log(this.planned.value);
 
         return this;
     }
@@ -82,7 +82,7 @@ export default class Planner {
     filter(selectedSteps: StepName[], day?: number) {
         return this.planned.value.filter((p) => {
             return undefined !== p.deliveryDate && 
-                p.delivery.weeks.includes(p.deliveryDate.week()) && 
+                p.delivery.deliveryDate.week() === p.deliveryDate.week() && 
                 selectedSteps.includes(p.step.name) && 
                 (undefined === day || (undefined !== p.date && day === p.date.weekday()));
         });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, type Ref } from 'vue';
 import stepService from '@/service/StepService';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
@@ -11,13 +11,14 @@ import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
 import Icon from '@/components/Icon.vue';
+import type { StepName } from '@/interfaces/step';
 
 const { getWeekDates } = useDates();
 
 const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
-const selectedStep = ref('soaking');
+const selectedStep: Ref<StepName> = ref('soaking');
 const steps = stepService.getTypes();
 const planner = new Planner();
 
