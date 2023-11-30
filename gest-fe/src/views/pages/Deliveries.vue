@@ -8,7 +8,6 @@ import userService from '@/service/UserService';
 import productService from '@/service/ProductService';
 import { useDates } from '../composables/dates';
 import { computed } from '@vue/reactivity';
-import type { TreeNode } from 'primevue/tree';
 import type Sellable from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -54,87 +53,14 @@ onMounted(async () => {
     products.value = await productService.getSellable();
 });
 
-const selectedWeeks = computed({
-    get(): TreeNode {
-        let _weeks = {} as TreeNode;
-        if ('undefined' === typeof single.value || !single.value.hasOwnProperty('weeks')) {
-            return _weeks;
-        }
-        for (const month of weeks) {
-            let partialChecked = false;
-            let checked = true;
-            for (const week of month.children) {
-                const weekNumber = parseInt(week.key);
-                if (single.value.weeks.includes(weekNumber)) {
-                    partialChecked = true;
-                } else {
-                    checked = false;
-                }
-                _weeks[week.key] = {
-                    checked: single.value.weeks.includes(weekNumber),
-                    partialChecked: false
-                };
-            }
-
-            if (true === checked) {
-                partialChecked = false;
-            }
-
-            _weeks[month.key] = {
-                checked,
-                partialChecked
-            };
-        }
-
-        return _weeks;
-    },
-    set(weeksTree: TreeNode) {
-        if ('undefined' === typeof single.value) {
-            return;
-        }
-        let _weeks = [];
-        for (let i = 1; i <= 52; i++) {
-            if (weeksTree.hasOwnProperty(i) && weeksTree[i].checked) {
-                _weeks.push(i);
-            }
-        }
-        single.value.weeks = _weeks;
-    }
-});
-
 const getCustomerNumber = (item: Delivery) => (data.value?.filter((d) => d.customer?.id === item.customer?.id).findIndex((d) => d.id === item.id) ?? 0) + 1;
-
-
 
 const preSave = function () {
     if (0 >= (single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0) ?? 0)) {
         alert('Product quantity is 0!');
-    }
-    save();
-};
-
-const selectWeeks = function (type: string) {
-    if ('undefined' === typeof single.value) {
         return;
     }
-    switch (type) {
-        case 'even':
-            single.value.weeks = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53];
-            break;
-        case 'odd':
-            single.value.weeks = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52];
-            break;
-        case 'all':
-            single.value.weeks = Array.from(Array(53).keys()).map((x) => ++x);
-            break;
-        case 'suspend':
-            single.value.weeks = single.value.weeks.filter((x) => x <= dayjs().week());
-            break;
-    }
-
-    if (nextOnly.value) {
-        single.value.weeks = single.value.weeks.filter((x) => x >= dayjs().week());
-    }
+    save();
 };
 </script>
 

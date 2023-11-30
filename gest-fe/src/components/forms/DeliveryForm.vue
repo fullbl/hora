@@ -9,6 +9,7 @@ import type User from '@/interfaces/user';
 import type { Sellable } from '@/interfaces/product';
 import type { PropType } from 'vue';
 import type DeliveryProduct from '@/interfaces/deliveryProduct';
+import Calendar from 'primevue/calendar';
 
 const props = defineProps({
     single: {
@@ -92,12 +93,18 @@ const removeProduct = (dp: DeliveryProduct) => {
             </DataTable>
         </div>
 
-        <div class="field col-6">
+        <div class="field col-6" v-if="single.id">
             <label for="harvestDate">Harvest Date</label>
             <DateInput id="harvestDate" v-model="single.harvestDate" dateFormat="dd/mm/yy" :class="{ 'p-invalid': isInvalid('harvestDate') }" />
 
             <label for="deliveryDate">Delivery Date</label>
             <DateInput id="deliveryDate" v-model="single.deliveryDate" dateFormat="dd/mm/yy" :class="{ 'p-invalid': isInvalid('deliveryDate') }" />
+        </div>
+        <div class="field col-6" v-else>
+            <label for="harvestDate">Harvest Dates</label>
+            <Calendar selectionMode="multiple" id="harvestDates" v-model="single.harvestDates" dateFormat="dd/mm/yy" :class="{ 'p-invalid': isInvalid('harvestDate') }" />
+            <label for="deliveryDate">Delivery Dates</label>
+            <Calendar selectionMode="multiple" id="deliveryDates" v-model="single.deliveryDates" dateFormat="dd/mm/yy" :class="{ 'p-invalid': isInvalid('deliveryDate') }" />
         </div>
     </div>
 </template>

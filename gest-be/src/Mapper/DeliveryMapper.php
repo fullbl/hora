@@ -4,8 +4,8 @@ namespace App\Mapper;
 
 use App\Entity\Delivery;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Generator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -16,31 +16,39 @@ class DeliveryMapper
         private SerializerInterface $serializer,
         private DeliveryProductMapper $deliveryProductMapper,
         private EntityManagerInterface $em,
-        )
-    {}
+    ) {
+    }
 
-    public function fromRequest(Request $request): Delivery
+    /**
+     * @return Generator<Delivery>
+     */
+    public function fromRequest(Request $request): Generator
     {
-        return $this->fill(new Delivery(), $request);
+        $data = $request->toArray();
+        foreach ($data['deliveryDates'] as $key => $deliveryDate) {
+            $delivery = $this->fill(new Delivery(), $request);
+            $delivery->setDeliveryDate(new \DateTimeImmutable($deliveryDate));
+            $delivery->setHarvestDate(new \DateTimeImmutable($data['harvestDates'][$key]));
+            yield $delivery;
+        }
     }
 
     public function fill(Delivery $delivery, Request $request): Delivery
     {
         $delivery = $this->serializer->deserialize(
-            $request->getContent(), 
-            Delivery::class, 
-            'json', 
+            $request->getContent(),
+            Delivery::class,
+            'json',
             [AbstractNormalizer::OBJECT_TO_POPULATE => $delivery]
         );
 
         $data = $request->toArray();
         $deliveryProducts = $this->deliveryProductMapper->map($data['deliveryProducts'], $delivery);
-        if(isset($data['customer']['id'])){
+        if (isset($data['customer']['id'])) {
             $delivery->setCustomer(
                 $this->em->getReference(User::class, $data['customer']['id'])
             );
-        }
-        else {
+        } else {
             $delivery->setCustomer(null);
         }
 

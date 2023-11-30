@@ -34,25 +34,27 @@ class DeliveriesController extends AbstractController
     #[Route('/deliveries', methods: ['POST'], name: 'delivery_create')]
     public function create(Request $request): JsonResponse
     {
-        $delivery = $this->mapper->fromRequest($request);
-        $errors = $this->validator->validate($delivery);
-        if ($errors->count() > 0) {
+        foreach ($this->mapper->fromRequest($request) as $delivery) {
 
-            return $this->json(
-                $errors,
-                Response::HTTP_BAD_REQUEST,
-            );
+            $errors = $this->validator->validate($delivery);
+            if ($errors->count() > 0) {
+
+                return $this->json(
+                    $errors,
+                    Response::HTTP_BAD_REQUEST,
+                );
+            }
+            try {
+                $this->repo->save($delivery);
+            } catch (Exception $e) {
+
+                return $this->json(
+                    ['error' => $e->getMessage()],
+                    Response::HTTP_INTERNAL_SERVER_ERROR,
+                );
+            }
         }
-        try {
-            $this->repo->save($delivery, true);
-        } catch (Exception $e) {
-
-            return $this->json(
-                ['error' => $e->getMessage()],
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-            );
-        }
-
+        $this->repo->flush();
         return $this->json('');
     }
 

@@ -21,6 +21,8 @@ const service: Service<Delivery> = {
             ...delivery,
             deliveryDate: dayjs(delivery.deliveryDate).format('YYYY-MM-DD'),
             harvestDate: dayjs(delivery.harvestDate).format('YYYY-MM-DD'),
+            deliveryDates: delivery.deliveryDates?.map((date) => dayjs(date).format('YYYY-MM-DD')),
+            harvestDates: delivery.harvestDates?.map((date) => dayjs(date).format('YYYY-MM-DD')),
         }
         if (delivery.id) {
             return await dataService.put(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, data);

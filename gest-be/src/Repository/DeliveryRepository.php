@@ -22,6 +22,11 @@ class DeliveryRepository extends ServiceEntityRepository
         parent::__construct($registry, Delivery::class);
     }
 
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
     public function save(Delivery $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
