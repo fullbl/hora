@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
@@ -9,15 +9,15 @@ import QtyHolder from '@/components/QtyHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
 
-const { getWeekDates } = useDates();
+const { getWeekDates, getDate } = useDates();
 
 const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
 const planner = new Planner
 
-onMounted(async () => {
-    (await planner.load()).flatPlanned()
+watch([week, year], async () => {
+    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned()
 });
 
 const deliveryGroups = computed(() => {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref } from 'vue';
 import stepService from '@/service/StepService';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 import Icon from '@/components/Icon.vue';
 import type { StepName } from '@/interfaces/step';
 
-const { getWeekDates } = useDates();
+const { getDate, getWeekDates } = useDates();
 
 const today = dayjs();
 const week = ref(today.week());
@@ -22,8 +22,8 @@ const selectedStep: Ref<StepName> = ref('soaking');
 const steps = stepService.getTypes();
 const planner = new Planner();
 
-onMounted(async () => {
-    (await planner.load()).flatPlanned();
+watch([week, year], async () => {
+    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned();
 });
 
 const deliveryGroups = computed(() => {

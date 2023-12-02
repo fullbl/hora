@@ -32,32 +32,32 @@ class Product
         self::TYPE_EXTRA,
     ];
 
-    #[Groups(['activity-list', 'delivery-list', 'product', 'product-edit'])]
+    #[Groups(['activity-list', 'delivery-list', 'product', 'product-edit', 'delivery-dash'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[Groups(['delivery-list', 'product', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(length: 100)]
     #[Assert\Length(max: 100)]
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[Groups(['product', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(length: 15)]
     #[Assert\Choice(self::TYPES)]
     #[Assert\NotNull]
     private ?string $type = null;
     
-    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[Groups(['product', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull(groups: ['seeds'])]
     private ?int $decigrams = null;
     
-    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[Groups(['product', 'product-edit'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
@@ -70,12 +70,12 @@ class Product
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
     
-    #[Groups(['delivery-list', 'product'])]
+    #[Groups(['product', 'delivery-dash'])]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['sort' => 'ASC'])]
     private Collection $steps;
     
-    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[Groups(['delivery-list', 'product', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(options: ['default' => false])]
     private bool $weight = false;
 

@@ -4,9 +4,21 @@ import userService from './UserService';
 import type {Delivery} from '@/interfaces/delivery';
 import dayjs from 'dayjs';
 
-const service: Service<Delivery> = {
+interface DeliveryService extends Service<Delivery> {
+    getFrom(from: string): Promise<Array<Delivery>>
+}
+
+const service: DeliveryService = {
     async delete(delivery) {
         return await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id);
+    },
+    async getFrom(from: string) {
+        return (await dataService.get<Delivery[]>(import.meta.env.VITE_API_URL + 'deliveries/' + from))
+            .map((delivery: Delivery) => {
+                delivery.harvestDate = dayjs(delivery.harvestDate);
+                delivery.deliveryDate = dayjs(delivery.deliveryDate);
+                return delivery;
+            });
     },
     async getAll() {
         return (await dataService.get<Delivery[]>(import.meta.env.VITE_API_URL + 'deliveries'))

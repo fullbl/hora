@@ -20,12 +20,12 @@ class DeliveryProduct
     #[ORM\JoinColumn(nullable: false)]
     private ?Delivery $delivery = null;
 
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
     
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $qty = null;
 

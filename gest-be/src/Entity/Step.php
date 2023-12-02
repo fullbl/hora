@@ -31,7 +31,7 @@ class Step
         self::STEP_LIGHT,
     ];
 
-    #[Groups(['delivery-list', 'activity-list', 'product'])]
+    #[Groups(['activity-list', 'product'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -42,13 +42,13 @@ class Step
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
     
-    #[Groups(['delivery-list', 'activity-list', 'product'])]
+    #[Groups(['activity-list', 'product', 'delivery-dash'])]
     #[ORM\Column(length: 10)]
     #[Assert\Length(max: 10)]
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[Groups(['product', 'delivery-list'])]
+    #[Groups(['product', 'delivery-dash'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]

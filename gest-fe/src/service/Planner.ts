@@ -23,9 +23,9 @@ export default class Planner {
     activities: Activity[] = [];
     planned = ref([] as Planned[]);
 
-    async load() {
-        this.deliveries = await deliveryService.getAll();
-        this.activities = await activityService.getAll();
+    async load(from: string) {
+        this.deliveries = await deliveryService.getFrom(from);
+        //this.activities = await activityService.getAll();
 
         return this;
     }
@@ -55,7 +55,6 @@ export default class Planner {
     }
 
     setDates(year: number, week: number) {
-        debugger
         this.planned.value = this.planned.value.map((p) => {
             let harvestDate = p.delivery.harvestDate;
             let deliveryDate = p.delivery.deliveryDate;

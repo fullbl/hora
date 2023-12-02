@@ -17,6 +17,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[IsGranted('ROLE_ADMIN')]
 class DeliveriesController extends AbstractController
 {
+    private const DASHBOARD_WEEKS = 4;
+
     public function __construct(
         private DeliveryRepository $repo,
         private DeliveryMapper $mapper,
@@ -29,6 +31,12 @@ class DeliveriesController extends AbstractController
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'delivery-list']);
+    }
+    
+    #[Route('/deliveries/{fromDate}', methods: ['GET'], name: 'deliveries_dashboard')]
+    public function dashboard(\DateTimeImmutable $fromDate): JsonResponse
+    {        
+        return $this->json($this->repo->findNext($fromDate, self::DASHBOARD_WEEKS), Response::HTTP_OK, [], ['groups' => 'delivery-dash']);
     }
 
     #[Route('/deliveries', methods: ['POST'], name: 'delivery_create')]
@@ -58,17 +66,6 @@ class DeliveriesController extends AbstractController
         return $this->json('');
     }
 
-    #[Route('/deliveries/{id}', methods: ['GET'], name: 'deliveries_show')]
-    public function show(int $id): JsonResponse
-    {
-        $delivery = $this->repo->find($id);
-        if (null === $delivery) {
-
-            return $this->json('', Response::HTTP_NOT_FOUND);
-        }
-
-        return $this->json($delivery);
-    }
 
     #[Route('/deliveries/{id}', methods: ['PUT'], name: 'delivery_update')]
     public function update(int $id, Request $request): JsonResponse

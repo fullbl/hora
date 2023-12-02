@@ -38,13 +38,13 @@ class Delivery
     #[Assert\NotNull]
     private ?int $deliveryWeekDay = null;
     
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotNull]
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     private ?DateTimeImmutable $harvestDate = null;
     
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotNull]
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
@@ -56,12 +56,6 @@ class Delivery
     private ?string $notes = null;
 
     /** @deprecated */
-    #[Groups(['delivery-list'])]
-    #[Assert\NotNull]
-    #[Assert\All([
-        new Assert\Range(min: 1, max: 53),
-    ])]
-    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
     private array $weeks = [];
 
     #[Groups(['delivery-list'])]
@@ -72,7 +66,7 @@ class Delivery
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: Activity::class, orphanRemoval: true)]
     private Collection $activities;
 
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: DeliveryProduct::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $deliveryProducts;
     

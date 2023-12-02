@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Delivery;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -43,6 +44,16 @@ class DeliveryRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findNext(DateTimeImmutable $from, int $weeks): array
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.deliveryDate BETWEEN :from AND :to')
+            ->setParameter('from', $from)
+            ->setParameter('to', $from->modify('+' . $weeks . ' week'))
+            ->getQuery()
+            ->getResult();
     }
 
     public function intersectingWeeks(array $weeks, ?User $customer, ?int $id): array
