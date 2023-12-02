@@ -1,0 +1,45 @@
+version: "3.4"
+include:
+  - ./ha/docker-compose.yml
+
+services:
+  php:
+    extends:
+      file: ./gest-be/docker-compose.yml
+      service: php
+    build:
+      context: ./gest-be
+    restart: always
+
+  database:
+    extends:
+      file: ./gest-be/docker-compose.yml
+      service: database
+    restart: always
+
+  caddy:
+    extends:
+      file: ./gest-be/docker-compose.yml
+      service: caddy
+    build:
+      context: ./gest-be
+    depends_on: 
+      - vuejs
+    volumes:
+      - vue:/app/srv/vue
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    restart: always
+
+  vuejs:
+    build: 
+      context: ./gest-fe
+      dockerfile: ../Dockerfile
+    restart: no
+    volumes:
+      - vue:/app/dist
+  
+volumes:
+  php_socket:
+  caddy_data:
+  caddy_config:
+  vue:

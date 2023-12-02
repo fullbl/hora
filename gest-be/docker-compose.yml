@@ -24,8 +24,6 @@ services:
     build:
       context: .
       target: app_caddy
-    depends_on:
-      - php
     environment:
       SERVER_NAME: ${SERVER_NAME:-http://localhost, localhost:80, caddy:80}
     restart: unless-stopped
@@ -55,8 +53,9 @@ services:
       # You should definitely change the password in production
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
       POSTGRES_USER: ${POSTGRES_USER:-app}
+    restart: unless-stopped
     volumes:
-      - ./var/postgres/data:/var/lib/postgresql/data:rw
+      - ../docker/data/postgres:/var/lib/postgresql/data:rw
 ###< doctrine/doctrine-bundle ###
 
 volumes:

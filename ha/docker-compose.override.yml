@@ -1,0 +1,5 @@
+version: '3.5'
+services:
+  homeassistant:
+    ports:
+      - "8123:8123"

@@ -1,0 +1,16 @@
+{$LOCATION}-ha.{$SECOND_LEVEL_DOMAIN} {
+    reverse_proxy homeassistant:8123
+}
+
+{$LOCATION}-be.{$SECOND_LEVEL_DOMAIN} {
+    root * /srv/app/public
+    php_fastcgi unix//var/run/php/php-fpm.sock
+    encode zstd gzip
+    file_server
+}
+
+{$LOCATION}.{$SECOND_LEVEL_DOMAIN} {
+    root * /srv/vue/public
+    encode zstd gzip
+    file_server
+}
