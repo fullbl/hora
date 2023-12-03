@@ -30,7 +30,7 @@ services:
       - SECOND_LEVEL_DOMAIN
     restart: always
     volumes:
-      - vue:/srv/app/vue
+      - vue:/srv/vue
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
 
   vuejs:
