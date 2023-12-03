@@ -25,6 +25,10 @@ services:
       context: ./gest-be
     depends_on: 
       - vuejs
+    environment:
+      - LOCATION      
+      - SECOND_LEVEL_DOMAIN
+    restart: always
     volumes:
       - vue:/app/srv/vue
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
