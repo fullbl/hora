@@ -32,7 +32,6 @@ services:
     volumes:
       - vue:/app/srv/vue
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-    restart: always
 
   vuejs:
     build: 
