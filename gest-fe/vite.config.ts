@@ -8,7 +8,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(({ command }) => {
     return {
         plugins: [tsconfigPaths(), vue()],
-        base: command === 'serve' ? '' : '/dist/',
+        base: '/',
         resolve: {
             alias: {
                 '@': fileURLToPath(new URL('./src', import.meta.url)),
