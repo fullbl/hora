@@ -30,7 +30,6 @@ export default class Planner {
                     let minutes = 0;
                     return (dp.product.steps?.toReversed() ?? []).map((s: Step) => {
                         minutes += s.minutes;
-                        if(dp.product.name === 'amaranto') debugger
                         //const activities = this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week);
                         return {
                             qty: dp.qty,
@@ -57,22 +56,22 @@ export default class Planner {
         });
     }
 
-    groupByWeekDayAndProduct(planned: Planned[]) {
+    groupByDayAndProduct(planned: Planned[]) {
         return planned.reduce((g, p) => {
             if (undefined === p.date) {
                 return g;
             }
-            let weekDayHash = p.date.weekday();
-            const products = g.get(weekDayHash) ?? new Map();
+            let dayHash = p.date.format('YYYMMDD');
+            const products = g.get(dayHash) ?? new Map();
             const productHash = p.product.id + p.step.name;
             let qty = p.qty;
             if (products.has(productHash)) {
                 qty += products.get(productHash)?.qty ?? 0;
             }
             products.set(productHash, { ...p, qty });
-            g.set(weekDayHash, products);
+            g.set(dayHash, products);
 
             return g;
-        }, new Map<number, Map<string, Planned>>());
+        }, new Map<string, Map<string, Planned>>());
     }
 }

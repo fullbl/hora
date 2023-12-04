@@ -9,7 +9,7 @@ import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
-import dayjs from 'dayjs';
+import dayjs, {type Dayjs} from 'dayjs';
 import Icon from '@/components/Icon.vue';
 import type { StepName } from '@/interfaces/step';
 import type Planned from '@/interfaces/planned';
@@ -22,19 +22,19 @@ const year = ref(today.year());
 const selectedStep: Ref<StepName> = ref('soaking');
 const steps = stepService.getTypes();
 const planner = new Planner();
-const deliveryGroups = ref<Map<number, Map<string, Planned>>> (new Map());
+const deliveryGroups = ref<Map<string, Map<string, Planned>>> (new Map());
 
 watchEffect(async () => {
     (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
 
-    deliveryGroups.value = planner.groupByWeekDayAndProduct(
+    deliveryGroups.value = planner.groupByDayAndProduct(
         planner.filter([selectedStep.value], year.value, week.value)
     )
 });
 
-const weekDayTotal = function (weekDay: number) {
+const weekDayTotal = function (day: Dayjs) {
     let totals = 0;
-    const group = deliveryGroups.value.get(weekDay);
+    const group = deliveryGroups.value.get(day.format('YYYMMDD'));
     if (undefined === group) {
         return 0;
     }
@@ -49,7 +49,7 @@ const weekDayTotal = function (weekDay: number) {
 const weekTotal = computed(function () {
     let totals = 0;
     for (let i = 0; i < 6; i++) {
-        totals += weekDayTotal(i);
+        totals += weekDayTotal(getDate(year.value, week.value, i));
     }
 
     return totals;
@@ -77,7 +77,7 @@ const weekTotal = computed(function () {
             <div style="width: 14.28%" v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
 
-                <div v-for="[name, dp] in deliveryGroups.get(date.weekday())">
+                <div v-for="[name, dp] in deliveryGroups.get(date.format('YYYMMDD'))">
                     <QtyHolder :qty="dp.qty">
                         <Icon :type="dp.step.name" />
                         {{ dp.step.name }}

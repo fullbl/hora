@@ -8,7 +8,7 @@ import Planner from '@/service/Planner';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import QtyHolder from '@/components/QtyHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 const { getWeekDates, getDate } = useDates();
 
@@ -16,12 +16,12 @@ const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
 const planner = new Planner
-const deliveryGroups = ref<Map<number, Map<string, Planned>>> (new Map());
+const deliveryGroups = ref<Map<string, Map<string, Planned>>> (new Map());
 
 watchEffect(async () => {
     (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
 
-    deliveryGroups.value = planner.groupByWeekDayAndProduct(
+    deliveryGroups.value = planner.groupByDayAndProduct(
         planner.filter(['blackout'], year.value, week.value)
     )
 });
@@ -37,9 +37,9 @@ const weekTotal = computed(() => {
     return total;
 });
 
-const dayTotal = function (weekDay: number) {
+const dayTotal = function (day: Dayjs) {
     let total = 0;
-    deliveryGroups.value.get(weekDay)?.forEach(function (y) {
+    deliveryGroups.value.get(day.format('YYYMMDD'))?.forEach(function (y) {
         total += y.qty;
     });
 
@@ -63,8 +63,8 @@ const dayTotal = function (weekDay: number) {
         <div class="grid">
             <div style="width:14.28%" v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
-                <b>Day total: {{ dayTotal(date.weekday()) }}</b>
-                <div v-for="[name, dp] in deliveryGroups.get(date.weekday()) ">
+                <b>Day total: {{ dayTotal(date) }}</b>
+                <div v-for="[name, dp] in deliveryGroups.get(date.format('YYYMMDD')) ">
                     <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g{{ dp.product.weight ? ' + weight' : '' }})</QtyHolder>
                     <ProgressHolder :dp="dp" />
                 </div>
