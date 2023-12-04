@@ -28,6 +28,8 @@ services:
     environment:
       - LOCATION      
       - SECOND_LEVEL_DOMAIN
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
     volumes:
       - vue:/srv/vue
