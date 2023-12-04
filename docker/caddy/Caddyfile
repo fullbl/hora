@@ -1,5 +1,5 @@
 {$LOCATION}-ha.{$SECOND_LEVEL_DOMAIN} {
-    reverse_proxy homeassistant:8123
+    reverse_proxy host.docker.internal:8123
 }
 
 {$LOCATION}-be.{$SECOND_LEVEL_DOMAIN} {
