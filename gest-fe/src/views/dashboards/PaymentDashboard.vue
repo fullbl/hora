@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import activityService from '@/service/ActivityService';
 
 import deliveryService from '@/service/DeliveryService';
@@ -20,11 +20,7 @@ const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
 
-onMounted(async () => {
-    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
-    activities.value = await activityService.getAll()
-});
-watch([week, year], async () => {
+watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
     activities.value = await activityService.getAll()
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
@@ -24,11 +24,7 @@ const year = ref(today.year());
 
 const groupMode = ref('customer');
 
-onMounted(async () => {
-    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
-    activities.value = await activityService.getAll()
-});
-watch([week, year], async () => {
+watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
     activities.value = await activityService.getAll()
 });

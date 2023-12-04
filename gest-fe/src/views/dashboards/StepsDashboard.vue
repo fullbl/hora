@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref, watchEffect } from 'vue';
 import stepService from '@/service/StepService';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
@@ -12,6 +12,7 @@ import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
 import Icon from '@/components/Icon.vue';
 import type { StepName } from '@/interfaces/step';
+import type Planned from '@/interfaces/planned';
 
 const { getDate, getWeekDates } = useDates();
 
@@ -21,16 +22,14 @@ const year = ref(today.year());
 const selectedStep: Ref<StepName> = ref('soaking');
 const steps = stepService.getTypes();
 const planner = new Planner();
+const deliveryGroups = ref<Map<number, Map<string, Planned>>> (new Map());
 
-onMounted(async () => {
-    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned();
-});
-watch([week, year], async () => {
-    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned();
-});
+watchEffect(async () => {
+    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
 
-const deliveryGroups = computed(() => {
-    return planner.groupByWeekDayAndProduct(planner.setDates(year.value, week.value).filter([selectedStep.value]));
+    deliveryGroups.value = planner.groupByWeekDayAndProduct(
+        planner.filter([selectedStep.value], year.value, week.value)
+    )
 });
 
 const weekDayTotal = function (weekDay: number) {

@@ -42,8 +42,8 @@ final class Version20231128095926 extends AbstractMigration
             $products = $readProducts->executeQuery([$delivery['id']])->fetchAllAssociative();
             foreach ($weeks as $week) {
                 $date = new \DateTimeImmutable();
-                $harvestDate = $date->setIsoDate(2023, $week - 1, $delivery['week_day']);
-                $deliveryDate = $date->setIsoDate(2023, $week - 1, $delivery['delivery_week_day']);
+                $harvestDate = $date->setIsoDate(2023, $week - 1, $delivery['week_day'] +1);
+                $deliveryDate = $date->setIsoDate(2023, $week - 1, $delivery['delivery_week_day'] +1);
                 $id = $writeDelivery->executeQuery([
                     $delivery['customer_id'],
                     $delivery['week_day'],

@@ -11,9 +11,6 @@ export default interface Planned {
     decigrams: number;
     product: Product;
     delivery: Delivery;
-    minutesBeforeHarvest: number;
-    date?: Dayjs;
-    harvestDate: Dayjs;
-    deliveryDate: Dayjs;
+    date: Dayjs;
     activities?: Activity[];
 }

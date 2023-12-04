@@ -58,7 +58,7 @@ class Delivery
     /** @deprecated */
     private array $weeks = [];
 
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $customer = null;

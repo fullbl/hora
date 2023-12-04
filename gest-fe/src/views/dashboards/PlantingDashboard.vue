@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, watchEffect } from 'vue';
 import { computed } from '@vue/reactivity';
 import { useDates } from '../composables/dates';
 import Toast from 'primevue/toast';
+import type Planned from '@/interfaces/planned';
 import Planner from '@/service/Planner';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import QtyHolder from '@/components/QtyHolder.vue';
@@ -15,19 +16,13 @@ const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
 const planner = new Planner
+const deliveryGroups = ref<Map<number, Map<string, Planned>>> (new Map());
 
-onMounted(async () => {
-    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned()
-});
-watch([week, year], async () => {
-    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned()
-});
+watchEffect(async () => {
+    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
 
-const deliveryGroups = computed(() => {
-    return planner.groupByWeekDayAndProduct(
-        planner
-            .setDates(year.value, week.value)
-            .filter(['blackout'])
+    deliveryGroups.value = planner.groupByWeekDayAndProduct(
+        planner.filter(['blackout'], year.value, week.value)
     )
 });
 

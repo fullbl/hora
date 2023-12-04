@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
@@ -22,11 +22,7 @@ const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
 
-onMounted(async () => {
-    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
-    activities.value = await activityService.getAll()
-});
-watch([week, year], async () => {
+watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
     activities.value = await activityService.getAll()
 });
@@ -36,14 +32,13 @@ const deliveryGroups = computed(() => {
         if (!x.has(delivery.deliveryDate.weekday())) {
             x.set(delivery.deliveryDate.weekday(), new Map());
         }
-
         if (
             delivery.deliveryDate.year() !== year.value ||
             delivery.deliveryDate.week() !== week.value
-        ) {
-            return x;
-        }
-
+            ) {
+                return x;
+            }
+            
         for (const dp of delivery.deliveryProducts) {
             const weekDay = x.get(delivery.deliveryDate.weekday());
             if (!delivery.customer || undefined === weekDay) {

@@ -50,7 +50,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private ?string $status = null;
 
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
     #[Assert\NotNull]
@@ -79,12 +79,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 7)]
     private ?string $sdi = null;
 
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(length: 50, nullable: true)]
     #[Assert\Length(max: 50)]
     private ?string $zone = null;
     
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(length: 50, nullable: true)]
     #[Assert\Length(max: 50)]
     private ?string $subZone = null;

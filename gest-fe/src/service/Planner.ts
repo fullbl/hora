@@ -1,5 +1,4 @@
 import type Activity from '@/interfaces/activity';
-import type { Delivery } from '@/interfaces/delivery';
 import type Planned from '@/interfaces/planned';
 import { useDates } from '@/views/composables/dates';
 import deliveryService from '@/service/DeliveryService';
@@ -7,7 +6,6 @@ import activityService from '@/service/ActivityService';
 import { ref } from 'vue';
 import type { Step, StepName } from '@/interfaces/step';
 
-const { getDate } = useDates();
 if (!Array.prototype.toReversed) {
     Array.prototype.toReversed = function () {
         for (var i = this.length - 1, arr = []; i >= 0; --i) {
@@ -19,24 +17,21 @@ if (!Array.prototype.toReversed) {
 }
 
 export default class Planner {
-    deliveries: Delivery[] = [];
     activities: Activity[] = [];
     planned = ref([] as Planned[]);
 
     async load(from: string) {
-        this.deliveries = await deliveryService.getFrom(from);
-        //this.activities = await activityService.getAll();
+        const deliveries = await deliveryService.getFrom(from);
+        this.activities = await activityService.getAll();
 
-        return this;
-    }
-
-    flatPlanned() {
-        this.planned.value = this.deliveries
+        this.planned.value = deliveries
             .map((delivery) =>
                 delivery.deliveryProducts.map((dp) => {
                     let minutes = 0;
                     return (dp.product.steps?.toReversed() ?? []).map((s: Step) => {
                         minutes += s.minutes;
+                        if(dp.product.name === 'amaranto') debugger
+                        //const activities = this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week);
                         return {
                             qty: dp.qty,
                             done: 0,
@@ -44,46 +39,21 @@ export default class Planner {
                             delivery: delivery,
                             product: dp.product,
                             step: s,
-                            minutesBeforeHarvest: minutes
+                            date: delivery.harvestDate.subtract(minutes, 'minute')
                         };
                     });
                 })
             )
             .flat(2);
-
         return this;
     }
 
-    setDates(year: number, week: number) {
-        this.planned.value = this.planned.value.map((p) => {
-            let harvestDate = p.delivery.harvestDate;
-            let deliveryDate = p.delivery.deliveryDate;
-            let date = harvestDate.subtract(p.minutesBeforeHarvest, 'minute');
-            while (date < getDate(year, week, 1)) {
-                date = date.add(1, 'week')
-                deliveryDate = deliveryDate.add(1, 'week')
-                harvestDate = harvestDate.add(1, 'week')
-            }
-            const activities = this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week);
-            return {
-                ...p,
-                date,
-                harvestDate,
-                deliveryDate,
-                done: activities.reduce((i, dp) => i + dp.qty, 0),
-                activities
-            };
-        });
-
-        return this;
-    }
-
-    filter(selectedSteps: StepName[], day?: number) {
+    filter(selectedSteps: StepName[], year: number, week: number) {
         return this.planned.value.filter((p) => {
-            return undefined !== p.deliveryDate && 
-                p.delivery.deliveryDate.week() === p.deliveryDate.week() && 
-                selectedSteps.includes(p.step.name) && 
-                (undefined === day || (undefined !== p.date && day === p.date.weekday()));
+            return selectedSteps.includes(p.step.name) && 
+                p.date.week() === week && 
+                p.date.year() === year
+            ;
         });
     }
 
