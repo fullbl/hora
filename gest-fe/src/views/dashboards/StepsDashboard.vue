@@ -22,6 +22,9 @@ const selectedStep: Ref<StepName> = ref('soaking');
 const steps = stepService.getTypes();
 const planner = new Planner();
 
+onMounted(async () => {
+    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned();
+});
 watch([week, year], async () => {
     (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned();
 });

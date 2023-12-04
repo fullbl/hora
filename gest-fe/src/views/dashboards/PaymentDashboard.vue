@@ -20,10 +20,13 @@ const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
 
+onMounted(async () => {
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
+    activities.value = await activityService.getAll()
+});
 watch([week, year], async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
     activities.value = await activityService.getAll()
-
 });
 
 const payments = computed(() => {

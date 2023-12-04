@@ -24,6 +24,10 @@ const year = ref(today.year());
 
 const groupMode = ref('customer');
 
+onMounted(async () => {
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
+    activities.value = await activityService.getAll()
+});
 watch([week, year], async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
     activities.value = await activityService.getAll()

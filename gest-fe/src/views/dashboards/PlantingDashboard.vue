@@ -16,6 +16,9 @@ const week = ref(today.week());
 const year = ref(today.year());
 const planner = new Planner
 
+onMounted(async () => {
+    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned()
+});
 watch([week, year], async () => {
     (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))).flatPlanned()
 });
