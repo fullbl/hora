@@ -6,6 +6,8 @@ use App\Entity\Delivery;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -46,14 +48,58 @@ class DeliveryRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @return Delivery[]
+     */
     public function findNext(DateTimeImmutable $from, int $weeks): array
     {
-        return $this->createQueryBuilder('d')
-            ->where('d.deliveryDate BETWEEN :from AND :to')
-            ->setParameter('from', $from)
-            ->setParameter('to', $from->modify('+' . $weeks . ' week'))
-            ->getQuery()
-            ->getResult();
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(Delivery::class, 'd');
+        $rsm->addScalarResult('max_delivery', 'max_delivery', Types::DATE_IMMUTABLE);
+
+        $query = $this->getEntityManager()->createNativeQuery(
+            'SELECT
+            d.*,
+            rd.max_delivery
+        FROM
+            delivery d
+        LEFT JOIN (
+            SELECT
+                dd.id,
+                MAX(dd.delivery_date) OVER (PARTITION BY dd.customer_id) AS max_delivery
+            FROM
+                delivery dd
+        ) rd ON d.id = rd.id
+        WHERE
+            d.delivery_date BETWEEN :from AND :to',
+            $rsm
+        );
+
+        $query->setParameters([
+            'from' => $from->format('Y-m-d'),
+            'to' => $from->modify('+' . $weeks . ' week')->format('Y-m-d'),
+        ]);
+
+        return array_map(
+            /**
+             * @param array<array{0: Delivery, 'max_delivery': string}> $row
+             */
+            function (array $row): Delivery{
+                $row[0]->setLastWarning(false);
+                $row[0]->setWarning(false);
+                if($row['max_delivery'] <= $row[0]->getDeliveryDate()) {
+                    $row[0]->setLastWarning(true);
+                    return $row[0];
+                }
+                if($row['max_delivery']->modify('-1 month') <= $row[0]->getDeliveryDate()) {
+                    $row[0]->setWarning(true);
+                }
+
+                return $row[0];
+
+            },
+            $query->getResult()
+        );
     }
 
     public function intersectingWeeks(array $weeks, ?User $customer, ?int $id): array

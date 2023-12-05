@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\DeliveryRepository;
-use App\Validator\ExistsInWeek;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,7 +13,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ExistsInWeek]
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
 {
@@ -55,8 +53,11 @@ class Delivery
     #[Assert\Length(max:255)]
     private ?string $notes = null;
 
-    /** @deprecated */
-    private array $weeks = [];
+    #[Groups(['delivery-dash'])]
+    private ?bool $lastWarning = null;
+
+    #[Groups(['delivery-dash'])]
+    private ?bool $warning = null;
 
     #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
@@ -94,6 +95,30 @@ class Delivery
     public function setCustomer(?User $customer): self
     {
         $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function isWarning(): ?bool
+    {
+        return $this->warning;
+    }
+
+    public function setWarning(bool $warning): self
+    {
+        $this->warning = $warning;
+
+        return $this;
+    }
+
+    public function isLastWarning(): ?bool
+    {
+        return $this->lastWarning;
+    }
+
+    public function setLastWarning(bool $lastWarning): self
+    {
+        $this->lastWarning = $lastWarning;
 
         return $this;
     }
@@ -228,23 +253,6 @@ class Delivery
         return $this;
     }
 
-    /**
-     * @deprecated
-     */
-    public function getWeeks(): array
-    {
-        return array_map(fn($w) => (int)$w, $this->weeks);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function setWeeks(array $weeks): self
-    {
-        $this->weeks = $weeks;
-
-        return $this;
-    }
 
     public function getPaymentMethod(): ?string
     {

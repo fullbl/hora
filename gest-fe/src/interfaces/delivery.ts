@@ -11,6 +11,8 @@ interface Delivery {
     harvestDate: Dayjs,
     harvestDates?: string[],
     customer?: User,
+    warning?: boolean,
+    lastWarning?: boolean,
     deliveryProducts: Array<DeliveryProduct>,
     notes: string,
     paymentMethod?: string,
