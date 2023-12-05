@@ -120,18 +120,6 @@ const preSave = function () {
                             {{ getCustomerNumber(slotProps.data) }}
                         </template>
                     </Column>
-                    <Column field="harvestWeekDay" header="Harvest" sortable>
-                        <template #body="slotProps">
-                            <span class="p-column-title">Harvest</span>
-                            {{ dayjs().weekday(slotProps.data.harvestWeekDay).format('dddd') }}
-                        </template>
-                    </Column>
-                    <Column field="deliveryWeekDay" header="Delivery" sortable>
-                        <template #body="slotProps">
-                            <span class="p-column-title">Delivery</span>
-                            {{ dayjs().weekday(slotProps.data.deliveryWeekDay).format('dddd') }}
-                        </template>
-                    </Column>
                     <Column field="customer.fullName" header="Customer" sortable headerStyle="min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Customer</span>
@@ -166,12 +154,6 @@ const preSave = function () {
                         <template #body="slotProps">
                             <span class="p-column-title">SubZone</span>
                             {{ slotProps.data.customer?.subZone }}
-                        </template>
-                    </Column>
-                    <Column field="notes" header="Notes" sortable headerStyle="min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Notes</span>
-                            {{ slotProps.data.notes ?? '' }}
                         </template>
                     </Column>
                     <Column field="price" header="Price">
