@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import type Calendar from 'primevue/calendar';
 import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
@@ -11,6 +11,7 @@ import type { Delivery } from '@/interfaces/delivery';
 import type { WaterBox } from '@/interfaces/product';
 import dayjs, { Dayjs } from 'dayjs';
 import Icon from '@/components/Icon.vue';
+import type Planned from '@/interfaces/planned';
 
 interface Planting {
     name: string;
@@ -39,9 +40,13 @@ const planner = new Planner();
 const boxes = ref<WaterBox[]>([]);
 
 onMounted(async () => {
-    (await planner.load()).flatPlanned();
     boxes.value = await productService.getWaterBoxes();
 });
+const planned = ref([] as Planned[]);
+watchEffect(async () => {
+    await planner.load(date.value.format('YYYY-MM-DD'));
+    planned.value = planner.filter(['light', 'blackout'], date.value.year(), date.value.weekday());
+})
 
 const single = ref<Selected>({ plantings: [] });
 
@@ -52,13 +57,6 @@ function select(s: Planting) {
         single.value.plantings = single.value.plantings.concat([s]);
     }
 }
-
-
-const planned = computed(() => {
-    return planner.setDates(date.value.year(), date.value.week()).filter([
-        'light', 'blackout'
-    ], date.value.weekday());
-});
 
 const products = computed(() => {
     return planned.value.reduce((x, p) => {

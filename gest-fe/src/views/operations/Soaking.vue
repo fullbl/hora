@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import type Calendar from 'primevue/calendar';
 import Planner from '@/service/Planner';
 import QtyHolder from '@/components/QtyHolder.vue';
@@ -10,7 +10,7 @@ import type {Step} from '@/interfaces/step';
 import type { Delivery } from '@/interfaces/delivery';
 import type { WaterBox } from '@/interfaces/product';
 import dayjs, { Dayjs } from 'dayjs';
-
+import type Planned from '@/interfaces/planned';
 interface Soaking {
     name: string;
     step: Step;
@@ -44,9 +44,14 @@ const planner = new Planner();
 const boxes = ref<WaterBox[]>([]);
 
 onMounted(async () => {
-    (await planner.load()).flatPlanned();
     boxes.value = await productService.getWaterBoxes();
 });
+
+const planned = ref([] as Planned[]);
+watchEffect(async () => {
+    await planner.load(date.value.format('YYYY-MM-DD'));
+    planned.value = planner.filter(['soaking'], date.value.year(), date.value.weekday());
+})
 
 const single = ref<Selected>({ soakings: [], plantingTime: dayjs() });
 
@@ -81,10 +86,6 @@ const plantingTime = computed(() => {
     }
 
     return single.value.plantingTime?.toDate();
-});
-
-const planned = computed(() => {
-    return planner.setDates(date.value.year(), date.value.week()).filter(['soaking'], date.value.weekday());
 });
 
 const products = computed(() => {
