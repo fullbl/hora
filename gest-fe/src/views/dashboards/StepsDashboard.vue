@@ -28,7 +28,7 @@ watchEffect(async () => {
     (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
 
     deliveryGroups.value = planner.groupByDayAndProduct(
-        planner.filter([selectedStep.value], year.value, week.value)
+        planner.filterWeek([selectedStep.value], year.value, week.value)
     )
 });
 
