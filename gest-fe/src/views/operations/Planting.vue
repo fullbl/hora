@@ -45,7 +45,7 @@ onMounted(async () => {
 const planned = ref([] as Planned[]);
 watchEffect(async () => {
     await planner.load(date.value.format('YYYY-MM-DD'));
-    planned.value = planner.filter(['light', 'blackout'], date.value.year(), date.value.weekday());
+    planned.value = planner.filter(['light', 'blackout'], date.value.year(), date.value.week());
 })
 
 const single = ref<Selected>({ plantings: [] });

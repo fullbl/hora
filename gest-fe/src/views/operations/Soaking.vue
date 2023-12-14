@@ -50,7 +50,7 @@ onMounted(async () => {
 const planned = ref([] as Planned[]);
 watchEffect(async () => {
     await planner.load(date.value.format('YYYY-MM-DD'));
-    planned.value = planner.filter(['soaking'], date.value.year(), date.value.weekday());
+    planned.value = planner.filter(['soaking'], date.value.year(), date.value.week());
 })
 
 const single = ref<Selected>({ soakings: [], plantingTime: dayjs() });
@@ -172,8 +172,8 @@ async function save() {
             <QtyHolder :qty="p.qty" class="mr-2"> {{ p.grams }} grams </QtyHolder>
             <QtyHolder :qty="p.hours"> hours </QtyHolder>
             <ProgressBar :value="(p.done / p.qty) * 100"> {{ p.done }} / {{ p.qty }} </ProgressBar>
-            <div v-if="p.data.box">Water box: {{ p.data.box }}</div>
-            <div v-if="p.data.script">Script id: {{ p.data.script }}</div>
+            <div v-if="p.data && p.data.box">Water box: {{ p.data.box }}</div>
+            <div v-if="p.data && p.data.script">Script id: {{ p.data.script }}</div>
         </div>
 
         <Dialog v-model:visible="showDialog" header="Soaking Details" :modal="true" class="p-fluid">
