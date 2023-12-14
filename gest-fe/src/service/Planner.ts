@@ -30,9 +30,10 @@ export default class Planner {
                     let minutes = 0;
                     return (dp.product.steps?.toReversed() ?? []).map((s: Step) => {
                         minutes += s.minutes;
-                        //const activities = this.activities.filter((a) => a.delivery?.id === p.delivery.id && a.step.product?.id === p.product.id && a.step.name === p.step.name && a.year === year && a.week === week);
+                        const activities = this.activities.filter((a) => a.delivery?.id === delivery.id && a.step.product?.id === dp.product.id && a.step.name === s.name);
                         return {
                             qty: dp.qty,
+                            activities: activities,
                             done: 0,
                             decigrams: dp.product.decigrams,
                             delivery: delivery,
@@ -48,7 +49,11 @@ export default class Planner {
     }
 
     filterWeek(selectedSteps: StepName[], year: number, week: number) {
-        return this.planned.value.filter((p) => {
+        return this.planned.value.map((p) => {  
+            p.done = p.activities?.filter((a) => a.week === week && a.year === year).reduce((i, dp) => i + dp.qty, 0) ?? 0
+            return p
+        }).        
+        filter((p) => {
             return selectedSteps.includes(p.step.name) && 
                 p.date.week() === week && 
                 p.date.year() === year
@@ -57,7 +62,12 @@ export default class Planner {
     }
 
     filterDay(selectedSteps: StepName[], date: dayjs.Dayjs) {
-        return this.planned.value.filter((p) => {
+        return this.planned.value.map((p) => {  
+            p.done = p.activities?.filter((a) => a.week === date.week() && a.year === date.year()).reduce((i, dp) => i + dp.qty, 0) ?? 0
+            return p
+        }).        
+        
+        filter((p) => {
             return selectedSteps.includes(p.step.name) && 
                 p.date.format('YYYYMMDD') === date.format('YYYYMMDD')
             ;

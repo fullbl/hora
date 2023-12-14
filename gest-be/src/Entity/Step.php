@@ -31,7 +31,7 @@ class Step
         self::STEP_LIGHT,
     ];
 
-    #[Groups(['activity-list', 'product'])]
+    #[Groups(['activity-list', 'product', 'delivery-dash'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
