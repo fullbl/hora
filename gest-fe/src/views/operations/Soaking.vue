@@ -50,7 +50,7 @@ onMounted(async () => {
 const planned = ref([] as Planned[]);
 watchEffect(async () => {
     await planner.load(date.value.format('YYYY-MM-DD'));
-    planned.value = planner.filter(['soaking'], date.value.year(), date.value.week());
+    planned.value = planner.filterDay(['soaking'], date.value);
 })
 
 const single = ref<Selected>({ soakings: [], plantingTime: dayjs() });

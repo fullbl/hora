@@ -4,6 +4,7 @@ import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
 import { ref } from 'vue';
 import type { Step, StepName } from '@/interfaces/step';
+import type dayjs from 'dayjs';
 
 if (!Array.prototype.toReversed) {
     Array.prototype.toReversed = function () {
@@ -46,11 +47,19 @@ export default class Planner {
         return this;
     }
 
-    filter(selectedSteps: StepName[], year: number, week: number) {
+    filterWeek(selectedSteps: StepName[], year: number, week: number) {
         return this.planned.value.filter((p) => {
             return selectedSteps.includes(p.step.name) && 
                 p.date.week() === week && 
                 p.date.year() === year
+            ;
+        });
+    }
+
+    filterDay(selectedSteps: StepName[], date: dayjs.Dayjs) {
+        return this.planned.value.filter((p) => {
+            return selectedSteps.includes(p.step.name) && 
+                p.date.format('YYYYMMDD') === date.format('YYYYMMDD')
             ;
         });
     }

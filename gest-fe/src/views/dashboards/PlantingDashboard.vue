@@ -22,7 +22,7 @@ watchEffect(async () => {
     (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
 
     deliveryGroups.value = planner.groupByDayAndProduct(
-        planner.filter(['blackout'], year.value, week.value)
+        planner.filterWeek(['blackout'], year.value, week.value)
     )
 });
 
