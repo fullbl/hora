@@ -25,10 +25,11 @@ const planner = new Planner();
 const deliveryGroups = ref<Map<string, Map<string, Planned>>> (new Map());
 
 watchEffect(async () => {
-    (await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD')))
+    const filters = [selectedStep.value]
+    await planner.load(getDate(year.value, week.value, 0).format('YYYY-MM-DD'))
 
     deliveryGroups.value = planner.groupByDayAndProduct(
-        planner.filterWeek([selectedStep.value], year.value, week.value)
+        planner.filterWeek(filters, year.value, week.value)
     )
 });
 
