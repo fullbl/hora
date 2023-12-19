@@ -39,14 +39,13 @@ const freeDeliveries = computed(() => {
 });
 const save = async () => {
     form.value?.save();
-    try{
+    try {
         deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
-    }
-    catch (e) {
-        alert("C'è stato un errore nel salvataggio")
+    } catch (e) {
+        alert("C'è stato un errore nel salvataggio");
     }
     hideDialog();
-}
+};
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     activities.value = await activityService.getAll();
@@ -98,10 +97,10 @@ const deliveryGroups = computed(() => {
         }
 
         return x;
-    }, new Map<number, Map<string, Map<string, Map<string, { delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>>>>());
+    }, new Map<number, Map<string, Map<string, Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>>>>());
 });
 
-const zoneTotals = function (customers: Map<string, {delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>) {
+const zoneTotals = function (customers: Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>) {
     let totals = new Map();
 
     customers.forEach(function (x) {
@@ -127,27 +126,29 @@ const customerTotal = function (products: Map<string, { qty: number; done: numbe
     return totals;
 };
 
-const subZoneTotal = function (customers: Map<string, {delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>) {
+const subZoneTotal = function (customers: Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>, withExtra: boolean) {
     let totals = 0;
 
     customers.forEach(function (x) {
-        totals += customerTotal(x.products);
+        if (withExtra || x.delivery.customer) {
+            totals += customerTotal(x.products);
+        }
     });
 
     return totals;
 };
 
-const zoneTotal = function (subZones: Map<string, Map<string, {delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>>) {
+const zoneTotal = function (subZones: Map<string, Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>>, withExtra: boolean) {
     let totals = 0;
 
     subZones.forEach(function (x) {
-        totals += subZoneTotal(x);
+        totals += subZoneTotal(x, withExtra);
     });
 
     return totals;
 };
 
-const dayTotal = function (weekDay: number) {
+const dayTotal = function (weekDay: number, withExtra: boolean) {
     let totals = 0;
     const zones = deliveryGroups.value.get(weekDay);
     if (undefined === zones) {
@@ -155,16 +156,20 @@ const dayTotal = function (weekDay: number) {
     }
 
     zones.forEach(function (x) {
-        totals += zoneTotal(x);
+        totals += zoneTotal(x, withExtra);
     });
 
     return totals;
 };
 
 const weekTotal = computed(function () {
-    let totals = 0;
+    let totals = {
+        withExtra: 0,
+        withoutExtra: 0
+    };
     for (let i = 0; i < 6; i++) {
-        totals += dayTotal(i);
+        totals.withExtra += dayTotal(i, true);
+        totals.withoutExtra += dayTotal(i, false);
     }
 
     return totals;
@@ -182,7 +187,7 @@ const getWarningClass = function (delivery: Delivery) {
         <YearWeek v-model:year="year" v-model:week="week" />
     </div>
 
-    <div class="card">Week total: {{ weekTotal }}</div>
+    <div class="card">Week total: {{ weekTotal.withoutExtra }} ({{ weekTotal.withExtra }})</div>
 
     <Toast />
 
@@ -190,11 +195,11 @@ const getWarningClass = function (delivery: Delivery) {
         <div class="grid">
             <div style="width: 14.28%" v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
-                <b>Day total: {{ dayTotal(date.weekday()) }}</b>
+                <b>Day total: {{ dayTotal(date.weekday(), true) }}</b>
 
                 <div>
-                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :header="zoneName + ': ' + zoneTotal(subZones)" toggleable collapsed>
-                        <Panel v-for="[subZoneName, customers] in subZones" :header="subZoneName + ': ' + subZoneTotal(customers)" toggleable collapsed>
+                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :header="zoneName + ': ' + zoneTotal(subZones, true)" toggleable collapsed>
+                        <Panel v-for="[subZoneName, customers] in subZones" :header="subZoneName + ': ' + subZoneTotal(customers, true)" toggleable collapsed>
                             <p v-for="[productName, qty] in Array.from(zoneTotals(customers)).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
@@ -217,7 +222,7 @@ const getWarningClass = function (delivery: Delivery) {
     </div>
 
     <Dialog v-model:visible="showDialog" :header="dialog" :modal="true" class="p-fluid" v-if="null !== single">
-        <DeliveryChangeForm :single="single" :free-deliveries="freeDeliveries" ref="form"/>
+        <DeliveryChangeForm :single="single" :free-deliveries="freeDeliveries" ref="form" />
 
         <template #footer>
             <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
