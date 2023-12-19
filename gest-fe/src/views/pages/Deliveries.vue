@@ -52,9 +52,8 @@ onMounted(async () => {
 const getCustomerNumber = (item: Delivery) => (data.value?.filter((d) => d.customer?.id === item.customer?.id).findIndex((d) => d.id === item.id) ?? 0) + 1;
 
 const preSave = function () {
-    if (0 >= (single.value?.deliveryProducts.reduce((x, dp) => x + dp.qty, 0) ?? 0)) {
-        alert('Product quantity is 0!');
-        return;
+    if(!single.value?.id && (!single.value?.deliveryDates || !single.value.harvestDates)) {
+        alert('Please select delivery dates and harvest dates');
     }
     save();
 };
