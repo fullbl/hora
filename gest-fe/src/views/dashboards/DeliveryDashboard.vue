@@ -39,7 +39,12 @@ const freeDeliveries = computed(() => {
 });
 const save = async () => {
     form.value?.save();
-    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
+    try{
+        deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
+    }
+    catch (e) {
+        alert("C'è stato un errore nel salvataggio")
+    }
     hideDialog();
 }
 watchEffect(async () => {
