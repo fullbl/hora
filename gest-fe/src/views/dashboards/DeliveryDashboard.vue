@@ -194,16 +194,16 @@ const getWarningClass = function (delivery: Delivery) {
     <div class="card">
         <div class="grid">
             <div style="width: 14.28%" v-for="date of getWeekDates(year, week)">
-                <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
+                <h5>{{ date.format('dddd DD/MM/YY') }}</h5>
                 <b>Day total: {{ dayTotal(date.weekday(), true) }}</b>
 
                 <div>
-                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :header="zoneName + ': ' + zoneTotal(subZones, true)" toggleable collapsed>
-                        <Panel v-for="[subZoneName, customers] in subZones" :header="subZoneName + ': ' + subZoneTotal(customers, true)" toggleable collapsed>
+                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :pt="{header: {title: zoneName + ': ' + zoneTotal(subZones, true)}}" :header="zoneName + ': ' + zoneTotal(subZones, true)" toggleable collapsed>
+                        <Panel v-for="[subZoneName, customers] in subZones" :pt="{header: {title: subZoneName + ': ' + subZoneTotal(customers, true)}}" :header="subZoneName + ': ' + subZoneTotal(customers, true)" toggleable collapsed>
                             <p v-for="[productName, qty] in Array.from(zoneTotals(customers)).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
-                            <Panel v-for="[customerName, customerData] in customers" :header="customerName + ': ' + customerTotal(customerData.products)" toggleable collapsed>
+                            <Panel v-for="[customerName, customerData] in customers" :pt="{header: {title: customerName + ': ' + customerTotal(customerData.products)}}" :header="customerName + ': ' + customerTotal(customerData.products)" toggleable collapsed>
                                 <template #icons>
                                     <button class="p-panel-header-icon p-link mr-2" @click="single = customerData.delivery">
                                         <span class="pi pi-cog"></span>
@@ -230,3 +230,10 @@ const getWarningClass = function (delivery: Delivery) {
         </template>
     </Dialog>
 </template>
+
+<style>
+.p-panel .p-panel-header .p-panel-title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+</style>
