@@ -61,6 +61,7 @@ const save = () => {
         });
     }
     deliveryService.move(props.single, Array.from(deliveries.values()));
+    
 };
 
 defineExpose({

@@ -33,11 +33,15 @@ const showDialog = computed({
 const hideDialog = () => {
     single.value = null;
 };
-const form = ref(null);
+const form = ref(null as typeof DeliveryChangeForm | null);
 const freeDeliveries = computed(() => {
     return deliveries.value.filter((d) => null === d.customer);
 });
-
+const save = async () => {
+    form.value?.save();
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
+    hideDialog();
+}
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     activities.value = await activityService.getAll();
@@ -212,7 +216,7 @@ const getWarningClass = function (delivery: Delivery) {
 
         <template #footer>
             <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-            <Button label="Save" icon="pi pi-check" class="p-button-text" @click="form.save()" />
+            <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save()" />
         </template>
     </Dialog>
 </template>
