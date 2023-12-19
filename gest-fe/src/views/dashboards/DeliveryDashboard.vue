@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import deliveryService from '@/service/DeliveryService';
 import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
@@ -12,6 +12,7 @@ import QtyHolder from '@/components/QtyHolder.vue';
 import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
+import DeliveryChangeForm from '@/components/forms/DeliveryChangeForm.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -21,6 +22,21 @@ const { getDate, getWeekDates } = useDates();
 const today = dayjs();
 const week = ref(today.week());
 const year = ref(today.year());
+const single = ref<Delivery | null>(null);
+const dialog = computed(() => single.value?.customer?.fullName ?? 'New Delivery');
+const showDialog = computed({
+    get: () => single.value !== null,
+    set: (value) => {
+        single.value = false === value ? null : single.value;
+    }
+});
+const hideDialog = () => {
+    single.value = null;
+};
+const form = ref(null);
+const freeDeliveries = computed(() => {
+    return deliveries.value.filter((d) => null === d.customer);
+});
 
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
@@ -38,31 +54,34 @@ const deliveryGroups = computed(() => {
 
         for (const dp of delivery.deliveryProducts) {
             const weekDay = x.get(delivery.deliveryDate.weekday());
-            if (!delivery.customer || undefined === weekDay) {
+            if (undefined === weekDay) {
                 continue;
             }
-            if (!weekDay.has(delivery.customer.zone ?? '')) {
-                weekDay.set(delivery.customer.zone ?? '', new Map());
+            if (!weekDay.has(delivery.customer?.zone ?? '')) {
+                weekDay.set(delivery.customer?.zone ?? '', new Map());
             }
             const zone = weekDay.get(delivery.customer?.zone ?? '');
             if (undefined === zone) {
                 continue;
             }
-            if (!zone.has(delivery.customer.subZone ?? '')) {
-                zone.set(delivery.customer.subZone ?? '', new Map());
+            if (!zone.has(delivery.customer?.subZone ?? '')) {
+                zone.set(delivery.customer?.subZone ?? '', new Map());
             }
 
-            const subZone = zone.get(delivery.customer.subZone ?? '');
+            const subZone = zone.get(delivery.customer?.subZone ?? '');
             if (undefined === subZone) {
                 continue;
             }
-            if (!subZone.has(delivery.customer.fullName)) {
-                subZone.set(delivery.customer.fullName, new Map());
+            if (!subZone.has(delivery.customer?.fullName ?? 'EXTRA')) {
+                subZone.set(delivery.customer?.fullName ?? 'EXTRA', {
+                    delivery: delivery,
+                    products: new Map()
+                });
             }
-            const customer = subZone.get(delivery.customer.fullName);
+            const customer = subZone.get(delivery.customer?.fullName ?? 'EXTRA');
 
-            customer?.set(dp.product.name, {
-                qty: (customer.get(dp.product.name)?.qty ?? 0) + dp.qty,
+            customer?.products.set(dp.product.name, {
+                qty: (customer.products.get(dp.product.name)?.qty ?? 0) + dp.qty,
                 done: activities.value.filter((a) => a.delivery?.id === delivery.id && a.step.product?.id === dp.product.id && a.step.name === 'shipping' && a.year === year.value && a.week === week.value).reduce((i, dp) => i + dp.qty, 0),
                 delivery: delivery,
                 product: dp.product
@@ -70,14 +89,14 @@ const deliveryGroups = computed(() => {
         }
 
         return x;
-    }, new Map<number, Map<string, Map<string, Map<string, Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>>>>>());
+    }, new Map<number, Map<string, Map<string, Map<string, { delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>>>>());
 });
 
-const zoneTotals = function (customers: Map<string, Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>>) {
+const zoneTotals = function (customers: Map<string, {delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>) {
     let totals = new Map();
 
     customers.forEach(function (x) {
-        x.forEach(function (y, k) {
+        x.products.forEach(function (y, k) {
             if (!totals.has(k)) {
                 totals.set(k, 0);
             }
@@ -99,17 +118,17 @@ const customerTotal = function (products: Map<string, { qty: number; done: numbe
     return totals;
 };
 
-const subZoneTotal = function (customers: Map<string, Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>>) {
+const subZoneTotal = function (customers: Map<string, {delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>) {
     let totals = 0;
 
     customers.forEach(function (x) {
-        totals += customerTotal(x);
+        totals += customerTotal(x.products);
     });
 
     return totals;
 };
 
-const zoneTotal = function (subZones: Map<string, Map<string, Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>>>) {
+const zoneTotal = function (subZones: Map<string, Map<string, {delivery: Delivery, products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>}>>) {
     let totals = 0;
 
     subZones.forEach(function (x) {
@@ -143,10 +162,8 @@ const weekTotal = computed(function () {
 });
 
 const getWarningClass = function (delivery: Delivery) {
-    if (delivery.lastWarning)
-        return 'bg-red-600';
-    if (delivery.warning)
-        return 'bg-yellow-600';
+    if (delivery.lastWarning) return 'bg-red-600';
+    if (delivery.warning) return 'bg-yellow-600';
     return '';
 };
 </script>
@@ -167,14 +184,19 @@ const getWarningClass = function (delivery: Delivery) {
                 <b>Day total: {{ dayTotal(date.weekday()) }}</b>
 
                 <div>
-                    <Panel v-for="[zone, subZones] in deliveryGroups.get(date.weekday())" :header="zone + ': ' + zoneTotal(subZones)" toggleable collapsed>
-                        <Panel v-for="[subZone, customers] in subZones" :header="subZone + ': ' + subZoneTotal(customers)" toggleable collapsed>
-                            <p v-for="[product, qty] in Array.from(zoneTotals(customers)).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
-                                <QtyHolder :qty="qty">{{ product }}</QtyHolder>
+                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :header="zoneName + ': ' + zoneTotal(subZones)" toggleable collapsed>
+                        <Panel v-for="[subZoneName, customers] in subZones" :header="subZoneName + ': ' + subZoneTotal(customers)" toggleable collapsed>
+                            <p v-for="[productName, qty] in Array.from(zoneTotals(customers)).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
+                                <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
-                            <Panel v-for="[customer, products] in customers" :header="customer + ': ' + customerTotal(products)" toggleable collapsed>
-                                <p v-for="[name, dp] in Array.from(products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(dp.delivery)">
-                                    <QtyHolder :qty="dp.qty">{{ name }}</QtyHolder>
+                            <Panel v-for="[customerName, customerData] in customers" :header="customerName + ': ' + customerTotal(customerData.products)" toggleable collapsed>
+                                <template #icons>
+                                    <button class="p-panel-header-icon p-link mr-2" @click="single = customerData.delivery">
+                                        <span class="pi pi-cog"></span>
+                                    </button>
+                                </template>
+                                <p v-for="[productName, dp] in Array.from(customerData.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(dp.delivery)">
+                                    <QtyHolder :qty="dp.qty">{{ productName }}</QtyHolder>
                                     <ProgressHolder :dp="dp" />
                                 </p>
                             </Panel>
@@ -184,4 +206,13 @@ const getWarningClass = function (delivery: Delivery) {
             </div>
         </div>
     </div>
+
+    <Dialog v-model:visible="showDialog" :header="dialog" :modal="true" class="p-fluid" v-if="null !== single">
+        <DeliveryChangeForm :single="single" :free-deliveries="freeDeliveries" ref="form"/>
+
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
+            <Button label="Save" icon="pi pi-check" class="p-button-text" @click="form.save()" />
+        </template>
+    </Dialog>
 </template>

@@ -10,7 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: DeliveryProductRepository::class)]
 class DeliveryProduct
 {
-    #[Groups(['delivery-list'])]
+    #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

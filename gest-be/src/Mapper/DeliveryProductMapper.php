@@ -26,7 +26,7 @@ class DeliveryProductMapper
     public function map(array $data, Delivery $delivery): array
     {
         return array_map(
-            fn (array $data): DeliveryProduct => $this->mapSingle($data)->setDelivery($delivery),
+            fn (array $single): DeliveryProduct => $this->mapSingle($single)->setDelivery($delivery),
             $data
         );
     }

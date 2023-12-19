@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Delivery;
+use App\Entity\DeliveryProduct;
+use App\Entity\Product;
 use App\Mapper\DeliveryMapper;
+use App\Mapper\DeliveryProductMapper;
 use App\Repository\DeliveryRepository;
 use App\Repository\LogRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -63,6 +68,33 @@ class DeliveriesController extends AbstractController
             }
         }
         $this->repo->flush();
+        return $this->json('');
+    }
+
+    #[Route('/deliveries/move', methods: ['PUT'], name: 'delivery_move')]
+    public function move(Request $request, DeliveryProductMapper $mapper, EntityManagerInterface $em): JsonResponse
+    {
+        $moves = $request->toArray();
+        $baseDelivery = $this->repo->find($moves['delivery']);
+        if (null === $baseDelivery) {
+
+            return $this->json(
+                ['error' => 'not found'],
+                Response::HTTP_NOT_FOUND,
+            );
+        }
+        foreach ($moves['deliveries'] as $move) {
+            $delivery = $this->repo->find($move['delivery']);
+            if (null === $delivery) {
+                $delivery = clone $baseDelivery;
+                $delivery->setCustomer(null);
+                $em->persist($delivery);                
+            }
+            $delivery->setDeliveryProducts($mapper->map($move['deliveryProducts'], $delivery));
+        }
+
+        $this->repo->flush();
+
         return $this->json('');
     }
 

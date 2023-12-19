@@ -6,7 +6,6 @@ import type DeliveryProduct from '@/interfaces/deliveryProduct';
 import { onMounted, ref } from 'vue';
 import userService from '@/service/UserService';
 import productService from '@/service/ProductService';
-import { useDates } from '../composables/dates';
 import { computed } from '@vue/reactivity';
 import type Sellable from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
@@ -18,15 +17,12 @@ import DeliveryForm from '@/components/forms/DeliveryForm.vue';
 
 const { filters, data: _data, single, save, openNew: _openNew, editData: _editData, cloneData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(deliveryService);
 
-const { getWeeks } = useDates();
 const customers = ref<Array<User>>([]);
 const products = ref<Array<Sellable>>([]);
 const logEntity = ref(null);
 const nextOnly = ref(false);
 const activeOnly = ref(false);
 const today = dayjs();
-const year = dayjs().year();
-const weeks = getWeeks(year);
 const expandedRowGroups = ref();
 
 const data = computed(() => {
@@ -106,7 +102,7 @@ const preSave = function () {
                     </template>
 
                     <template #groupheader="slotProps">
-                        <span class="vertical-align-middle ml-2 font-bold line-height-3">{{ slotProps.data.customer.fullName }}</span>
+                        <span class="vertical-align-middle ml-2 font-bold line-height-3">{{ slotProps.data.customer?.fullName ?? 'EXTRA' }}</span>
                     </template>
 
                     <Column field="id" header="Id" sortable>
