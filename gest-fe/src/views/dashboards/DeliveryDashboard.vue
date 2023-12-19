@@ -35,7 +35,7 @@ const hideDialog = () => {
 };
 const form = ref(null as typeof DeliveryChangeForm | null);
 const freeDeliveries = computed(() => {
-    return deliveries.value.filter((d) => null === d.customer);
+    return deliveries.value.filter((d) => null === d.customer && d.deliveryDate.year() === year.value && d.deliveryDate.week() === week.value);
 });
 const save = async () => {
     form.value?.save();
