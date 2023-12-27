@@ -136,7 +136,10 @@ const preSave = function () {
                     <Column field="deliveryProducts" header="Products" sortable headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Products</span>
-                            {{ slotProps.data.deliveryProducts.map((d: DeliveryProduct) => d.product.name + ': ' + d.qty).join(', ') }}
+                            {{ slotProps.data.deliveryProducts
+                                .map((d: DeliveryProduct) => d.product.name + ': ' + d.qty)
+                                .sort()
+                                .join(', ') }}
                         </template>
                     </Column>
                     <Column field="customer.zone" header="Zone" sortable>
