@@ -47,6 +47,7 @@ RUN set -eux; \
     	zip \
     	apcu \
 		opcache \
+		excimer \
     ;
 
 ###> recipes ###
