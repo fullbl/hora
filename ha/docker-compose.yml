@@ -9,7 +9,3 @@ services:
       - TZ=Europe/Rome
     volumes:
       - ../../docker/data/ha:/config
-  
-  ewpe:
-    image: demydiuk/ewpe-smart-mqtt:1.0.5
-    network_mode: host
