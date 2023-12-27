@@ -23,11 +23,5 @@ export default [
         name: 'delivery-dashboard',
         component: () => import('@/views/dashboards/DeliveryDashboard.vue'),
         meta: { auth: 'ROLE_OPERATOR' }
-    },
-    {
-        path: '/dashboards/payment',
-        name: 'payment-dashboard',
-        component: () => import('@/views/dashboards/PaymentDashboard.vue'),
-        meta: { auth: 'ROLE_OPERATOR' }
-    },
+    }
 ]

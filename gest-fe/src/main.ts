@@ -114,7 +114,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faFire, faWater } from '@fortawesome/free-solid-svg-icons'
 import * as Sentry from "@sentry/vue";
 
-/* add icons to the library */
 library.add(faFire, faWater)
 
 authService.load();
