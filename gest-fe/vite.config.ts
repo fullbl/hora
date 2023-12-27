@@ -17,7 +17,7 @@ export default defineConfig(({ command }) => {
             sentryVitePlugin({
                 org: "fullbl",
                 project: "belluno-hora-fe",
-                authToken: import.meta.env.VITE_SENTRY_AUTH_TOKEN,
+                authToken: process.env.SENTRY_AUTH_TOKEN,
               }),
         ],
         base: '/',
