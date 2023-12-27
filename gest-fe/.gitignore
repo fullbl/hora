@@ -13,3 +13,4 @@ node_modules
 !.vscode/extensions.json
 
 .env.local
+.env.sentry-build-plugin
