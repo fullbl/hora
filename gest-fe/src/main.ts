@@ -112,18 +112,44 @@ import '@/assets/styles.scss';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faFire, faWater } from '@fortawesome/free-solid-svg-icons'
+import * as Sentry from "@sentry/vue";
 
 /* add icons to the library */
 library.add(faFire, faWater)
 
-
 authService.load();
 const app = createApp(App);
+
+Sentry.init({
+    app,
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    integrations: [
+      new Sentry.BrowserTracing({
+        routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+      }),
+      new Sentry.Replay(),
+    ],
+  
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+  
+    // Set `tracePropagationTargets` to control for which URLs distributed tracing should be enabled
+    tracePropagationTargets: ["localhost", /^https:\/\/[a-z+]\-api.horafarms\.it/],
+  
+    // Capture Replay for 10% of all sessions,
+    // plus for 100% of sessions with an error
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  });
+  
 app.use(router);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);
+
 
 app.use({
     install: () => {
