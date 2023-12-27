@@ -60,34 +60,34 @@ const deliveryGroups = computed(() => {
             return x;
         }
 
+        const weekDay = x.get(delivery.deliveryDate.weekday());
+        if (undefined === weekDay) {
+            return x;
+        }
+        if (!weekDay.has(delivery.customer?.zone ?? '')) {
+            weekDay.set(delivery.customer?.zone ?? '', new Map());
+        }
+        const zone = weekDay.get(delivery.customer?.zone ?? '');
+        if (undefined === zone) {
+            return x;
+        }
+        if (!zone.has(delivery.customer?.subZone ?? '')) {
+            zone.set(delivery.customer?.subZone ?? '', new Map());
+        }
+
+        const subZone = zone.get(delivery.customer?.subZone ?? '');
+        if (undefined === subZone) {
+            return x;
+        }
+        if (!subZone.has(delivery.customer?.fullName ?? 'EXTRA')) {
+            subZone.set(delivery.customer?.fullName ?? 'EXTRA', {
+                delivery: delivery,
+                products: new Map()
+            });
+        }
+        const customer = subZone.get(delivery.customer?.fullName ?? 'EXTRA');
+
         for (const dp of delivery.deliveryProducts) {
-            const weekDay = x.get(delivery.deliveryDate.weekday());
-            if (undefined === weekDay) {
-                continue;
-            }
-            if (!weekDay.has(delivery.customer?.zone ?? '')) {
-                weekDay.set(delivery.customer?.zone ?? '', new Map());
-            }
-            const zone = weekDay.get(delivery.customer?.zone ?? '');
-            if (undefined === zone) {
-                continue;
-            }
-            if (!zone.has(delivery.customer?.subZone ?? '')) {
-                zone.set(delivery.customer?.subZone ?? '', new Map());
-            }
-
-            const subZone = zone.get(delivery.customer?.subZone ?? '');
-            if (undefined === subZone) {
-                continue;
-            }
-            if (!subZone.has(delivery.customer?.fullName ?? 'EXTRA')) {
-                subZone.set(delivery.customer?.fullName ?? 'EXTRA', {
-                    delivery: delivery,
-                    products: new Map()
-                });
-            }
-            const customer = subZone.get(delivery.customer?.fullName ?? 'EXTRA');
-
             customer?.products.set(dp.product.name, {
                 qty: (customer.products.get(dp.product.name)?.qty ?? 0) + dp.qty,
                 done: activities.value.filter((a) => a.delivery?.id === delivery.id && a.step.product?.id === dp.product.id && a.step.name === 'shipping' && a.year === year.value && a.week === week.value).reduce((i, dp) => i + dp.qty, 0),
@@ -198,12 +198,18 @@ const getWarningClass = function (delivery: Delivery) {
                 <b>Day total: {{ dayTotal(date.weekday(), true) }}</b>
 
                 <div>
-                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :pt="{header: {title: zoneName + ': ' + zoneTotal(subZones, true)}}" :header="zoneName + ': ' + zoneTotal(subZones, true)" toggleable collapsed>
-                        <Panel v-for="[subZoneName, customers] in subZones" :pt="{header: {title: subZoneName + ': ' + subZoneTotal(customers, true)}}" :header="subZoneName + ': ' + subZoneTotal(customers, true)" toggleable collapsed>
+                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :pt="{ header: { title: zoneName + ': ' + zoneTotal(subZones, true) } }" :header="zoneName + ': ' + zoneTotal(subZones, true)" toggleable collapsed>
+                        <Panel v-for="[subZoneName, customers] in subZones" :pt="{ header: { title: subZoneName + ': ' + subZoneTotal(customers, true) } }" :header="subZoneName + ': ' + subZoneTotal(customers, true)" toggleable collapsed>
                             <p v-for="[productName, qty] in Array.from(zoneTotals(customers)).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
-                            <Panel v-for="[customerName, customerData] in customers" :pt="{header: {title: customerName + ': ' + customerTotal(customerData.products)}}" :header="customerName + ': ' + customerTotal(customerData.products)" toggleable collapsed>
+                            <Panel
+                                v-for="[customerName, customerData] in customers"
+                                :pt="{ header: { title: customerName + ': ' + customerTotal(customerData.products) } }"
+                                :header="customerName + ': ' + customerTotal(customerData.products)"
+                                toggleable
+                                collapsed
+                            >
                                 <template #icons>
                                     <button class="p-panel-header-icon p-link mr-2" @click="single = customerData.delivery">
                                         <span class="pi pi-cog"></span>
@@ -233,7 +239,7 @@ const getWarningClass = function (delivery: Delivery) {
 
 <style>
 .p-panel .p-panel-header .p-panel-title {
-  text-overflow: ellipsis;
-  overflow: hidden;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 </style>
