@@ -51,7 +51,6 @@ const moveLeft = (deliveryProduct: DeliveryProductMoveable) => {
 const save = () => {
     const deliveries = new Map();
     for (const dp of [...freeDPs.value, ...singleDPs.value]) {
-        if (dp.qty === 0) continue;
         const key = dp.delivery?.id ?? 0;
         if (!deliveries.has(key)) deliveries.set(key, { delivery: key, deliveryProducts: [] });
         const delivery = deliveries.get(key);
