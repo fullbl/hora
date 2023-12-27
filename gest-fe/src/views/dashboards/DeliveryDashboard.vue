@@ -192,8 +192,8 @@ const getWarningClass = function (delivery: Delivery) {
     <Toast />
 
     <div class="card">
-        <div class="grid">
-            <div style="width: 14.28%" v-for="date of getWeekDates(year, week)">
+        <div class="day">
+            <div v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YY') }}</h5>
                 <b>Day total: {{ dayTotal(date.weekday(), true) }}</b>
 
@@ -241,5 +241,9 @@ const getWarningClass = function (delivery: Delivery) {
 .p-panel .p-panel-header .p-panel-title {
     text-overflow: ellipsis;
     overflow: hidden;
+}
+.day{
+    display: flex;
+    justify-content: space-between;
 }
 </style>
