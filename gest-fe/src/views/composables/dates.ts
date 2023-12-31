@@ -21,10 +21,10 @@ export function useDates(): useDates {
             return dayjs(d).week();
         },
         getDate(year: number, week: number, weekDay: number) {
-            return dayjs().year(year).week(week).weekday(weekDay);
+            return dayjs().year(year).startOf('year').week(week).weekday(weekDay);
         },
         getWeekDates(year: number, week: number) {
-            return [...Array(7).keys()].map((weekDay) => dayjs().year(year).week(week).weekday(weekDay));
+            return [...Array(7).keys()].map((weekDay) => dayjs().year(year).startOf('year').week(week).weekday(weekDay));
         },
         getWeeks(year: number) {
             let firstDayOfWeek = dayjs().year(year).startOf('year');
