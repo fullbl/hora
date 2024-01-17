@@ -13,6 +13,7 @@ import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
 import DeliveryChangeForm from '@/components/forms/DeliveryChangeForm.vue';
+import CustomerMenu from '@/components/CustomerMenu.vue';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -39,11 +40,7 @@ const freeDeliveries = computed(() => {
 });
 const save = async () => {
     form.value?.save();
-    try {
-        deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
-    } catch (e) {
-        alert("C'è stato un errore nel salvataggio");
-    }
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     hideDialog();
 };
 watchEffect(async () => {
@@ -82,7 +79,7 @@ const deliveryGroups = computed(() => {
         if (!subZone.has(delivery.customer?.fullName ?? 'EXTRA')) {
             subZone.set(delivery.customer?.fullName ?? 'EXTRA', {
                 delivery: delivery,
-                products: new Map()
+                products: new Map()                
             });
         }
         const customer = subZone.get(delivery.customer?.fullName ?? 'EXTRA');
@@ -180,6 +177,37 @@ const getWarningClass = function (delivery: Delivery) {
     if (delivery.warning) return 'bg-yellow-600';
     return '';
 };
+
+const changeDelivery = function(delivery: Delivery) {
+    single.value = delivery;
+};
+
+const emptyDelivery = async function(delivery: Delivery) {
+    if(undefined === delivery.id){
+        alert('error');
+        return;
+    }
+    const freeDelivery = freeDeliveries.value.find(Boolean);
+    const products = [...delivery.deliveryProducts, ...freeDelivery?.deliveryProducts ?? []];
+    await deliveryService.move(
+        delivery, 
+        [
+            {
+            delivery: delivery.id,
+            deliveryProducts: []
+        },
+        {
+            delivery: freeDelivery?.id ?? 0,
+            deliveryProducts: products.map((dp) => ({
+                product: {id: dp.product.id ?? 0},
+                qty: dp.qty
+            }))
+        }
+    ]
+    )
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
+};
+
 </script>
 
 <template>
@@ -206,14 +234,18 @@ const getWarningClass = function (delivery: Delivery) {
                             <Panel
                                 v-for="[customerName, customerData] in customers"
                                 :pt="{ header: { title: customerName + ': ' + customerTotal(customerData.products) } }"
-                                :header="customerName + ': ' + customerTotal(customerData.products)"
                                 toggleable
                                 collapsed
                             >
-                                <template #icons>
-                                    <button class="p-panel-header-icon p-link mr-2" @click="single = customerData.delivery">
-                                        <span class="pi pi-cog"></span>
-                                    </button>
+                                <template #header>
+                                    <CustomerMenu 
+                                        :change="() => changeDelivery(customerData.delivery)"
+                                        :empty="() => emptyDelivery(customerData.delivery)"
+                                        :remove="() => form.value?.remove()"
+                                    />
+                                    <p class="px-1">
+                                        {{ customerName }}: {{ customerTotal(customerData.products) }}
+                                    </p>
                                 </template>
                                 <p v-for="[productName, dp] in Array.from(customerData.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(dp.delivery)">
                                     <QtyHolder :qty="dp.qty">{{ productName }}</QtyHolder>
@@ -242,7 +274,7 @@ const getWarningClass = function (delivery: Delivery) {
     text-overflow: ellipsis;
     overflow: hidden;
 }
-.day{
+.day {
     display: flex;
     justify-content: space-between;
 }

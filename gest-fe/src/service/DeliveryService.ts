@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 
 interface DeliveryService extends Service<Delivery> {
     getFrom(from: string): Promise<Array<Delivery>>;
-    move(delivery: Delivery, deliveries: Array<{ delivery: number; deliveryProducts: { product: { id: number }, qty: number } }>): Promise<Array<Delivery>>;
+    move(delivery: Delivery, deliveries: Array<{ delivery: number; deliveryProducts: Array<{ product: { id: number }, qty: number }> }>): Promise<Array<Delivery>>;
 }
 
 const service: DeliveryService = {

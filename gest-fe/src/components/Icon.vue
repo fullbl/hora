@@ -18,11 +18,11 @@ const htmlClass = computed(() => {
             return 'pi pi-sun';
         case 'blackout':
             return 'pi pi-moon';
-        }
-    if(props.type.startsWith('pi')) {
+    }
+    if (props.type.startsWith('pi')) {
         return props.type;
     }
-    if(props.type.startsWith('fa')) {
+    if (props.type.startsWith('fa')) {
         return '';
     }
     return 'pi pi-question';
@@ -39,14 +39,14 @@ const icon = computed(() => {
         case 'blackout':
             return '';
     }
-    if(props.type.startsWith('fa ')) {
+    if (props.type.startsWith('fa ')) {
         return props.type;
     }
-    if(props.type.startsWith('pi ')) {
+    if (props.type.startsWith('pi ')) {
         return '';
     }
     return '';
-})
+});
 
 const element = computed(() => {
     switch (props.type) {
@@ -61,15 +61,14 @@ const element = computed(() => {
         case 'blackout':
             return 'i';
     }
-    if(props.type.startsWith('fa ')) {
+    if (props.type.startsWith('fa ')) {
         return 'font-awesome-icon';
     }
-    if(props.type.startsWith('pi ')) {
+    if (props.type.startsWith('pi ')) {
         return 'i';
     }
     return 'i';
 });
-
 </script>
 
 <template>

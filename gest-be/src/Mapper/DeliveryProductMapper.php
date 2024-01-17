@@ -25,9 +25,12 @@ class DeliveryProductMapper
      */
     public function map(array $data, Delivery $delivery): array
     {
-        return array_map(
-            fn (array $single): DeliveryProduct => $this->mapSingle($single)->setDelivery($delivery),
-            $data
+        return array_filter(
+            array_map(
+                fn (array $single): DeliveryProduct => $this->mapSingle($single)->setDelivery($delivery),
+                $data
+            ),
+            fn (DeliveryProduct $dp) => $dp->getQty() > 0
         );
     }
 

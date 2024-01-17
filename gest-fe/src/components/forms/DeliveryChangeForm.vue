@@ -54,10 +54,12 @@ const save = () => {
         const key = dp.delivery?.id ?? 0;
         if (!deliveries.has(key)) deliveries.set(key, { delivery: key, deliveryProducts: [] });
         const delivery = deliveries.get(key);
-        delivery.deliveryProducts.push({
-            product: {id: dp.product.id},
-            qty: dp.qty
-        });
+        if(dp.qty > 0){
+            delivery.deliveryProducts.push({
+                product: {id: dp.product.id},
+                qty: dp.qty
+            });
+        }
     }
     deliveryService.move(props.single, Array.from(deliveries.values()));
     
@@ -69,8 +71,8 @@ defineExpose({
 </script>
 
 <template>
-    <div class="formgrid grid">
-        <div class="field col-6">
+    <div class="flex overflow-hidden delivery-change">
+        <div class="overflow-y-auto">
             <label for="free_products">Free Products</label>
             <DataTable :value="freeDPs">
                 <Column field="product.name" header="Product"> </Column>
@@ -89,7 +91,7 @@ defineExpose({
             </DataTable>
         </div>
 
-        <div class="field col-6">
+        <div class="overflow-y-auto">
             <label for="products">Products</label>
             <DataTable :value="singleDPs">
                 <Column field="product.name" header="Product" />
@@ -109,3 +111,9 @@ defineExpose({
         </div>
     </div>
 </template>
+
+<style scoped lang="scss">
+.delivery-change {
+    height: 65vh;
+}
+</style>
