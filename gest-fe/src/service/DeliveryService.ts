@@ -10,8 +10,8 @@ interface DeliveryService extends Service<Delivery> {
 }
 
 const service: DeliveryService = {
-    async delete(delivery) {
-        return await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id);
+    async delete(delivery, reason) {
+        return await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, {reason});
     },
     async getFrom(from: string) {
         return (await dataService.get<Delivery[]>(import.meta.env.VITE_API_URL + 'deliveries/' + from)).map((delivery: Delivery) => {
@@ -24,6 +24,9 @@ const service: DeliveryService = {
         return (await dataService.get<Delivery[]>(import.meta.env.VITE_API_URL + 'deliveries')).map((delivery: Delivery) => {
             delivery.harvestDate = dayjs(delivery.harvestDate);
             delivery.deliveryDate = dayjs(delivery.deliveryDate);
+            if(delivery.deletedAt){
+                delivery.deletedAt = dayjs(delivery.deletedAt);
+            }
             return delivery;
         });
     },
@@ -32,6 +35,7 @@ const service: DeliveryService = {
             ...delivery,
             deliveryDate: dayjs(delivery.deliveryDate).format('YYYY-MM-DD'),
             harvestDate: dayjs(delivery.harvestDate).format('YYYY-MM-DD'),
+            deletedAt: delivery.deletedAt ? dayjs(delivery.deletedAt).format('YYYY-MM-DD') : null,
             deliveryDates: delivery.deliveryDates?.map((date) => dayjs(date).format('YYYY-MM-DD')),
             harvestDates: delivery.harvestDates?.map((date) => dayjs(date).format('YYYY-MM-DD'))
         };

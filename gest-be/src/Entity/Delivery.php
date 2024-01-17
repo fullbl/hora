@@ -75,6 +75,14 @@ class Delivery
     #[Assert\Length(max:10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $paymentMethod = null;
+
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
+    #[Groups(['delivery-list'])]
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $deletedReason = null;
     
     public function __construct()
     {
@@ -262,6 +270,30 @@ class Delivery
     public function setPaymentMethod(?string $paymentMethod): self
     {
         $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function getDeletedReason(): ?string
+    {
+        return $this->deletedReason;
+    }
+
+    public function setDeletedReason(?string $deletedReason): self
+    {
+        $this->deletedReason = $deletedReason;
 
         return $this;
     }

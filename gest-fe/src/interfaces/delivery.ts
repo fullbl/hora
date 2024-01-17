@@ -16,7 +16,9 @@ interface Delivery {
     deliveryProducts: Array<DeliveryProduct>,
     notes: string,
     paymentMethod?: string,
-    nextDelivery?: number
+    nextDelivery?: number,
+    deletedAt?: Dayjs,
+    deletedReason?: string
 }
 interface DeliveryWithoutProducts {
     id?: number,

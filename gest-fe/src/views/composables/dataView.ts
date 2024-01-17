@@ -75,14 +75,14 @@ export function useDataView<T>(service: Service<T>) {
             }
             return false;
         },
-        async deleteData() {
+        async deleteData(reason?: string) {
             if (undefined === single.value || null === single.value) {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'No data Provided', life: 3000 });
                 return;
             }
 
             try {
-                const res = await service.delete(single.value);
+                const res = await service.delete(single.value, reason);
                 toast.add({ severity: 'success', summary: 'Successful', detail: 'Object Deleted', life: 3000 });
                 data.value = await service.getAll();
             } catch (e) {

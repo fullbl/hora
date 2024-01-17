@@ -86,9 +86,7 @@ class DeliveriesController extends AbstractController
         foreach ($moves['deliveries'] as $move) {
             $delivery = $this->repo->find($move['delivery']);
             if (null === $delivery) {
-                $delivery = clone $baseDelivery;
-                $delivery->setCustomer(null);
-                $em->persist($delivery);                
+                $delivery = $this->repo->findFreeDeliveryInSameWeek($baseDelivery);
             }
             $delivery->setDeliveryProducts($mapper->map($move['deliveryProducts'], $delivery));
         }
@@ -147,7 +145,17 @@ class DeliveriesController extends AbstractController
         }
 
         try {
-            $this->repo->remove($delivery, true);
+            $delivery->setDeletedAt(new \DateTimeImmutable());
+            $delivery->setDeletedReason($request->toArray()['reason'] ?? '');
+
+            $freeDelivery = $this->repo->findFreeDeliveryInSameWeek($delivery);
+            foreach($delivery->getDeliveryProducts() as $deliveryProduct){
+                $freeDelivery->addDeliveryProduct($deliveryProduct);
+            }
+            
+            $delivery->setDeliveryProducts([]);
+            $this->repo->save($delivery);
+            $this->repo->save($freeDelivery, true);
         } catch (Exception $e) {
 
             return $this->json(

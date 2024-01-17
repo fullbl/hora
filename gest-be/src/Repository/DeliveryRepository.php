@@ -41,7 +41,7 @@ class DeliveryRepository extends ServiceEntityRepository
 
     public function remove(Delivery $entity, bool $flush = false): void
     {
-        $this->getEntityManager()->remove($entity);
+        $entity->setDeletedAt(new \DateTimeImmutable());
 
         if ($flush) {
             $this->getEntityManager()->flush();
@@ -71,6 +71,7 @@ class DeliveryRepository extends ServiceEntityRepository
                 delivery dd
         ) rd ON d.id = rd.id
         WHERE
+            d.deleted_at IS NULL AND
             d.delivery_date BETWEEN :from AND :to',
             $rsm
         );
@@ -84,22 +85,41 @@ class DeliveryRepository extends ServiceEntityRepository
             /**
              * @param array<array{0: Delivery, 'max_delivery': string}> $row
              */
-            function (array $row): Delivery{
+            function (array $row): Delivery {
                 $row[0]->setLastWarning(false);
                 $row[0]->setWarning(false);
-                if($row['max_delivery'] <= $row[0]->getDeliveryDate()) {
+                if ($row['max_delivery'] <= $row[0]->getDeliveryDate()) {
                     $row[0]->setLastWarning(true);
                     return $row[0];
                 }
-                if($row['max_delivery']->modify('-1 month') <= $row[0]->getDeliveryDate()) {
+                if ($row['max_delivery']->modify('-1 month') <= $row[0]->getDeliveryDate()) {
                     $row[0]->setWarning(true);
                 }
 
                 return $row[0];
-
             },
             $query->getResult()
         );
+    }
+
+    public function findFreeDeliveryInSameWeek(Delivery $delivery): Delivery
+    {
+        $freeDelivery = $this->createQueryBuilder('d')
+            ->where('d.deletedAt IS NULL')
+            ->andWhere('d.deliveryDate BETWEEN :from AND :to')
+            ->setParameter('from', $delivery->getDeliveryDate()->modify('monday 00:00:00')->format('Y-m-d'))
+            ->setParameter('to', $delivery->getDeliveryDate()->modify('sunday 23:59:59')->format('Y-m-d'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (null === $freeDelivery) {
+            $freeDelivery = clone $delivery;
+            $freeDelivery->setCustomer(null);
+            $this->getEntityManager()->persist($delivery);
+        }
+
+        return $freeDelivery;
     }
 
     public function intersectingWeeks(array $weeks, ?User $customer, ?int $id): array

@@ -52,11 +52,13 @@ onMounted(async () => {
 const getCustomerNumber = (item: Delivery) => (data.value?.filter((d) => d.customer?.id === item.customer?.id).findIndex((d) => d.id === item.id) ?? 0) + 1;
 
 const preSave = function () {
-    if(!single.value?.id && (!single.value?.deliveryDates || !single.value.harvestDates)) {
+    if (!single.value?.id && (!single.value?.deliveryDates || !single.value.harvestDates)) {
         alert('Please select delivery dates and harvest dates');
     }
     save();
 };
+
+const deleteReason = ref('');
 </script>
 
 <template>
@@ -76,14 +78,15 @@ const preSave = function () {
                     :value="data"
                     dataKey="id"
                     v-model:expandedRowGroups="expandedRowGroups"
-                    expandableRowGroups 
-                    rowGroupMode="subheader" 
-                    groupRowsBy="customer.fullName" 
-                    sortMode="single" 
+                    expandableRowGroups
+                    rowGroupMode="subheader"
+                    groupRowsBy="customer.fullName"
+                    sortMode="single"
                     sortField="customer.fullName"
                     :paginator="false"
                     :rows="10"
                     :filters="filters"
+                    :rowClass="(data) => data.deletedAt ? 'bg-red-900' : ''"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data"
@@ -135,11 +138,14 @@ const preSave = function () {
                     </Column>
                     <Column field="deliveryProducts" header="Products" sortable headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">Products</span>
-                            {{ slotProps.data.deliveryProducts
-                                .map((d: DeliveryProduct) => d.product.name + ': ' + d.qty)
-                                .sort()
-                                .join(', ') }}
+                            <span v-if="slotProps.data.deletedAt">Deleted on {{ slotProps.data.deletedAt.format('DD/MM/YYYY HH:mm:ss') }} because {{ slotProps.data.deletedReason }}</span>
+                            <span class="p-column-title" v-else>Products</span>
+                            {{
+                                slotProps.data.deliveryProducts
+                                    .map((d: DeliveryProduct) => d.product.name + ': ' + d.qty)
+                                    .sort()
+                                    .join(', ')
+                            }}
                         </template>
                     </Column>
                     <Column field="customer.zone" header="Zone" sortable>
@@ -177,7 +183,7 @@ const preSave = function () {
                 </DataTable>
 
                 <Dialog v-model:visible="showDialog" :style="{ width: '60rem' }" :header="dialog" :modal="true" class="p-fluid" v-if="'undefined' !== typeof single">
-                   <DeliveryForm :single="single" :is-invalid="isInvalid" :customers="customers" :products="products" />
+                    <DeliveryForm :single="single" :is-invalid="isInvalid" :customers="customers" :products="products" />
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
@@ -189,10 +195,11 @@ const preSave = function () {
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                         <span v-if="single">Are you sure you want to delete this?</span>
+                        <InputText v-model="deleteReason" placeholder="Reason" />
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteData" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="() => deleteData(deleteReason)" />
                     </template>
                 </Dialog>
 

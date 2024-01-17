@@ -208,6 +208,15 @@ const emptyDelivery = async function(delivery: Delivery) {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
 };
 
+const deleteDelivery = async function(delivery: Delivery) {
+    if(undefined === delivery.id){
+        alert('error');
+        return;
+    }
+    const reason = prompt('Reason for deletion');
+    await deliveryService.delete(delivery, reason ?? '');
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
+}
 </script>
 
 <template>
@@ -241,7 +250,7 @@ const emptyDelivery = async function(delivery: Delivery) {
                                     <CustomerMenu 
                                         :change="() => changeDelivery(customerData.delivery)"
                                         :empty="() => emptyDelivery(customerData.delivery)"
-                                        :remove="() => form.value?.remove()"
+                                        :remove="() => deleteDelivery(customerData.delivery)"
                                     />
                                     <p class="px-1">
                                         {{ customerName }}: {{ customerTotal(customerData.products) }}

@@ -4,7 +4,7 @@ interface DataService {
     post<T>(url: string, postData: object): Promise<T>
     put<T>(url: string, postData: object): Promise<T>
     get<T>(url: string): Promise<T>
-    delete<T>(url: string): Promise<T>
+    delete<T>(url: string, postData?: object): Promise<T>
     token: string | null
 }
 
@@ -59,8 +59,8 @@ const service: DataService = {
     async get<T>(url: string): Promise<T> {
         return helper.call(url, 'GET');
     },
-    async delete<T>(url: string): Promise<T> {
-        return await helper.call(url, 'DELETE');
+    async delete<T>(url: string, postData?: object): Promise<T> {
+        return await helper.call(url, 'DELETE', postData);
     },
     token: null
 }
