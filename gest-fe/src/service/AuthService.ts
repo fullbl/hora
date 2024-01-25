@@ -31,7 +31,7 @@ const service: AuthService = {
     logout() {
         localStorage.removeItem('token')
         this.user = null
-
+        window.location.href = ''
     },
     async login(username, password) {
         try {

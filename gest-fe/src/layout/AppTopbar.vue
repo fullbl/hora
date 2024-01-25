@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { useLayout } from '@/layout/composables/layout';
+import authService from '@/service/AuthService';
 
 const { onMenuToggle, contextPath } = useLayout();
+const logout = () => {
+    authService.logout();
+};
 
 const logoUrl = `${contextPath}layout/images/logo-dark.svg`;
 </script>
@@ -13,9 +17,15 @@ const logoUrl = `${contextPath}layout/images/logo-dark.svg`;
             <span>Hora</span>
         </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button>
+        <div class="flex justify-content-between w-full">
+            <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+                <i class="pi pi-bars"></i>
+            </button>
+
+            <button class="p-link layout-menu-button layout-topbar-button" @click="logout()">
+                <i class="pi pi-sign-out"></i>
+            </button>
+        </div>
     </div>
 </template>
 

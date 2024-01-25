@@ -188,7 +188,7 @@ const emptyDelivery = async function(delivery: Delivery) {
         return;
     }
     const freeDelivery = freeDeliveries.value.find(Boolean);
-    const products = [...delivery.deliveryProducts, ...freeDelivery?.deliveryProducts ?? []];
+    const products = [...delivery.deliveryProducts, ...(freeDelivery?.deliveryProducts ?? [])];
     await deliveryService.move(
         delivery, 
         [
