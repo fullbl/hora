@@ -9,6 +9,7 @@ interface DataService {
 }
 
 const helper = {
+    refresh: false,
     getHeaders() {
         const headers: HeadersInit = {
             "Content-Type": "application/json",
@@ -25,22 +26,39 @@ const helper = {
             headers: this.getHeaders(),
             body: null as string | null
         };
+        
         if (postData) {
             options.body = JSON.stringify(postData)
         }
         try {
             const res: Response = await fetch(url, options)
-            const data = await res.json()
+            let data = await res.json()
             if (!res.ok) {
                 if (data.hasOwnProperty('message') && 'Expired JWT Token' === data.message) {
-                    authService.logout()
+                    if(this.refresh){
+                        alert('Expired token')
+                        authService.logout()
+                        return {} as T
+                    }
+                    this.refresh = true
+                    if(await authService.refresh()){
+                        this.refresh = false
+                        data = await helper.call(url, method, postData)
+                    }
+                    else{
+                        authService.logout()
+                        return {} as T
+                    }
                 }
-                throw data as object
+                else {
+                    throw data as object
+                }
             }
             return data as T;
         }
         catch (e) {
             if (e.hasOwnProperty('message') && 'NetworkError when attempting to fetch resource.' === e.message) {
+                alert('Could not connect to the server. Please try again later.')
                 authService.logout()
             }
             throw e

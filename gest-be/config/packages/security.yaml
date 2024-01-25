@@ -11,22 +11,22 @@ security:
                 class: App\Entity\User
                 property: username
     firewalls:
-        login:
-            pattern: ^/login
+        main:
             stateless: true
+            provider: app_user_provider
+            entry_point: jwt
+            jwt: ~
             json_login:
                 check_path: login
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
-        main:
-            stateless: true
-            provider: app_user_provider
-            jwt: ~
+            refresh_jwt:
+                check_path: gesdinet_jwt_refresh_token
 
     access_control:
         - { path: ^/,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/refresh_token, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/ha, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
     role_hierarchy:
