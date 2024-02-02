@@ -1,4 +1,5 @@
 import type {Step} from "./step";
+import type Zone from "./zone";
 
 export interface Product {
     id?: number,
@@ -8,7 +9,8 @@ export interface Product {
     days: number,
     price?: number,
     steps?: Step[],
-    weight: boolean
+    weight: boolean,
+    zones: Zone[],
 }
 
 export interface WaterBox extends Product {

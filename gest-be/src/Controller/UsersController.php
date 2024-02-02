@@ -28,7 +28,7 @@ class UsersController extends AbstractController
     #[Route('users', methods: ['GET'], name: 'users_list')]
     public function list(): JsonResponse
     {
-        return $this->json($this->repo->findAll());
+        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'user-list']);
     }
 
     #[Route('users', methods: ['POST'], name: 'user_create')]
@@ -52,7 +52,7 @@ class UsersController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($user);
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user-list']);
     }
 
     #[Route('users/{id}', methods: ['GET'], name: 'users_show')]
@@ -98,7 +98,7 @@ class UsersController extends AbstractController
                 Response::HTTP_INTERNAL_SERVER_ERROR,
             );
         }
-        return $this->json($user);
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => 'user-list']);
     }
 
     #[Route('users/{id}', methods: ['DELETE'], name: 'user_delete')]

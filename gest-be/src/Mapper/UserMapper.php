@@ -3,12 +3,17 @@
 namespace App\Mapper;
 
 use App\Entity\User;
+use App\Entity\Zone;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserMapper
 {
-    public function __construct(private UserPasswordHasherInterface $hasher)
+    public function __construct(
+        private UserPasswordHasherInterface $hasher,
+        private EntityManagerInterface $em
+    )
     {
     }
 
@@ -24,6 +29,19 @@ class UserMapper
             $user->setPassword($this->hasher->hashPassword($user, $data['password']));
         }
 
+        foreach($user->getZones() as $zone) {
+            if(!in_array($zone->getId(), array_column($data['zones'], 'id'))) {
+                $user->removeZone($zone);
+            }
+        }
+        foreach($data['zones'] as $zoneData) {
+            if(!isset($zoneData['id'])) {
+                continue;
+            }
+            $zone = $this->em->find(Zone::class, $zoneData['id']);
+            $user->addZone($zone);
+        }
+
         return $user
             ->setUsername($data['username'])
             ->setVatNumber($data['vatNumber'])
@@ -33,8 +51,6 @@ class UserMapper
             ->setFullName($data['fullName'])
             ->setRoles($data['roles'])
             ->setStatus($data['status'])
-            ->setZone($data['zone'] ?? null)
-            ->setSubZone($data['subZone'] ?? null)
         ;
     }
 }

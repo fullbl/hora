@@ -32,57 +32,61 @@ class Product
         self::TYPE_EXTRA,
     ];
 
-    #[Groups(['activity-list', 'delivery-list', 'product', 'product-edit', 'delivery-dash'])]
+    #[Groups(['activity-list', 'delivery-list', 'product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['delivery-list', 'product', 'product-edit', 'delivery-dash'])]
+    #[Groups(['delivery-list', 'product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(length: 100)]
     #[Assert\Length(max: 100)]
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[Groups(['product', 'product-edit', 'delivery-dash'])]
+    #[Groups(['product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(length: 15)]
     #[Assert\Choice(self::TYPES)]
     #[Assert\NotNull]
     private ?string $type = null;
     
-    #[Groups(['product', 'product-edit', 'delivery-dash'])]
+    #[Groups(['product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull(groups: ['seeds'])]
     private ?int $decigrams = null;
     
-    #[Groups(['product', 'product-edit'])]
+    #[Groups(['product-list', 'product-edit'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull(groups: ['seeds'])]
     private ?int $days = null;
     
-    #[Groups(['delivery-list', 'product', 'product-edit'])]
+    #[Groups(['delivery-list', 'product-list', 'product-edit'])]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
     
-    #[Groups(['product', 'delivery-dash'])]
+    #[Groups(['product-list', 'delivery-dash'])]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['sort' => 'ASC'])]
     private Collection $steps;
     
-    #[Groups(['delivery-list', 'product', 'product-edit', 'delivery-dash'])]
+    #[Groups(['delivery-list', 'product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(options: ['default' => false])]
     private bool $weight = false;
 
+    #[Groups(['product-list', 'product-edit'])]
+    #[ORM\ManyToMany(targetEntity: Zone::class)]
+    private Collection $zones;
 
     public function __construct()
     {
         $this->steps = new ArrayCollection();
+        $this->zones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -197,6 +201,30 @@ class Product
     public function setWeight(bool $weight): static
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Zone>
+     */
+    public function getZones(): Collection
+    {
+        return $this->zones;
+    }
+
+    public function addZone(Zone $zone): static
+    {
+        if (!$this->zones->contains($zone)) {
+            $this->zones->add($zone);
+        }
+
+        return $this;
+    }
+
+    public function removeZone(Zone $zone): static
+    {
+        $this->zones->removeElement($zone);
 
         return $this;
     }

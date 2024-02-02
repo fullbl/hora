@@ -1,3 +1,5 @@
+import type Zone from "./zone";
+
 export default interface User {
     id?: number,
     roles: Array<string>,
@@ -15,5 +17,6 @@ export default interface User {
     sdi?: string,
     zone?: string,
     subZone?: string,
-    discount: number
+    discount: number,
+    zones: Array<Zone>
 }

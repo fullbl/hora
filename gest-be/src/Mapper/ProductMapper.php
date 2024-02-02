@@ -4,8 +4,8 @@ namespace App\Mapper;
 
 use App\Entity\Product;
 use App\Entity\Step;
+use App\Entity\Zone;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -36,13 +36,29 @@ class ProductMapper
                 AbstractNormalizer::GROUPS => ['product-edit'],
             ]
         );
-        foreach ($newProduct->getSteps()->filter(function (Step $step) use ($data): bool {
+
+        foreach($newProduct->getZones() as $zone) {
+            if(!in_array($zone->getId(), array_column($data['zones'], 'id'))) {
+                $product->removeZone($zone);
+            }
+        }
+        foreach($data['zones'] as $zoneData) {
+            if(!isset($zoneData['id'])) {
+                continue;
+            }
+            $zone = $this->em->find(Zone::class, $zoneData['id']);
+            $newProduct->addZone($zone);
+        }
+
+
+        $steps = $newProduct->getSteps()->filter(function (Step $step) use ($data): bool {
             $stepKey = array_search($step->getId(), array_column($data['steps'], 'id'), true);
             if (false === $stepKey) {
                 return true;
             }
             return $data['steps'][$stepKey]['sort'] !== $step->getSort();
-        }) as $step) {
+        });
+        foreach ($steps as $step) {
             $newProduct->removeStep($step);
         }
         

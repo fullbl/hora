@@ -33,7 +33,7 @@ class ProductsController extends AbstractController
             ['type' => Product::TYPE_WATER_BOX],
             ['name' => 'ASC']
         ), Response::HTTP_OK, [], [
-            'groups' => 'product'
+            'groups' => 'product-list'
         ]);
     }
 
@@ -44,7 +44,7 @@ class ProductsController extends AbstractController
             ['type' => Product::TYPE_SEED],
             ['name' => 'ASC']
         ), Response::HTTP_OK, [], [
-            'groups' => 'product'
+            'groups' => 'product-list'
         ]);
     }
 
@@ -62,7 +62,7 @@ class ProductsController extends AbstractController
             Response::HTTP_OK,
             [],
             [
-                'groups' => 'product'
+                'groups' => 'product-list'
             ]
         );
     }
@@ -71,7 +71,7 @@ class ProductsController extends AbstractController
     public function list(): JsonResponse
     {
         return $this->json($this->repo->findAll(), Response::HTTP_OK, [], [
-            'groups' => 'product'
+            'groups' => 'product-list'
         ]);
     }
 
@@ -97,7 +97,7 @@ class ProductsController extends AbstractController
             );
         }
         return $this->json($product, Response::HTTP_OK, [], [
-            'groups' => 'product'
+            'groups' => 'product-list'
         ]);
     }
 
@@ -111,7 +111,7 @@ class ProductsController extends AbstractController
         }
 
         return $this->json($product, Response::HTTP_OK, [], [
-            'groups' => 'product'
+            'groups' => 'product-list'
         ]);
     }
 
@@ -148,7 +148,7 @@ class ProductsController extends AbstractController
             );
         }
         return $this->json($product, Response::HTTP_OK, [], [
-            'groups' => 'product'
+            'groups' => 'product-list'
         ]);
     }
 

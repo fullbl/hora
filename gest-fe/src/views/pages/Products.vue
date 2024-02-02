@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import productService from '@/service/ProductService';
+import zoneService from '@/service/ZoneService';
 import { useDataView } from '../composables/dataView';
-import {  ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Logger from '@/components/Logger.vue';
 import Extra from './products/Extra.vue';
 import Seed from './products/Seed.vue';
-import type {Step} from '@/interfaces/step';
+import type { Step } from '@/interfaces/step';
+import type Zone from '@/interfaces/zone';
 
-const { filters, data, single, save, openNew, editData, 
-    dialog, hideDialog, showDialog, deleteDialog, 
-    confirmDelete, deleteData, isInvalid } = useDataView(productService);
+const { filters, data, single, save, openNew, editData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(productService);
 
+const zones = ref<Array<Zone>>([]);
+onMounted(async () => {
+    zones.value = await zoneService.getAll();
+});
 const logEntity = ref(null);
 
 const types = [
@@ -23,8 +27,6 @@ const types = [
     { label: 'Shipping box', value: 'shipping_box' },
     { label: 'Extra', value: 'extra' }
 ];
-
-
 </script>
 
 <template>
@@ -71,6 +73,24 @@ const types = [
                         <template #body="slotProps">
                             <span class="p-column-title">Name</span>
                             {{ slotProps.data.name }}
+                        </template>
+                    </Column>
+                    <Column field="zones" header="Zones" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <template #body="slotProps">
+                            <span class="p-column-title">Zones</span>
+                            {{
+                                slotProps.data.zones
+                                    .filter((zone: Zone) => null === zone.parent)
+                                    .map((zone: Zone) => zone.name)
+                                    .join(',')
+                            }}
+                            <br />
+                            {{
+                                slotProps.data.zones
+                                    .filter((zone: Zone) => null !== zone.parent)
+                                    .map((zone: Zone) => zone.name)
+                                    .join(',')
+                            }}
                         </template>
                     </Column>
                     <Column field="type" header="Type" sortable>
@@ -125,23 +145,23 @@ const types = [
                 </DataTable>
 
                 <Dialog v-model:visible="showDialog" v-if="single" style="width: 40rem" :header="dialog" :modal="true" class="p-fluid">
-                    <div class="formgrid grid">
-                        <div class="field col-6">
-                            <label for="name">Name</label>
-                            <InputText id="name" v-model.trim="single.name" required="true" autofocus :class="{ 'p-invalid': isInvalid('name') }" />
-                        </div>
-    
-                        <div class="field col-6">
-                            <label for="type">Type</label>
-                            <Dropdown id="type" v-model="single.type" :options="types" 
-                                optionLabel="label" optionValue="value" 
-                                placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }" />
-                        </div>
+                    <div class="field">
+                        <label for="name">Name</label>
+                        <InputText id="name" v-model.trim="single.name" required="true" autofocus :class="{ 'p-invalid': isInvalid('name') }" />
+                    </div>
+
+                    <div class="field">
+                        <label for="zone">Zones</label>
+                        <MultiSelect id="zone" v-model="single.zones" :options="zones" :optionLabel="(c) => c.name + (c.parent ? ' (' + c.parent.name + ')' : '')" placeholder="Select a Zone" />
+                    </div>
+
+                    <div class="field">
+                        <label for="type">Type</label>
+                        <Dropdown id="type" v-model="single.type" :options="types" optionLabel="label" optionValue="value" placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }" />
                     </div>
 
                     <Seed v-if="'seeds' === single.type" :seed="single" :isInvalid="isInvalid" />
                     <Extra v-if="'extra' === single.type" :extra="single" :isInvalid="isInvalid" />
-                    
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />

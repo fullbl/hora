@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import userService from '@/service/UserService';
+import zoneService from '@/service/ZoneService';
 import { useDataView } from '../composables/dataView';
 import Logger from '@/components/Logger.vue';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import type Zone from '@/interfaces/zone';
+
 const { filters, data, single, save, openNew, editData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(userService);
 const roles = [
     { label: 'Admin', value: 'ROLE_ADMIN' },
@@ -13,6 +16,11 @@ const statuses = [
     { label: 'Active', value: 'active' },
     { label: 'Inactive', value: 'inactive' }
 ];
+const zones = ref<Array<Zone>>([]);
+onMounted(async () => {
+    zones.value = await zoneService.getAll();
+});
+
 const logEntity = ref(null);
 </script>
 
@@ -56,46 +64,17 @@ const logEntity = ref(null);
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column field="username" header="Username" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Username</span>
-                            {{ slotProps.data.username }}
-                        </template>
-                    </Column>
                     <Column field="fullName" header="Full Name" :sortable="true" headerStyle="width:14%; min-width:8rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">Full Name</span>
                             {{ slotProps.data.fullName }}
                         </template>
                     </Column>
-                    <Column field="email" header="E-mail" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                    <Column field="zones" header="Zones" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
-                            <span class="p-column-title">E-mail</span>
-                            {{ slotProps.data.email }}
-                        </template>
-                    </Column>
-                    <Column field="vatNumber" header="VAT Number" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">VAT Number</span>
-                            {{ slotProps.data.vatNumber }}
-                        </template>
-                    </Column>
-                    <Column field="sdi" header="Sdi" :sortable="true" headerStyle="width:10%; min-width:5rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Sdi</span>
-                            {{ slotProps.data.sdi }}
-                        </template>
-                    </Column>
-                    <Column field="zone" header="Zone" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Zone</span>
-                            {{ slotProps.data.zone }}
-                        </template>
-                    </Column>
-                    <Column field="subZone" header="SubZone" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">SubZone</span>
-                            {{ slotProps.data.subZone }}
+                            <span class="p-column-title">Zones</span>
+                            {{ slotProps.data.zones.filter((zone: Zone) => null === zone.parent).map((zone: Zone) => zone.name).join(',') }} <br>
+                            {{ slotProps.data.zones.filter((zone: Zone) => null !== zone.parent).map((zone: Zone) => zone.name).join(',') }}
                         </template>
                     </Column>
                     <Column field="roles" header="Roles" headerStyle="width:14%; min-width:10rem;">
@@ -156,13 +135,8 @@ const logEntity = ref(null);
                     </div>
 
                     <div class="field">
-                        <label for="zone">Zone</label>
-                        <InputText id="zone" v-model="single.zone" :class="{ 'p-invalid': isInvalid('zone') }" />
-                    </div>
-
-                    <div class="field">
-                        <label for="subZone">SubZone</label>
-                        <InputText id="subZone" v-model="single.subZone" :class="{ 'p-invalid': isInvalid('subZone') }" />
+                        <label for="zone">Zones</label>
+                        <MultiSelect id="zone" v-model="single.zones" :options="zones" :optionLabel="(c) => c.name + (c.parent ? ' (' + c.parent.name + ')' : '')" placeholder="Select a Zone" />
                     </div>
 
                     <div class="field">

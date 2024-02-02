@@ -59,7 +59,6 @@ const helper = {
         catch (e) {
             if (e.hasOwnProperty('message') && 'NetworkError when attempting to fetch resource.' === e.message) {
                 alert('Could not connect to the server. Please try again later.')
-                authService.logout()
             }
             throw e
         }

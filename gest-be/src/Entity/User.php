@@ -26,17 +26,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         self::STATUS_INACTIVE
     ];
 
-    #[Groups(['delivery-list'])]
+    #[Groups(['user-list', 'delivery-list'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['user-list'])]
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\Length(max: 180)]
     #[Assert\NotNull]
     private ?string $username = null;
 
+    #[Groups(['user-list'])]
     #[ORM\Column]
     private array $roles = [];
 
@@ -45,25 +47,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private ?string $password = null;
 
+    #[Groups(['user-list'])]
     #[ORM\Column(length: 10)]
     #[Assert\Choice(self::STATUSES)]
     #[Assert\NotNull]
     private ?string $status = null;
 
-    #[Groups(['delivery-list', 'delivery-dash'])]
+    #[Groups(['user-list', 'delivery-list', 'delivery-dash'])]
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
     #[Assert\NotNull]
     private ?string $fullName = null;
 
+    #[Groups(['user-list'])]
     #[ORM\Column(length: 15)]
     #[Assert\Length(max: 15)]
     private ?string $vatNumber = null;
 
+    #[Groups(['user-list'])]
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
     private ?string $email = null;
 
+    #[Groups(['user-list'])]
     #[ORM\Column(length: 255)]
     #[Assert\Length(max: 255)]
     private ?string $address = null;
@@ -75,31 +81,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'prisoner', targetEntity: Suspension::class, orphanRemoval: true)]
     private Collection $suspensions;
 
+    #[Groups(['user-list'])]
     #[ORM\Column(length: 7, nullable: true)]
     #[Assert\Length(max: 7)]
     private ?string $sdi = null;
-
-    #[Groups(['delivery-list', 'delivery-dash'])]
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(max: 50)]
-    private ?string $zone = null;
     
-    #[Groups(['delivery-list', 'delivery-dash'])]
-    #[ORM\Column(length: 50, nullable: true)]
-    #[Assert\Length(max: 50)]
-    private ?string $subZone = null;
-    
-    #[Groups(['delivery-list'])]
+    #[Groups(['user-list', 'delivery-list'])]
     #[ORM\Column(options: ['default' => 0])]
     #[Assert\Type('integer')]
     #[Assert\GreaterThanOrEqual(0)]
     #[Assert\NotNull]
     private int $discount = 0;
 
+    #[Groups(['user-list', 'delivery-list'])]
+    #[ORM\ManyToMany(targetEntity: Zone::class)]
+    private Collection $zones;
+
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
         $this->suspensions = new ArrayCollection();
+        $this->zones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -302,30 +304,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getZone(): ?string
-    {
-        return $this->zone;
-    }
-
-    public function setZone(?string $zone): self
-    {
-        $this->zone = $zone;
-
-        return $this;
-    }
-
-    public function getSubZone(): ?string
-    {
-        return $this->subZone;
-    }
-
-    public function setSubZone(?string $subZone): self
-    {
-        $this->subZone = $subZone;
-
-        return $this;
-    }
-
     public function getDiscount(): int
     {
         return $this->discount;
@@ -337,4 +315,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Zone>
+     */
+    public function getZones(): Collection
+    {
+        return $this->zones;
+    }
+
+    public function addZone(Zone $zone): static
+    {
+        if (!$this->zones->contains($zone)) {
+            $this->zones->add($zone);
+        }
+
+        return $this;
+    }
+
+    public function removeZone(Zone $zone): static
+    {
+        $this->zones->removeElement($zone);
+
+        return $this;
+    }
+
 }

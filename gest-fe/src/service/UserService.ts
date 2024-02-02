@@ -27,7 +27,8 @@ const service: Service<User> = {
             address: '',
             discount: 0,
             deliveries: [],
-            suspensions: []
+            suspensions: [],
+            zones: [],
         };
     }
 };
