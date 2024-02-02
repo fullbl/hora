@@ -69,7 +69,7 @@ class DeliveryRepository extends ServiceEntityRepository
         $rsm->addRootEntityFromClassMetadata(Delivery::class, 'd');
         $rsm->addScalarResult('max_delivery', 'max_delivery', Types::DATE_IMMUTABLE);
 
-        $join = 'LEFT JOIN (
+        $join = ' LEFT JOIN (
             SELECT
                 dd.id,
                 MAX(dd.delivery_date) OVER (PARTITION BY dd.customer_id) AS max_delivery
@@ -77,7 +77,7 @@ class DeliveryRepository extends ServiceEntityRepository
                 delivery dd
         ) rd ON d.id = rd.id';
 
-        $where = 'd.deleted_at IS NULL AND d.delivery_date BETWEEN :from AND :to';
+        $where = ' d.deleted_at IS NULL AND d.delivery_date BETWEEN :from AND :to';
 
         $parameters = [
             'from' => $from->format('Y-m-d'),
@@ -86,7 +86,7 @@ class DeliveryRepository extends ServiceEntityRepository
 
 
         if (null !== $zones) {
-            $join .= ' LEFT JOIN user_zone uz ON d.customer_id = uz.user_id ';
+            $join .= ' LEFT JOIN user_zone uz ON d.customer_id = uz.user_id';
             $where .= ' AND uz.zone_id IN (:zones) ';
             $parameters['zones'] = $zones->map(fn (Zone $z) => $z->getId())->toArray();
         }
@@ -96,9 +96,9 @@ class DeliveryRepository extends ServiceEntityRepository
             d.*,
             rd.max_delivery
         FROM
-            delivery d '
+            delivery d'
                 . $join .
-                'WHERE ' . $where,
+                ' WHERE' . $where,
             $rsm
         );
 

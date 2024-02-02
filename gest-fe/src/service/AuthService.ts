@@ -63,7 +63,7 @@ const service: AuthService = {
             return false;
         }
 
-        return this.user.roles.includes('ROLE_ADMIN') || this.user.roles.includes(role);
+        return this.user.roles.includes('ROLE_SUPER_ADMIN') || (this.user.roles.includes('ROLE_ADMIN') && 'ROLE_OPERATOR' === role) || this.user.roles.includes(role);
     }
 };
 

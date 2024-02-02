@@ -12,10 +12,10 @@ export default [
         meta: { auth: 'ROLE_ADMIN' }
     },
     {
-        path: '/orders',
-        name: 'orders',
-        component: () => import('@/views/pages/Orders.vue'),
-        meta: { auth: 'ROLE_ADMIN' }
+        path: '/zones',
+        name: 'zones',
+        component: () => import('@/views/pages/Zones.vue'),
+        meta: { auth: 'ROLE_SUPER_ADMIN' }
     },
     {
         path: '/deliveries',

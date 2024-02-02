@@ -28,6 +28,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
     if ('undefined' !== typeof to.meta.auth && !authService.isGranted(to.meta.auth)) {
+        alert('You are not allowed to access this page');
         return { name: 'login' };
     }
 });

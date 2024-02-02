@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Entity\Zone;
 use App\Repository\ZoneRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +20,25 @@ class ZonesController extends AbstractController
     #[Route('/zones', name: 'zones')]
     public function index(): JsonResponse
     {
-        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'zone-list']);
+        /** @var User $user */
+        $user = $this->getUser();
+        if (null === $user) {
+            return $this->json(
+                ['error' => 'not found'],
+                Response::HTTP_FORBIDDEN,
+            );
+        }
+        if($this->isGranted('ROLE_SUPER_ADMIN')){
+            $zones = $this->repo->findAll();
+        }
+        else{
+            $zones = $user->getZones();
+            $zones = array_merge(
+                $zones->toArray(),
+                ... $zones->map(fn (Zone $zone) => $zone->getSubZones()->toArray())->toArray()
+            );
+        }
+
+        return $this->json($zones, Response::HTTP_OK, [], ['groups' => 'zone-list']);
     }
 }
