@@ -70,7 +70,22 @@ class ProductsController extends AbstractController
     #[Route('/products', methods: ['GET'], name: 'products_list')]
     public function list(): JsonResponse
     {
-        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], [
+        /** @var User $user */
+        $user = $this->getUser();
+        if (null === $user) {
+            return $this->json(
+                ['error' => 'not found'],
+                Response::HTTP_FORBIDDEN,
+            );
+        }
+
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+            $products = $this->repo->findAll();
+        } else {
+            $products = $this->repo->findAllFiltered($user->getZones());
+        }
+
+        return $this->json($products, Response::HTTP_OK, [], [
             'groups' => 'product-list'
         ]);
     }

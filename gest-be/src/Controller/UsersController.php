@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Mapper\UserMapper;
 use App\Repository\LogRepository;
 use App\Repository\UserRepository;
@@ -28,7 +29,23 @@ class UsersController extends AbstractController
     #[Route('users', methods: ['GET'], name: 'users_list')]
     public function list(): JsonResponse
     {
-        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'user-list']);
+        /** @var User $user */
+        $user = $this->getUser();
+        if (null === $user) {
+            return $this->json(
+                ['error' => 'not found'],
+                Response::HTTP_FORBIDDEN,
+            );
+        }
+
+        if($this->isGranted('ROLE_SUPER_ADMIN')){
+            $users = $this->repo->findAll();
+        }
+        else{
+            $users = $this->repo->findAllFiltered($user->getZones());
+        }
+
+        return $this->json($users, Response::HTTP_OK, [], ['groups' => 'user-list']);
     }
 
     #[Route('users', methods: ['POST'], name: 'user_create')]

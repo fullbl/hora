@@ -15,8 +15,6 @@ export default interface User {
     deliveries: Array<unknown>,
     suspensions: Array<unknown>,
     sdi?: string,
-    zone?: string,
-    subZone?: string,
     discount: number,
     zones: Array<Zone>
 }

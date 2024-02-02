@@ -14,6 +14,7 @@ import type { Delivery } from '@/interfaces/delivery';
 import Logger from '@/components/Logger.vue';
 import dayjs from 'dayjs';
 import DeliveryForm from '@/components/forms/DeliveryForm.vue';
+import type Zone from '@/interfaces/zone';
 
 const { filters, data: _data, single, save, openNew: _openNew, editData: _editData, cloneData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(deliveryService);
 
@@ -148,16 +149,11 @@ const deleteReason = ref('');
                             }}
                         </template>
                     </Column>
-                    <Column field="customer.zone" header="Zone" sortable>
+                    <Column field="customer.zones" header="Zones" sortable>
                         <template #body="slotProps">
-                            <span class="p-column-title">Zone</span>
-                            {{ slotProps.data.customer?.zone }}
-                        </template>
-                    </Column>
-                    <Column field="customer.subZone" header="SubZone" sortable>
-                        <template #body="slotProps">
-                            <span class="p-column-title">SubZone</span>
-                            {{ slotProps.data.customer?.subZone }}
+                            <span class="p-column-title">Zones</span>
+                            {{ slotProps.data.customer.zones.filter((zone: Zone) => null === zone.parent).map((zone: Zone) => zone.name).join(',') }} <br>
+                            {{ slotProps.data.customer.zones.filter((zone: Zone) => null !== zone.parent).map((zone: Zone) => zone.name).join(',') }}
                         </template>
                     </Column>
                     <Column field="price" header="Price">

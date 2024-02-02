@@ -11,17 +11,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 class Zone
 {
-    #[Groups(['zone-list', 'product-list', 'user-list'])]
+    #[Groups(['zone-list', 'product-list', 'user-list', 'delivery-list', 'delivery-dash'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['zone-list', 'product-list', 'user-list'])]
+    #[Groups(['zone-list', 'product-list', 'user-list', 'delivery-list', 'delivery-dash'])]
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
-    #[Groups(['zone-list', 'product-list', 'user-list'])]
+    #[Groups(['zone-list', 'product-list', 'user-list', 'delivery-list', 'delivery-dash'])]
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'subzones')]
     private ?self $parent = null;
 

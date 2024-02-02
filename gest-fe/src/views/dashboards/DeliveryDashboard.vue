@@ -14,6 +14,7 @@ import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
 import DeliveryChangeForm from '@/components/forms/DeliveryChangeForm.vue';
 import CustomerMenu from '@/components/CustomerMenu.vue';
+import type Zone from '@/interfaces/zone';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -43,133 +44,68 @@ const save = async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     hideDialog();
 };
+const dayTotals = ref({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0} as Record<number, number>);
+const dayTotalsWithoutExtra = ref({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0} as Record<number, number>);
+const weekTotal = ref(0);
+const weekTotalWithoutExtra = ref(0);
+const deliveryGroups = ref(
+    {
+        0: new Map(), 1: new Map(), 2: new Map(), 3: new Map(), 4: new Map(), 5: new Map(), 6: new Map()
+    } as Record<number, Map<string, {total: number, subZones: Map<string, {total: number, products: Map<string, number>, customers: Map<string, {total: number, products: Map<string, number>, delivery: Delivery}>}>}>>);
+
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     activities.value = await activityService.getAll();
-});
 
-const deliveryGroups = computed(() => {
-    return deliveries.value.reduce(function (x, delivery) {
-        if (!x.has(delivery.deliveryDate.weekday())) {
-            x.set(delivery.deliveryDate.weekday(), new Map());
-        }
+    for (const delivery of deliveries.value) {
         if (delivery.deliveryDate.year() !== year.value || delivery.deliveryDate.week() !== week.value) {
-            return x;
+            continue;
         }
 
-        const weekDay = x.get(delivery.deliveryDate.weekday());
-        if (undefined === weekDay) {
-            return x;
-        }
-        if (!weekDay.has(delivery.customer?.zone ?? '')) {
-            weekDay.set(delivery.customer?.zone ?? '', new Map());
-        }
-        const zone = weekDay.get(delivery.customer?.zone ?? '');
-        if (undefined === zone) {
-            return x;
-        }
-        if (!zone.has(delivery.customer?.subZone ?? '')) {
-            zone.set(delivery.customer?.subZone ?? '', new Map());
-        }
+        const weekday = delivery.deliveryDate.weekday();
+        const zone = delivery.customer?.zones.find((z) => z.parent !== null)?.name ?? 'EXTRA';
+        const subZone = delivery.customer?.zones.find((z) => z.parent === null)?.name ?? 'EXTRA';
 
-        const subZone = zone.get(delivery.customer?.subZone ?? '');
-        if (undefined === subZone) {
-            return x;
+        let zoneGroup = deliveryGroups.value[weekday].get(zone);
+        if (undefined === zoneGroup) {
+            zoneGroup = {total: 0, subZones: new Map()};
         }
-        if (!subZone.has(delivery.customer?.fullName ?? 'EXTRA')) {
-            subZone.set(delivery.customer?.fullName ?? 'EXTRA', {
-                delivery: delivery,
-                products: new Map()                
-            });
+        let subZoneGroup = zoneGroup.subZones.get(subZone);
+        if (undefined === subZoneGroup) {
+            subZoneGroup = {total: 0, products: new Map(), customers: new Map()};
         }
-        const customer = subZone.get(delivery.customer?.fullName ?? 'EXTRA');
 
         for (const dp of delivery.deliveryProducts) {
-            customer?.products.set(dp.product.name, {
-                qty: (customer.products.get(dp.product.name)?.qty ?? 0) + dp.qty,
-                done: activities.value.filter((a) => a.delivery?.id === delivery.id && a.step.product?.id === dp.product.id && a.step.name === 'shipping' && a.year === year.value && a.week === week.value).reduce((i, dp) => i + dp.qty, 0),
-                delivery: delivery,
-                product: dp.product
-            });
-        }
-
-        return x;
-    }, new Map<number, Map<string, Map<string, Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>>>>());
-});
-
-const zoneTotals = function (customers: Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>) {
-    let totals = new Map();
-
-    customers.forEach(function (x) {
-        x.products.forEach(function (y, k) {
-            if (!totals.has(k)) {
-                totals.set(k, 0);
+            dayTotals.value[weekday] += dp.qty;
+            weekTotal.value += dp.qty;
+            zoneGroup.total += dp.qty;
+            subZoneGroup.total += dp.qty;
+            if(zone !== 'EXTRA'){
+                dayTotalsWithoutExtra.value[weekday] += dp.qty;
+                weekTotalWithoutExtra.value += dp.qty;
+            }
+            let product = subZoneGroup.products.get(dp.product.name);
+            if (undefined === product) {
+                product = 0;
             }
 
-            totals.set(k, totals.get(k) + y.qty);
-        });
-    });
-
-    return totals;
-};
-
-const customerTotal = function (products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }>) {
-    let totals = 0;
-
-    products.forEach(function (y, k) {
-        totals += y.qty;
-    });
-
-    return totals;
-};
-
-const subZoneTotal = function (customers: Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>, withExtra: boolean) {
-    let totals = 0;
-
-    customers.forEach(function (x) {
-        if (withExtra || x.delivery.customer) {
-            totals += customerTotal(x.products);
+            subZoneGroup.products.set(dp.product.name, product + dp.qty);
+            let customerGroup = subZoneGroup.customers.get(delivery.customer?.fullName ?? 'EXTRA');
+            if (undefined === customerGroup) {
+                customerGroup = {total: 0, products: new Map(), delivery: delivery};
+            }
+            customerGroup.total += dp.qty;
+            let customerProduct = customerGroup.products.get(dp.product.name);
+            if (undefined === customerProduct) {
+                customerProduct = 0;
+            }
+            customerGroup.products.set(dp.product.name, customerProduct + dp.qty);
+            subZoneGroup.customers.set(delivery.customer?.fullName ?? 'EXTRA', customerGroup);
         }
-    });
-
-    return totals;
-};
-
-const zoneTotal = function (subZones: Map<string, Map<string, { delivery: Delivery; products: Map<string, { qty: number; done: number; delivery: Delivery; product: Product }> }>>, withExtra: boolean) {
-    let totals = 0;
-
-    subZones.forEach(function (x) {
-        totals += subZoneTotal(x, withExtra);
-    });
-
-    return totals;
-};
-
-const dayTotal = function (weekDay: number, withExtra: boolean) {
-    let totals = 0;
-    const zones = deliveryGroups.value.get(weekDay);
-    if (undefined === zones) {
-        return 0;
+        
+        zoneGroup.subZones.set(subZone, subZoneGroup);
+        deliveryGroups.value[weekday].set(zone, zoneGroup);
     }
-
-    zones.forEach(function (x) {
-        totals += zoneTotal(x, withExtra);
-    });
-
-    return totals;
-};
-
-const weekTotal = computed(function () {
-    let totals = {
-        withExtra: 0,
-        withoutExtra: 0
-    };
-    for (let i = 0; i < 6; i++) {
-        totals.withExtra += dayTotal(i, true);
-        totals.withoutExtra += dayTotal(i, false);
-    }
-
-    return totals;
 });
 
 const getWarningClass = function (delivery: Delivery) {
@@ -224,7 +160,7 @@ const deleteDelivery = async function(delivery: Delivery) {
         <YearWeek v-model:year="year" v-model:week="week" />
     </div>
 
-    <div class="card">Week total: {{ weekTotal.withoutExtra }} ({{ weekTotal.withExtra }})</div>
+    <div class="card">Week total: {{ weekTotal }} ({{ weekTotalWithoutExtra }})</div>
 
     <Toast />
 
@@ -232,33 +168,32 @@ const deleteDelivery = async function(delivery: Delivery) {
         <div class="day">
             <div v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YY') }}</h5>
-                <b>Day total: {{ dayTotal(date.weekday(), true) }}</b>
+                <b>Day total: {{ dayTotals[date.weekday()] }} ({{ dayTotalsWithoutExtra[date.weekday()] }})</b>
 
                 <div>
-                    <Panel v-for="[zoneName, subZones] in deliveryGroups.get(date.weekday())" :pt="{ header: { title: zoneName + ': ' + zoneTotal(subZones, true) } }" :header="zoneName + ': ' + zoneTotal(subZones, true)" toggleable collapsed>
-                        <Panel v-for="[subZoneName, customers] in subZones" :pt="{ header: { title: subZoneName + ': ' + subZoneTotal(customers, true) } }" :header="subZoneName + ': ' + subZoneTotal(customers, true)" toggleable collapsed>
-                            <p v-for="[productName, qty] in Array.from(zoneTotals(customers)).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
+                    <Panel v-for="[zoneName, zoneGroup] in deliveryGroups[date.weekday()]" :pt="{ header: { title: zoneName + ': ' + zoneGroup.total } }" :header="zoneName + ': ' + zoneGroup.total" toggleable collapsed>
+                        <Panel v-for="[subZoneName, subZoneGroup] in zoneGroup.subZones" :pt="{ header: { title: subZoneName + ': ' + subZoneGroup.total } }" :header="subZoneName + ': ' + subZoneGroup.total" toggleable collapsed>
+                            <p v-for="[productName, qty] in Array.from(subZoneGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
                             <Panel
-                                v-for="[customerName, customerData] in customers"
-                                :pt="{ header: { title: customerName + ': ' + customerTotal(customerData.products) } }"
+                                v-for="[customerName, customerGroup] in subZoneGroup.customers"
+                                :pt="{ header: { title: customerName + ': ' + customerGroup.total } }"
                                 toggleable
                                 collapsed
                             >
                                 <template #header>
                                     <CustomerMenu 
-                                        :change="() => changeDelivery(customerData.delivery)"
-                                        :empty="() => emptyDelivery(customerData.delivery)"
-                                        :remove="() => deleteDelivery(customerData.delivery)"
+                                        :change="() => changeDelivery(customerGroup.delivery)"
+                                        :empty="() => emptyDelivery(customerGroup.delivery)"
+                                        :remove="() => deleteDelivery(customerGroup.delivery)"
                                     />
                                     <p class="px-1">
-                                        {{ customerName }}: {{ customerTotal(customerData.products) }}
+                                        {{ customerName }}: {{ customerGroup.total }}
                                     </p>
                                 </template>
-                                <p v-for="[productName, dp] in Array.from(customerData.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(dp.delivery)">
-                                    <QtyHolder :qty="dp.qty">{{ productName }}</QtyHolder>
-                                    <ProgressHolder :dp="dp" />
+                                <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(customerGroup.delivery)">
+                                    <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                                 </p>
                             </Panel>
                         </Panel>

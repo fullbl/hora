@@ -93,7 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private int $discount = 0;
 
-    #[Groups(['user-list', 'delivery-list'])]
+    #[Groups(['user-list', 'delivery-list', 'delivery-dash'])]
     #[ORM\ManyToMany(targetEntity: Zone::class)]
     private Collection $zones;
 

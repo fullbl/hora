@@ -4,8 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Delivery;
 use App\Entity\User;
+use App\Entity\Zone;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,6 +32,16 @@ class DeliveryRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    public function findAllFiltered(Collection $zones): array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.customer', 'c')
+            ->andWhere(':zones MEMBER OF c.zones')
+            ->setParameter('zones', $zones)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function save(Delivery $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
@@ -51,35 +63,46 @@ class DeliveryRepository extends ServiceEntityRepository
     /**
      * @return Delivery[]
      */
-    public function findNext(DateTimeImmutable $from, int $weeks): array
+    public function findNext(DateTimeImmutable $from, int $weeks, ?Collection $zones = null): array
     {
         $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata(Delivery::class, 'd');
         $rsm->addScalarResult('max_delivery', 'max_delivery', Types::DATE_IMMUTABLE);
+
+        $join = 'LEFT JOIN (
+            SELECT
+                dd.id,
+                MAX(dd.delivery_date) OVER (PARTITION BY dd.customer_id) AS max_delivery
+            FROM
+                delivery dd
+        ) rd ON d.id = rd.id';
+
+        $where = 'd.deleted_at IS NULL AND d.delivery_date BETWEEN :from AND :to';
+
+        $parameters = [
+            'from' => $from->format('Y-m-d'),
+            'to' => $from->modify('+' . $weeks . ' week')->format('Y-m-d'),
+        ];
+
+
+        if (null !== $zones) {
+            $join .= ' LEFT JOIN user_zone uz ON d.customer_id = uz.user_id ';
+            $where .= ' AND uz.zone_id IN (:zones) ';
+            $parameters['zones'] = $zones->map(fn (Zone $z) => $z->getId())->toArray();
+        }
 
         $query = $this->getEntityManager()->createNativeQuery(
             'SELECT
             d.*,
             rd.max_delivery
         FROM
-            delivery d
-        LEFT JOIN (
-            SELECT
-                dd.id,
-                MAX(dd.delivery_date) OVER (PARTITION BY dd.customer_id) AS max_delivery
-            FROM
-                delivery dd
-        ) rd ON d.id = rd.id
-        WHERE
-            d.deleted_at IS NULL AND
-            d.delivery_date BETWEEN :from AND :to',
+            delivery d '
+                . $join .
+                'WHERE ' . $where,
             $rsm
         );
 
-        $query->setParameters([
-            'from' => $from->format('Y-m-d'),
-            'to' => $from->modify('+' . $weeks . ' week')->format('Y-m-d'),
-        ]);
+        $query->setParameters($parameters);
 
         return array_map(
             /**

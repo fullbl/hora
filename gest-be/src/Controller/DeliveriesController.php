@@ -2,9 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Delivery;
-use App\Entity\DeliveryProduct;
-use App\Entity\Product;
 use App\Mapper\DeliveryMapper;
 use App\Mapper\DeliveryProductMapper;
 use App\Repository\DeliveryRepository;
@@ -35,13 +32,45 @@ class DeliveriesController extends AbstractController
     #[Route('/deliveries', methods: ['GET'], name: 'deliveries_list')]
     public function list(): JsonResponse
     {
-        return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'delivery-list']);
+        /** @var User $user */
+        $user = $this->getUser();
+        if (null === $user) {
+            return $this->json(
+                ['error' => 'not found'],
+                Response::HTTP_FORBIDDEN,
+            );
+        }
+
+        if($this->isGranted('ROLE_SUPER_ADMIN')){
+            $deliveries = $this->repo->findAll();
+        }
+        else{
+            $deliveries = $this->repo->findAllFiltered($user->getZones());
+        }
+
+        return $this->json($deliveries, Response::HTTP_OK, [], ['groups' => 'delivery-list']);
     }
     
     #[Route('/deliveries/{fromDate}', methods: ['GET'], name: 'deliveries_dashboard')]
     public function dashboard(\DateTimeImmutable $fromDate): JsonResponse
     {        
-        return $this->json($this->repo->findNext($fromDate, self::DASHBOARD_WEEKS), Response::HTTP_OK, [], ['groups' => 'delivery-dash']);
+        /** @var User $user */
+        $user = $this->getUser();
+        if (null === $user) {
+            return $this->json(
+                ['error' => 'not found'],
+                Response::HTTP_FORBIDDEN,
+            );
+        }
+
+        if($this->isGranted('ROLE_SUPER_ADMIN')){
+            $deliveries = $this->repo->findNext($fromDate, self::DASHBOARD_WEEKS);
+        }
+        else{
+            $deliveries = $this->repo->findNext($fromDate, self::DASHBOARD_WEEKS, $user->getZones());
+        }
+        
+        return $this->json($deliveries, Response::HTTP_OK, [], ['groups' => 'delivery-dash']);
     }
 
     #[Route('/deliveries', methods: ['POST'], name: 'delivery_create')]
