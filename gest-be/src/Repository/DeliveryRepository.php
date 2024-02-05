@@ -87,7 +87,7 @@ class DeliveryRepository extends ServiceEntityRepository
 
         if (null !== $zones) {
             $join .= ' LEFT JOIN user_zone uz ON d.customer_id = uz.user_id';
-            $where .= ' AND uz.zone_id IN (:zones) ';
+            $where .= ' AND (uz.zone_id IN (:zones) OR uz.zone_id IS NULL)';
             $parameters['zones'] = $zones->map(fn (Zone $z) => $z->getId())->toArray();
         }
 
