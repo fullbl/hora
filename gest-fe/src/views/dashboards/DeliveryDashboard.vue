@@ -44,27 +44,40 @@ const save = async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     hideDialog();
 };
-const dayTotals = ref({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0} as Record<number, number>);
-const dayTotalsWithoutExtra = ref({0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0} as Record<number, number>);
+const dayTotals = ref({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } as Record<number, number>);
+const dayTotalsWithoutExtra = ref({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } as Record<number, number>);
 const weekTotal = ref(0);
 const weekTotalWithoutExtra = ref(0);
-const deliveryGroups = ref(
-    {
-        0: new Map(), 1: new Map(), 2: new Map(), 3: new Map(), 4: new Map(), 5: new Map(), 6: new Map()
-    } as Record<number, Map<string, {total: number, subZones: Map<string, {total: number, products: Map<string, number>, customers: Map<string, {total: number, products: Map<string, number>, delivery: Delivery}>}>}>>);
+const deliveryGroups = ref({
+    0: new Map(),
+    1: new Map(),
+    2: new Map(),
+    3: new Map(),
+    4: new Map(),
+    5: new Map(),
+    6: new Map()
+} as Record<number, Map<string, { total: number; subZones: Map<string, { total: number; products: Map<string, number>; customers: Map<string, { total: number; products: Map<string, number>; delivery: Delivery }> }> }>>);
 
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     activities.value = await activityService.getAll();
+})
 
-    dayTotals.value = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0};
-    dayTotalsWithoutExtra.value = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0};
+watchEffect(async () => {
+    dayTotals.value = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    dayTotalsWithoutExtra.value = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
     weekTotal.value = 0;
     weekTotalWithoutExtra.value = 0;
     deliveryGroups.value = {
-        0: new Map(), 1: new Map(), 2: new Map(), 3: new Map(), 4: new Map(), 5: new Map(), 6: new Map()
-    }
-    
+        0: new Map(),
+        1: new Map(),
+        2: new Map(),
+        3: new Map(),
+        4: new Map(),
+        5: new Map(),
+        6: new Map()
+    };
+
     for (const delivery of deliveries.value) {
         if (delivery.deliveryDate.year() !== year.value || delivery.deliveryDate.week() !== week.value) {
             continue;
@@ -76,11 +89,15 @@ watchEffect(async () => {
 
         let zoneGroup = deliveryGroups.value[weekday].get(zone);
         if (undefined === zoneGroup) {
-            zoneGroup = {total: 0, subZones: new Map()};
+            zoneGroup = { total: 0, subZones: new Map() };
         }
         let subZoneGroup = zoneGroup.subZones.get(subZone);
         if (undefined === subZoneGroup) {
-            subZoneGroup = {total: 0, products: new Map(), customers: new Map()};
+            subZoneGroup = { total: 0, products: new Map(), customers: new Map() };
+        }
+        let customerGroup = subZoneGroup.customers.get(delivery.customer?.fullName ?? 'EXTRA');
+        if (undefined === customerGroup) {
+            customerGroup = { total: 0, products: new Map(), delivery: delivery };
         }
 
         for (const dp of delivery.deliveryProducts) {
@@ -88,7 +105,7 @@ watchEffect(async () => {
             weekTotal.value += dp.qty;
             zoneGroup.total += dp.qty;
             subZoneGroup.total += dp.qty;
-            if(zone !== 'EXTRA'){
+            if (zone !== 'EXTRA') {
                 dayTotalsWithoutExtra.value[weekday] += dp.qty;
                 weekTotalWithoutExtra.value += dp.qty;
             }
@@ -98,19 +115,16 @@ watchEffect(async () => {
             }
 
             subZoneGroup.products.set(dp.product.name, product + dp.qty);
-            let customerGroup = subZoneGroup.customers.get(delivery.customer?.fullName ?? 'EXTRA');
-            if (undefined === customerGroup) {
-                customerGroup = {total: 0, products: new Map(), delivery: delivery};
-            }
+
             customerGroup.total += dp.qty;
             let customerProduct = customerGroup.products.get(dp.product.name);
             if (undefined === customerProduct) {
                 customerProduct = 0;
             }
             customerGroup.products.set(dp.product.name, customerProduct + dp.qty);
-            subZoneGroup.customers.set(delivery.customer?.fullName ?? 'EXTRA', customerGroup);
         }
         
+        subZoneGroup.customers.set(delivery.customer?.fullName ?? 'EXTRA', customerGroup);
         zoneGroup.subZones.set(subZone, subZoneGroup);
         deliveryGroups.value[weekday].set(zone, zoneGroup);
     }
@@ -122,45 +136,42 @@ const getWarningClass = function (delivery: Delivery) {
     return '';
 };
 
-const changeDelivery = function(delivery: Delivery) {
+const changeDelivery = function (delivery: Delivery) {
     single.value = delivery;
 };
 
-const emptyDelivery = async function(delivery: Delivery) {
-    if(undefined === delivery.id){
+const emptyDelivery = async function (delivery: Delivery) {
+    if (undefined === delivery.id) {
         alert('error');
         return;
     }
     const freeDelivery = freeDeliveries.value.find(Boolean);
     const products = [...delivery.deliveryProducts, ...(freeDelivery?.deliveryProducts ?? [])];
-    await deliveryService.move(
-        delivery, 
-        [
-            {
+    await deliveryService.move(delivery, [
+        {
             delivery: delivery.id,
             deliveryProducts: []
         },
         {
             delivery: freeDelivery?.id ?? 0,
             deliveryProducts: products.map((dp) => ({
-                product: {id: dp.product.id ?? 0},
+                product: { id: dp.product.id ?? 0 },
                 qty: dp.qty
             }))
         }
-    ]
-    )
+    ]);
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
 };
 
-const deleteDelivery = async function(delivery: Delivery) {
-    if(undefined === delivery.id){
+const deleteDelivery = async function (delivery: Delivery) {
+    if (undefined === delivery.id) {
         alert('error');
         return;
     }
     const reason = prompt('Reason for deletion');
     await deliveryService.delete(delivery, reason ?? '');
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
-}
+};
 </script>
 
 <template>
@@ -184,21 +195,10 @@ const deleteDelivery = async function(delivery: Delivery) {
                             <p v-for="[productName, qty] in Array.from(subZoneGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
-                            <Panel
-                                v-for="[customerName, customerGroup] in subZoneGroup.customers"
-                                :pt="{ header: { title: customerName + ': ' + customerGroup.total } }"
-                                toggleable
-                                collapsed
-                            >
+                            <Panel v-for="[customerName, customerGroup] in subZoneGroup.customers" :pt="{ header: { title: customerName + ': ' + customerGroup.total } }" toggleable collapsed>
                                 <template #header>
-                                    <CustomerMenu 
-                                        :change="() => changeDelivery(customerGroup.delivery)"
-                                        :empty="() => emptyDelivery(customerGroup.delivery)"
-                                        :remove="() => deleteDelivery(customerGroup.delivery)"
-                                    />
-                                    <p class="px-1">
-                                        {{ customerName }}: {{ customerGroup.total }}
-                                    </p>
+                                    <CustomerMenu :change="() => changeDelivery(customerGroup.delivery)" :empty="() => emptyDelivery(customerGroup.delivery)" :remove="() => deleteDelivery(customerGroup.delivery)" />
+                                    <p class="px-1">{{ customerName }}: {{ customerGroup.total }}</p>
                                 </template>
                                 <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(customerGroup.delivery)">
                                     <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
