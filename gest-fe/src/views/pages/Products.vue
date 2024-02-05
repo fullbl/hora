@@ -75,24 +75,6 @@ const types = [
                             {{ slotProps.data.name }}
                         </template>
                     </Column>
-                    <Column field="zones" header="Zones" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">Zones</span>
-                            {{
-                                slotProps.data.zones
-                                    .filter((zone: Zone) => null === zone.parent)
-                                    .map((zone: Zone) => zone.name)
-                                    .join(',')
-                            }}
-                            <br />
-                            {{
-                                slotProps.data.zones
-                                    .filter((zone: Zone) => null !== zone.parent)
-                                    .map((zone: Zone) => zone.name)
-                                    .join(',')
-                            }}
-                        </template>
-                    </Column>
                     <Column field="type" header="Type" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Type</span>
