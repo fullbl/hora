@@ -57,6 +57,14 @@ watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     activities.value = await activityService.getAll();
 
+    dayTotals.value = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0};
+    dayTotalsWithoutExtra.value = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0};
+    weekTotal.value = 0;
+    weekTotalWithoutExtra.value = 0;
+    deliveryGroups.value = {
+        0: new Map(), 1: new Map(), 2: new Map(), 3: new Map(), 4: new Map(), 5: new Map(), 6: new Map()
+    }
+    
     for (const delivery of deliveries.value) {
         if (delivery.deliveryDate.year() !== year.value || delivery.deliveryDate.week() !== week.value) {
             continue;
