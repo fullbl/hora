@@ -3,7 +3,7 @@ import userService from '@/service/UserService';
 import zoneService from '@/service/ZoneService';
 import { useDataView } from '../composables/dataView';
 import Logger from '@/components/Logger.vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import type Zone from '@/interfaces/zone';
 
 const { filters, data, single, save, openNew, editData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(userService);
@@ -17,10 +17,41 @@ const statuses = [
     { label: 'Inactive', value: 'inactive' }
 ];
 const zones = ref<Array<Zone>>([]);
+const subzones = ref<Array<Zone>>([]);
+const filteredSubzones = computed<Array<Zone>>(() => subzones.value.filter((zone: Zone) => single.value?.zones.some((z: Zone) => z.id === zone.parent?.id)));
+
 onMounted(async () => {
-    zones.value = await zoneService.getAll();
+    const z = await zoneService.getAll();
+    zones.value = z.filter((zone: Zone) => null === zone.parent)
+    subzones.value = z.filter((zone: Zone) => null !== zone.parent)
 });
 
+const zoneModel = computed<Zone>({
+    get: () =>  {
+        return single.value?.zones.find((zone: Zone) => null === zone.parent) ?? zoneService.getNew();
+    },
+    set: (zone: Zone) => {
+        if(single.value){
+            single.value.zones = [zone];
+        }
+    }
+})
+
+const subzoneModel = computed<Zone>({
+    get: () =>  {
+        return single.value?.zones.find((zone: Zone) => null !== zone.parent) ?? zoneService.getNew();
+    },
+    set: (zone: Zone|null) => {
+        if(single.value){
+            const zones = single.value.zones.filter((z: Zone) => null === z.parent);
+            if(zone){
+                zones.push(zone);
+            }
+
+            single.value.zones = zones;
+        }
+    }
+})
 const logEntity = ref(null);
 </script>
 
@@ -136,7 +167,12 @@ const logEntity = ref(null);
 
                     <div class="field">
                         <label for="zone">Zones</label>
-                        <MultiSelect id="zone" v-model="single.zones" :options="zones" :optionLabel="(c) => c.name + (c.parent ? ' (' + c.parent.name + ')' : '')" placeholder="Select a Zone" />
+                        <Dropdown id="zone" v-model="zoneModel" :options="zones" optionLabel="name" placeholder="Select a Zone" />    
+                    </div>
+
+                    <div class="field" v-show="filteredSubzones.length > 0">
+                        <label for="subzone">SubZones</label>
+                        <Dropdown id="subzone" showClear v-model="subzoneModel" :options="filteredSubzones" optionLabel="name" placeholder="Select a SubZone" />    
                     </div>
 
                     <div class="field">
