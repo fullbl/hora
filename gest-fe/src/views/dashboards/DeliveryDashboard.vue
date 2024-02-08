@@ -82,7 +82,7 @@ watchEffect(async () => {
 
         const weekday = delivery.deliveryDate.weekday();
         const zone = delivery.customer?.zones.find((z) => z.parent === null)?.name ?? 'EXTRA';
-        const subZone = delivery.customer?.zones.find((z) => z.parent !== null)?.name ?? 'EXTRA';
+        const subZone = delivery.customer?.zones.find((z) => z.parent !== null)?.name ?? zone;
 
         let zoneGroup = deliveryGroups.value[weekday].get(zone);
         if (undefined === zoneGroup) {
