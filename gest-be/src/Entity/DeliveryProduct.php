@@ -23,6 +23,7 @@ class DeliveryProduct
     #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private ?Product $product = null;
     
     #[Groups(['delivery-list', 'delivery-dash'])]

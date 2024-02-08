@@ -64,7 +64,7 @@ const dayTotal = function (day: Dayjs) {
             <div style="width:14.28%" v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
                 <b>Day total: {{ dayTotal(date) }}</b>
-                <div v-for="[name, dp] in deliveryGroups.get(date.format('YYYMMDD')) ">
+                <div v-for="[name, dp] in Array.from(deliveryGroups.get(date.format('YYYMMDD')) ?? []).sort(([x, a], [y, b]) => a.product.name.localeCompare(b.product.name)) ">
                     <QtyHolder :qty="dp.qty">{{ dp.product.name }} ({{ dp.qty * dp.decigrams / 10 }}g{{ dp.product.weight ? ' + weight' : '' }})</QtyHolder>
                     <ProgressHolder :dp="dp" />
                 </div>
