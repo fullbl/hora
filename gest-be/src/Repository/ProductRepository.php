@@ -12,7 +12,6 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Product|null find($id, $lockMode = null, $lockVersion = null)
  * @method Product|null findOneBy(array $criteria, array $orderBy = null)
- * @method Product[]    findAll()
  * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class ProductRepository extends ServiceEntityRepository
@@ -22,11 +21,17 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function findAll(): array
+    {
+        return $this->findBy([], ['name' => 'ASC']);
+    }
+
     public function findAllFiltered(Collection $zones): array
     {
         return $this->createQueryBuilder('p')
             ->andWhere(':zones MEMBER OF p.zones')
             ->setParameter('zones', $zones)
+            ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
