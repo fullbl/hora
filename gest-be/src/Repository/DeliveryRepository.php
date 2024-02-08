@@ -17,7 +17,6 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Delivery|null find($id, $lockMode = null, $lockVersion = null)
  * @method Delivery|null findOneBy(array $criteria, array $orderBy = null)
- * @method Delivery[]    findAll()
  * @method Delivery[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class DeliveryRepository extends ServiceEntityRepository
@@ -32,12 +31,18 @@ class DeliveryRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
+    public function findAll(): array
+    {
+        return $this->findBy([], ['deliveryDate' => 'ASC']);
+    }
+
     public function findAllFiltered(Collection $zones): array
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.customer', 'c')
             ->andWhere(':zones MEMBER OF c.zones')
             ->setParameter('zones', $zones)
+            ->orderBy('p.deliveryDate', 'ASC')
             ->getQuery()
             ->getResult();
     }
