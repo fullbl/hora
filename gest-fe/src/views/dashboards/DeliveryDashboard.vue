@@ -58,7 +58,7 @@ const deliveryGroups = ref({
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
     activities.value = await activityService.getAll();
-})
+});
 
 watchEffect(async () => {
     dayTotals.value = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
@@ -98,7 +98,7 @@ watchEffect(async () => {
         }
 
         for (const dp of delivery.deliveryProducts) {
-            if(0 === dp.qty){
+            if (0 === dp.qty) {
                 continue;
             }
             dayTotals.value[weekday] += dp.qty;
@@ -123,7 +123,7 @@ watchEffect(async () => {
             }
             customerGroup.products.set(dp.product.name, customerProduct + dp.qty);
         }
-        
+
         subZoneGroup.customers.set(delivery.customer?.fullName ?? 'EXTRA', customerGroup);
         zoneGroup.subZones.set(subZone, subZoneGroup);
         deliveryGroups.value[weekday].set(zone, zoneGroup);
@@ -195,12 +195,22 @@ const deleteDelivery = async function (delivery: Delivery) {
                             <p v-for="[productName, qty] in Array.from(subZoneGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
-                            <Panel v-for="[customerName, customerGroup] in subZoneGroup.customers" :pt="{ header: { title: customerName + ': ' + customerGroup.total } }" toggleable collapsed>
+                            <Panel
+                                v-for="[customerName, customerGroup] in subZoneGroup.customers"
+                                :pt="{
+                                    header: {
+                                        class: getWarningClass(customerGroup.delivery),
+                                        title: customerName + ': ' + customerGroup.total
+                                    }
+                                }"
+                                toggleable
+                                collapsed
+                            >
                                 <template #header>
                                     <CustomerMenu :change="() => changeDelivery(customerGroup.delivery)" :empty="() => emptyDelivery(customerGroup.delivery)" :remove="() => deleteDelivery(customerGroup.delivery)" />
                                     <p class="px-1">{{ customerName }}: {{ customerGroup.total }}</p>
                                 </template>
-                                <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0" :class="getWarningClass(customerGroup.delivery)">
+                                <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                     <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                                 </p>
                             </Panel>
