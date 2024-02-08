@@ -5,16 +5,13 @@ import activityService from '@/service/ActivityService';
 import type Panel from 'primevue/panel';
 import { useDates } from '../composables/dates';
 import type { Delivery } from '@/interfaces/delivery';
-import type Product from '@/interfaces/product';
 import type Activity from '@/interfaces/activity';
 import Toast from 'primevue/toast';
 import QtyHolder from '@/components/QtyHolder.vue';
-import ProgressHolder from '@/components/ProgressHolder.vue';
 import YearWeek from '@/components/YearWeek.vue';
 import dayjs from 'dayjs';
 import DeliveryChangeForm from '@/components/forms/DeliveryChangeForm.vue';
 import CustomerMenu from '@/components/CustomerMenu.vue';
-import type Zone from '@/interfaces/zone';
 
 const deliveries = ref<Array<Delivery>>([]);
 const activities = ref<Array<Activity>>([]);
@@ -101,6 +98,9 @@ watchEffect(async () => {
         }
 
         for (const dp of delivery.deliveryProducts) {
+            if(0 === dp.qty){
+                continue;
+            }
             dayTotals.value[weekday] += dp.qty;
             weekTotal.value += dp.qty;
             zoneGroup.total += dp.qty;
