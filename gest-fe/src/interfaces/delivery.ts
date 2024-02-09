@@ -4,12 +4,10 @@ import type User from "./user"
 
 interface Delivery {
     id?: number,
-    harvestWeekDay: number,
-    deliveryWeekDay: number,
     deliveryDate: Dayjs,
-    deliveryDates?: string[],
+    deliveryDates?: Date[],
     harvestDate: Dayjs,
-    harvestDates?: string[],
+    harvestDates?: Date[],
     customer?: User,
     warning?: boolean,
     lastWarning?: boolean,
@@ -22,8 +20,6 @@ interface Delivery {
 }
 interface DeliveryWithoutProducts {
     id?: number,
-    harvestWeekDay: number,
-    deliveryWeekDay: number,
     deliveryDate: Dayjs,
     harvestDate: Dayjs,
     customer?: User,

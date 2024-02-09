@@ -21,20 +21,6 @@ class Delivery
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[Groups(['delivery-list'])]
-    #[ORM\Column(type: Types::SMALLINT, name: 'week_day')]
-    #[Assert\Range(min: 0, max: 6)]
-    #[Assert\Type('integer')]
-    #[Assert\NotNull]
-    private ?int $harvestWeekDay = null;
-
-    #[Groups(['delivery-list'])]
-    #[ORM\Column(type: Types::SMALLINT, options: ["default" => 1])]
-    #[Assert\Range(min: 0, max: 6)]
-    #[Assert\Type('integer')]
-    #[Assert\NotNull]
-    private ?int $deliveryWeekDay = null;
     
     #[Groups(['delivery-list', 'delivery-dash'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -127,30 +113,6 @@ class Delivery
     public function setLastWarning(bool $lastWarning): self
     {
         $this->lastWarning = $lastWarning;
-
-        return $this;
-    }
-
-    public function getHarvestWeekDay(): int
-    {
-        return $this->harvestWeekDay;
-    }
-
-    public function setHarvestWeekDay(int $harvestWeekDay): self
-    {
-        $this->harvestWeekDay = $harvestWeekDay;
-
-        return $this;
-    }
-
-    public function getDeliveryWeekDay(): int
-    {
-        return $this->deliveryWeekDay;
-    }
-
-    public function setDeliveryWeekDay(int $deliveryWeekDay): self
-    {
-        $this->deliveryWeekDay = $deliveryWeekDay;
 
         return $this;
     }

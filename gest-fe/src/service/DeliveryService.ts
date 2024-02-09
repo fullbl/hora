@@ -50,8 +50,6 @@ const service: DeliveryService = {
     },
     getNew() {
         return {
-            harvestWeekDay: 0,
-            deliveryWeekDay: 0,
             customer: userService.getNew(),
             deliveryProducts: [],
             harvestDate: dayjs(),
