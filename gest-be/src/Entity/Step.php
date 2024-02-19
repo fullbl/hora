@@ -49,7 +49,7 @@ class Step
     private ?string $name = null;
     
     #[Groups(['product-list', 'delivery-dash'])]
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::INTEGER)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull]
