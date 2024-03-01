@@ -87,7 +87,7 @@ const deleteReason = ref('');
                     :paginator="false"
                     :rows="10"
                     :filters="filters"
-                    :rowClass="(data) => data.deletedAt ? 'bg-red-900' : ''"
+                    :rowClass="(data) => (data.deletedAt ? 'bg-red-900' : '')"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} data"
@@ -111,7 +111,8 @@ const deleteReason = ref('');
                     <Column field="id" header="Id" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Id</span>
-                            {{ slotProps.data.id }}
+                            <span class="font-bold text-blue-500 cursor-pointer" v-if="slotProps.data.notes" v-tooltip.left="slotProps.data.notes">{{ slotProps.data.id }}</span>
+                            <span v-else>{{ slotProps.data.id }}</span>
                         </template>
                     </Column>
                     <Column header="#">
@@ -152,8 +153,19 @@ const deleteReason = ref('');
                     <Column field="customer.zones" header="Zones" sortable>
                         <template #body="slotProps">
                             <span class="p-column-title">Zones</span>
-                            {{ slotProps.data.customer.zones.filter((zone: Zone) => null === zone.parent).map((zone: Zone) => zone.name).join(',') }} <br>
-                            {{ slotProps.data.customer.zones.filter((zone: Zone) => null !== zone.parent).map((zone: Zone) => zone.name).join(',') }}
+                            {{
+                                slotProps.data.customer.zones
+                                    .filter((zone: Zone) => null === zone.parent)
+                                    .map((zone: Zone) => zone.name)
+                                    .join(',')
+                            }}
+                            <br />
+                            {{
+                                slotProps.data.customer.zones
+                                    .filter((zone: Zone) => null !== zone.parent)
+                                    .map((zone: Zone) => zone.name)
+                                    .join(',')
+                            }}
                         </template>
                     </Column>
                     <Column field="price" header="Price">
