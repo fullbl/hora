@@ -51,6 +51,7 @@ class UserMapper
             ->setFullName($data['fullName'])
             ->setRoles($data['roles'])
             ->setStatus($data['status'])
+            ->setPosition($data['position'])
         ;
     }
 }

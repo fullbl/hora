@@ -93,6 +93,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull]
     private int $discount = 0;
 
+    #[Groups(['user-list', 'delivery-dash'])]
+    #[ORM\Column(options: ['default' => 0])]
+    #[Assert\Type('integer')]
+    #[Assert\GreaterThanOrEqual(0)]
+    #[Assert\NotNull]
+    private int $position = 0;
+
     #[Groups(['user-list', 'delivery-list', 'delivery-dash'])]
     #[ORM\ManyToMany(targetEntity: Zone::class)]
     private Collection $zones;
@@ -340,4 +347,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
 }

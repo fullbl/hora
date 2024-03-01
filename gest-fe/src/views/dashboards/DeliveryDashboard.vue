@@ -53,7 +53,7 @@ const deliveryGroups = ref({
     4: new Map(),
     5: new Map(),
     6: new Map()
-} as Record<number, Map<string, { total: number; subZones: Map<string, { total: number; products: Map<string, number>; customers: Map<string, { total: number; products: Map<string, number>; delivery: Delivery }> }> }>>);
+} as Record<number, Map<string, { total: number; subZones: Map<string, { total: number; products: Map<string, number>; customers: Map<string, { total: number; products: Map<string, number>; delivery: Delivery, position: number }> }> }>>);
 
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
@@ -94,7 +94,7 @@ watchEffect(async () => {
         }
         let customerGroup = subZoneGroup.customers.get(delivery.customer?.fullName ?? 'EXTRA');
         if (undefined === customerGroup) {
-            customerGroup = { total: 0, products: new Map(), delivery: delivery };
+            customerGroup = { total: 0, products: new Map(), delivery: delivery, position: delivery.customer?.position ?? 0 };
         }
 
         for (const dp of delivery.deliveryProducts) {
@@ -196,7 +196,7 @@ const deleteDelivery = async function (delivery: Delivery) {
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
                             <Panel
-                                v-for="[customerName, customerGroup] in subZoneGroup.customers"
+                                v-for="[customerName, customerGroup] in Array.from(subZoneGroup.customers).sort(([x, a], [y, b]) => a.position - b.position)"
                                 :pt="{
                                     header: {
                                         class: getWarningClass(customerGroup.delivery),

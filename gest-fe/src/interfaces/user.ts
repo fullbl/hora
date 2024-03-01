@@ -16,5 +16,6 @@ export default interface User {
     suspensions: Array<unknown>,
     sdi?: string,
     discount: number,
-    zones: Array<Zone>
+    zones: Array<Zone>,
+    position: number,
 }
