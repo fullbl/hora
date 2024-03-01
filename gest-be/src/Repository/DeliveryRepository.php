@@ -134,17 +134,20 @@ class DeliveryRepository extends ServiceEntityRepository
     {
         $freeDelivery = $this->createQueryBuilder('d')
             ->where('d.deletedAt IS NULL')
+            ->andWhere('d.customer IS NULL')
             ->andWhere('d.deliveryDate BETWEEN :from AND :to')
-            ->setParameter('from', $delivery->getDeliveryDate()->modify('monday 00:00:00')->format('Y-m-d'))
-            ->setParameter('to', $delivery->getDeliveryDate()->modify('sunday 23:59:59')->format('Y-m-d'))
+            ->setParameter('from', $delivery->getDeliveryDate()->modify('last monday')->format('Y-m-d'))
+            ->setParameter('to', $delivery->getDeliveryDate()->modify('next monday')->format('Y-m-d'))
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
 
         if (null === $freeDelivery) {
-            $freeDelivery = clone $delivery;
-            $freeDelivery->setCustomer(null);
-            $this->getEntityManager()->persist($delivery);
+            $freeDelivery = new Delivery();
+            $freeDelivery->setHarvestDate($delivery->getHarvestDate());
+            $freeDelivery->setDeliveryDate($delivery->getDeliveryDate());
+            $freeDelivery->setNotes('created automatically');
+            $this->getEntityManager()->persist($freeDelivery);
         }
 
         return $freeDelivery;

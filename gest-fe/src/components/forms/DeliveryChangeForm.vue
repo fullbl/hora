@@ -8,6 +8,8 @@ type DeliveryProductMoveable = DeliveryProduct & {
     moveQty: number;
 };
 
+const emits = defineEmits(['move']);
+
 const props = defineProps({
     single: {
         type: Object as PropType<Delivery>,
@@ -37,6 +39,7 @@ const move = (deliveryProduct: DeliveryProductMoveable, destination: DeliveryPro
 
     deliveryProduct.qty -= deliveryProduct.moveQty;
     deliveryProduct.moveQty = 0;
+
 };
 
 const moveRight = (deliveryProduct: DeliveryProductMoveable) => {
@@ -63,6 +66,7 @@ const save = () => {
     }
     deliveryService.move(props.single, Array.from(deliveries.values()));
     
+    emits('move');
 };
 
 defineExpose({

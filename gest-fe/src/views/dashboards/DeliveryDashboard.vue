@@ -60,6 +60,10 @@ watchEffect(async () => {
     activities.value = await activityService.getAll();
 });
 
+const reload = async () => {
+    deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
+};
+
 watchEffect(async () => {
     dayTotals.value = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
     dayTotalsWithoutExtra.value = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
@@ -222,7 +226,7 @@ const deleteDelivery = async function (delivery: Delivery) {
     </div>
 
     <Dialog v-model:visible="showDialog" :header="dialog" :modal="true" class="p-fluid" v-if="null !== single">
-        <DeliveryChangeForm :single="single" :free-deliveries="freeDeliveries" ref="form" />
+        <DeliveryChangeForm :single="single" :free-deliveries="freeDeliveries" ref="form" @move="reload" />
 
         <template #footer>
             <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
