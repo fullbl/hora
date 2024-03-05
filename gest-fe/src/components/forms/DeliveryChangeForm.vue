@@ -78,10 +78,10 @@ defineExpose({
     <div class="flex overflow-hidden delivery-change">
         <div class="overflow-y-auto">
             <label for="free_products">Free Products</label>
-            <DataTable :value="freeDPs">
-                <Column field="product.name" header="Product"> </Column>
-                <Column field="product.type" header="Type" />
-                <Column field="qty" header="Quantity" />
+            <DataTable :value="freeDPs" sortField="product.name" :sortOrder="1">
+                <Column field="product.name" header="Product" sortable> </Column>
+                <Column field="product.type" header="Type" sortable />
+                <Column field="qty" header="Quantity" sortable />
                 <Column header="Qt to">
                     <template #body="slotProps">
                         <InputNumber showButtons v-model="slotProps.data.moveQty" :min="1" :max="slotProps.data.qty" />
@@ -97,10 +97,10 @@ defineExpose({
 
         <div class="overflow-y-auto">
             <label for="products">Products</label>
-            <DataTable :value="singleDPs">
-                <Column field="product.name" header="Product" />
-                <Column field="product.type" header="Type" />
-                <Column field="qty" header="Quantity" />
+            <DataTable :value="singleDPs" sortField="product.name" :sortOrder="1">
+                <Column field="product.name" header="Product" sortable />
+                <Column field="product.type" header="Type" sortable />
+                <Column field="qty" header="Quantity" sortable />
                 <Column header="Qt to">
                     <template #body="slotProps">
                         <InputNumber v-model="slotProps.data.moveQty" :min="1" :max="slotProps.data.qty" showButtons />

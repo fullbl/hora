@@ -145,7 +145,7 @@ const changeDelivery = function (delivery: Delivery) {
 };
 
 const emptyDelivery = async function (delivery: Delivery) {
-    if (undefined === delivery.id) {
+    if (undefined === delivery.id || !confirm('Are you sure?')) {
         alert('error');
         return;
     }
