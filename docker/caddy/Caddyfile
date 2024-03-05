@@ -10,7 +10,5 @@
 }
 
 {$LOCATION}.{$SECOND_LEVEL_DOMAIN} {
-    root * /srv/vue
-    encode zstd gzip
-    file_server
+    reverse_proxy app
 }

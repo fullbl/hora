@@ -1,11 +1,6 @@
-
 {
-    # Debug
-    {$CADDY_DEBUG}
     auto_https disable_redirects 
 }
-
-{$SERVER_NAME}
 
 {$CADDY_EXTRA_CONFIG}
 

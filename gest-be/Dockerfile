@@ -17,14 +17,6 @@ RUN xcaddy build
 # Prod image
 FROM php:8.2-fpm-alpine AS app_php
 
-# Allow to use development versions of Symfony
-ARG STABILITY="stable"
-ENV STABILITY ${STABILITY}
-
-# Allow to select Symfony version
-ARG SYMFONY_VERSION=""
-ENV SYMFONY_VERSION ${SYMFONY_VERSION}
-
 ENV APP_ENV=prod
 
 WORKDIR /srv/app
