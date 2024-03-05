@@ -1,8 +1,8 @@
-FROM node:lts-alpine AS npm
+FROM node:lts-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY --link package*.json ./
 
 RUN npm install
 
