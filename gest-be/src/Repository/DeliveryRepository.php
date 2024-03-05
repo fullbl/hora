@@ -136,7 +136,7 @@ class DeliveryRepository extends ServiceEntityRepository
             ->where('d.deletedAt IS NULL')
             ->andWhere('d.customer IS NULL')
             ->andWhere('d.deliveryDate BETWEEN :from AND :to')
-            ->setParameter('from', $delivery->getDeliveryDate()->modify('last monday')->format('Y-m-d'))
+            ->setParameter('from', $delivery->getDeliveryDate()->modify('monday this week')->format('Y-m-d'))
             ->setParameter('to', $delivery->getDeliveryDate()->modify('next monday')->format('Y-m-d'))
             ->setMaxResults(1)
             ->getQuery()
