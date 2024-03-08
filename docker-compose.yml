@@ -36,6 +36,7 @@ services:
     environment:
       LOCATION: ${LOCATION}      
       SECOND_LEVEL_DOMAIN: ${SECOND_LEVEL_DOMAIN}
+      SENTRY_DSN: ${SENTRY_DSN}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
@@ -47,6 +48,10 @@ services:
     build: 
       context: ./gest-fe
       dockerfile: ../Dockerfile
+      args:
+        LOCATION: belluno
+        SECOND_LEVEL_DOMAIN: horafarms.it
+        SENTRY_DSN: ${SENTRY_DSN}
     image: fullbl/hora-app:${TAG:-latest}
     restart: always
 
