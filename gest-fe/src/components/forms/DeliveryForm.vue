@@ -96,7 +96,7 @@ const removeProduct = (dp: DeliveryProduct) => {
             <label for="products">Products</label>
 
             <Button label="Add" icon="pi pi-plus" @click="addProduct" />
-            <DataTable :value="single.deliveryProducts">
+            <DataTable :value="single.deliveryProducts.sort((a, b) => a.product.name.localeCompare(b.product.name))">
                 <Column field="product.name" header="Product">
                     <template #body="slotProps">
                         <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id" :options="products" />
