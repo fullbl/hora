@@ -115,9 +115,21 @@ class DeliveriesController extends AbstractController
         foreach ($moves['deliveries'] as $move) {
             $delivery = $this->repo->find($move['delivery']);
             if (null === $delivery) {
+                $productIds = array_map(fn($dp) => $dp['product']['id'], $move['deliveryProducts']);
                 $delivery = $this->repo->findFreeDeliveryInSameWeek($baseDelivery);
+                foreach($delivery->getDeliveryProducts() as $dp){
+                    if(in_array($dp->getProduct()?->getId(), $productIds)){
+                        $delivery->removeDeliveryProduct($dp);   
+                    }
+                }
+                
+                foreach($mapper->map($move['deliveryProducts'], $delivery) as $product){
+                    $delivery->addDeliveryProduct($product);
+                }
             }
-            $delivery->setDeliveryProducts($mapper->map($move['deliveryProducts'], $delivery));
+            else {
+                $delivery->setDeliveryProducts($mapper->map($move['deliveryProducts'], $delivery));
+            }
         }
 
         $this->repo->flush();

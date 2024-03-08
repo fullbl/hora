@@ -47,7 +47,10 @@ const moveRight = (deliveryProduct: DeliveryProductMoveable) => {
 };
 
 const moveLeft = (deliveryProduct: DeliveryProductMoveable) => {
-    const delivery = props.freeDeliveries.find((d) => d.deliveryProducts.some((dp) => dp.id === deliveryProduct.id));
+    let delivery = props.freeDeliveries.find((d) => d.deliveryProducts.some((dp) => dp.id === deliveryProduct.id));
+    if (undefined === delivery) {
+        delivery = props.freeDeliveries[0];
+    };
     move(deliveryProduct, freeDPs.value, delivery);
 };
 
