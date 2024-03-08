@@ -7,12 +7,14 @@ if [ "${1#-}" != "$1" ]; then
 fi
 
 if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
-		if [ "$APP_ENV" != 'prod' ]; then
+	if [ "$APP_ENV" != 'prod' ]; then
 		composer install --prefer-dist --no-progress --no-interaction
+	else
+		composer dump-env prod;
 	fi
 
 	if grep -q ^DATABASE_URL= .env; then
-				echo "Waiting for db to be ready..."
+		echo "Waiting for db to be ready..."
 		ATTEMPTS_LEFT_TO_REACH_DATABASE=60
 		until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || DATABASE_ERROR=$(bin/console dbal:run-sql "SELECT 1" 2>&1); do
 			if [ $? -eq 255 ]; then
@@ -33,7 +35,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 			echo "The db is now ready and reachable"
 		fi
 
-		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
+		if [ "$(find ./migrations -iname '*.php' -print -quit)" ]; then
 			bin/console doctrine:migrations:migrate --no-interaction
 		fi
 	fi

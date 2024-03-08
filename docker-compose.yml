@@ -9,6 +9,16 @@ services:
       service: php
     build:
       context: ./gest-be
+      args:
+        SENTRY_DSN: ${SENTRY_DSN}
+    image: fullbl/hora-be:${TAG:-latest}
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      LOCATION: ${LOCATION}
+      SECOND_LEVEL_DOMAIN: ${SECOND_LEVEL_DOMAIN}
+      HA_TOKEN: ${HA_TOKEN}
+      SENTRY_DSN: ${SENTRY_DSN}
     restart: always
 
   database:
@@ -23,28 +33,29 @@ services:
       service: caddy
     build:
       context: ./gest-be
-    depends_on: 
-      - vuejs
     environment:
-      - LOCATION      
-      - SECOND_LEVEL_DOMAIN
+      LOCATION: ${LOCATION}      
+      SECOND_LEVEL_DOMAIN: ${SECOND_LEVEL_DOMAIN}
+      SENTRY_DSN: ${SENTRY_DSN}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
     volumes:
-      - vue:/srv/vue
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
 
-  vuejs:
+
+  app:
     build: 
       context: ./gest-fe
       dockerfile: ../Dockerfile
-    restart: no
-    volumes:
-      - vue:/app/dist
-  
+      args:
+        LOCATION: belluno
+        SECOND_LEVEL_DOMAIN: horafarms.it
+        SENTRY_DSN: ${SENTRY_DSN}
+    image: fullbl/hora-app:${TAG:-latest}
+    restart: always
+
 volumes:
   php_socket:
   caddy_data:
   caddy_config:
-  vue:

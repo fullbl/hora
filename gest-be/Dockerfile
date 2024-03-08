@@ -17,14 +17,6 @@ RUN xcaddy build
 # Prod image
 FROM php:8.2-fpm-alpine AS app_php
 
-# Allow to use development versions of Symfony
-ARG STABILITY="stable"
-ENV STABILITY ${STABILITY}
-
-# Allow to select Symfony version
-ARG SYMFONY_VERSION=""
-ENV SYMFONY_VERSION ${SYMFONY_VERSION}
-
 ENV APP_ENV=prod
 
 WORKDIR /srv/app
@@ -99,7 +91,6 @@ RUN set -eux; \
 	mkdir -p var/cache var/log; \
     if [ -f composer.json ]; then \
 		composer dump-autoload --classmap-authoritative --no-dev; \
-		composer dump-env prod; \
 		composer run-script --no-dev post-install-cmd; \
 		chmod +x bin/console; sync; \
     fi
