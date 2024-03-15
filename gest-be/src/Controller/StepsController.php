@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Mapper\StepMapper;
 use App\Repository\StepRepository;
 use Exception;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,13 +16,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
+#[WithMonologChannel('actions')]
 class StepsController extends AbstractController
 {
     public function __construct(
         private StepRepository $repo, 
         private StepMapper $mapper,
-        private ValidatorInterface $validator)
-    {
+        private ValidatorInterface $validator,
+        private LoggerInterface $logger,
+    ){
     }
 
     #[Route('/steps', methods: ['GET'], name: 'steps_list')]
@@ -43,6 +47,10 @@ class StepsController extends AbstractController
         }
         try {
             $this->repo->save($step, true);
+            $this->logger->notice('[STEPS] Step created', [
+                'step' => $step->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -87,6 +95,10 @@ class StepsController extends AbstractController
         }
         try {
             $this->repo->save($step, true);
+            $this->logger->notice('[STEPS] Step updated', [
+                'step' => $step->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -111,6 +123,9 @@ class StepsController extends AbstractController
 
         try {
             $this->repo->remove($step, true);
+            $this->logger->notice('[STEPS] Step deleted', [
+                'step' => $id,
+            ]);
         } catch (Exception $e) {
 
             return $this->json(

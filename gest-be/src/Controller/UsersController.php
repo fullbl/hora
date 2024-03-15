@@ -4,9 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Mapper\UserMapper;
-use App\Repository\LogRepository;
 use App\Repository\UserRepository;
 use Exception;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,13 +17,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
+#[WithMonologChannel('actions')]
 class UsersController extends AbstractController
 {
     public function __construct(
         private UserRepository $repo,
         private UserMapper $mapper,
         private ValidatorInterface $validator,
-        private LogRepository $logRepo,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -62,6 +64,10 @@ class UsersController extends AbstractController
         }
         try {
             $this->repo->save($user, true);
+            $this->logger->notice('[USERS] User created', [
+                'user' => $user->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -105,9 +111,11 @@ class UsersController extends AbstractController
             );
         }
         try {
-            $this->logRepo->prepareForEntity($user);
             $this->repo->save($user, true);
-            $this->logRepo->saveForEntity($user);
+            $this->logger->notice('[USERS] User updated', [
+                'user' => $user->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -132,6 +140,10 @@ class UsersController extends AbstractController
 
         try {
             $this->repo->remove($user, true);
+            $this->logger->notice('[USERS] User deleted', [
+                'user' => $id,
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(

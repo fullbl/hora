@@ -4,9 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Mapper\ProductMapper;
-use App\Repository\LogRepository;
 use App\Repository\ProductRepository;
 use Exception;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,13 +17,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
+#[WithMonologChannel('actions')]
 class ProductsController extends AbstractController
 {
     public function __construct(
         private ProductRepository $repo,
         private ProductMapper $mapper,
         private ValidatorInterface $validator,
-        private LogRepository $logRepo
+        private LoggerInterface $logger
     ) {
     }
 
@@ -104,6 +106,10 @@ class ProductsController extends AbstractController
         }
         try {
             $this->repo->save($product, true);
+            $this->logger->notice('[PRODUCTS] Product created', [
+                'product' => $product->getId(),
+                'data' => $request->toArray(),
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -152,9 +158,11 @@ class ProductsController extends AbstractController
             );
         }
         try {
-            $this->logRepo->prepareForEntity($product);
             $this->repo->save($product, true);
-            $this->logRepo->saveForEntity($product);
+            $this->logger->notice('[PRODUCTS] Product updated', [
+                'product' => $product->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -181,6 +189,10 @@ class ProductsController extends AbstractController
 
         try {
             $this->repo->remove($product, true);
+            $this->logger->notice('[PRODUCTS] Product deleted', [
+                'product' => $id,
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(

@@ -1,11 +1,4 @@
-{
-    auto_https disable_redirects 
-}
-
-{$CADDY_EXTRA_CONFIG}
-
-log
-route {
+localhost:80 {
     root * /srv/app/public
     php_fastcgi unix//var/run/php/php-fpm.sock
     encode zstd gzip

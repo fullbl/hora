@@ -7,6 +7,8 @@ use App\Mapper\ActivityMapper;
 use App\Repository\ActivityRepository;
 use App\Service\HAService;
 use Exception;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +18,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_OPERATOR')]
+#[WithMonologChannel('actions')]
 class ActivitiesController extends AbstractController
 {
     public function __construct(
         private ActivityRepository $repo,
         private ActivityMapper $mapper,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -34,6 +38,7 @@ class ActivitiesController extends AbstractController
             $activity->setStatus(Activity::STATUS_DONE);
             $this->repo->save($activity, true);
         }
+        $this->logger->notice('[ACTIVITIES] Soaking done', ['ids' => $ids]);
 
         return $this->json(['status' => 'ok']);
     }
@@ -55,10 +60,15 @@ class ActivitiesController extends AbstractController
                     'week' => $data['week'],
                     'qty' => $soaking['qty'],
                     'status' => Activity::STATUS_PLANNED,
-                    
+
                 ]);
                 $this->repo->save($activity, true);
                 $activities[] = $activity;
+
+                $this->logger->notice('[ACTIVITIES] Soaking planned', [
+                    'activity' => $activity->getId(),
+                    'data' => $data
+                ]);
             }
         }
 
@@ -70,15 +80,26 @@ class ActivitiesController extends AbstractController
         );
 
         if (null === $scriptId) {
+            $this->logger->error('[ACTIVITIES] Soaking script failed', [
+                'soakingTime' => $soakingTime,
+                'box' => $data['box'],
+                'activities' => $activities,
+            ]);
             return $this->json(['status' => 'error'], 400);
         }
 
-        foreach($activities as $activity){
+        foreach ($activities as $activity) {
             $activity->setData([
                 'script' => $scriptId,
                 'box' => $data['box'],
             ]);
             $this->repo->save($activity, true);
+
+            $this->logger->notice('[ACTIVITIES] Soaking enqueued', [
+                'activity' => $activity,
+                'scriptId' => $scriptId,
+                'box' => $data['box'],
+            ]);
         }
 
         return $this->json($this->repo->findAll(), Response::HTTP_OK, [], ['groups' => 'activity-list']);
@@ -92,17 +113,23 @@ class ActivitiesController extends AbstractController
 
         foreach ($data['plantings'] as $planting) {
             foreach ($planting['deliveries'] as $delivery) {
-                $activity = $this->mapper->fromArray([
+                $activityData = [
                     'delivery' => $delivery,
                     'step' => $planting['step'],
                     'year' => $data['year'],
                     'week' => $data['week'],
                     'qty' => $planting['qty'],
                     'status' => Activity::STATUS_PLANNED,
-                    
-                ]);
+
+                ];
+                $activity = $this->mapper->fromArray();
                 $this->repo->save($activity, true);
                 $activities[] = $activity;
+
+                $this->logger->notice('[ACTIVITIES] Planting planned', [
+                    'activity' => $activity,
+                    'data' => $activityData
+                ]);
             }
         }
 
@@ -121,7 +148,6 @@ class ActivitiesController extends AbstractController
         $activity = $this->mapper->fromRequest($request);
         $errors = $this->validator->validate($activity);
         if ($errors->count() > 0) {
-
             return $this->json(
                 $errors,
                 Response::HTTP_BAD_REQUEST,
@@ -129,6 +155,10 @@ class ActivitiesController extends AbstractController
         }
         try {
             $this->repo->save($activity, true);
+            $this->logger->notice('[ACTIVITIES] Activity created', [
+                'activity' => $activity->getId(),
+                'data' => $request->toArray(),
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -154,18 +184,17 @@ class ActivitiesController extends AbstractController
     #[Route('/activities/{id}', methods: ['PUT'], name: 'activity_update')]
     public function update(int $id, Request $request): JsonResponse
     {
-        $activity = $this->repo->find($id);
-        if (null === $activity) {
-
+        $baseActivity = $this->repo->find($id);
+        if (null === $baseActivity) {
             return $this->json(
                 ['error' => 'not found'],
                 Response::HTTP_NOT_FOUND,
             );
         }
-        $activity = $this->mapper->fill($activity, $request);
+        $activity = $this->mapper->fill($baseActivity, $request);
         $errors = $this->validator->validate($activity);
-        if ($errors->count() > 0) {
 
+        if ($errors->count() > 0) {
             return $this->json(
                 $errors,
                 Response::HTTP_BAD_REQUEST
@@ -173,6 +202,10 @@ class ActivitiesController extends AbstractController
         }
         try {
             $this->repo->save($activity, true);
+            $this->logger->notice('[ACTIVITIES] Activity updated', [
+                'activity' => $activity->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -197,6 +230,9 @@ class ActivitiesController extends AbstractController
 
         try {
             $this->repo->remove($activity, true);
+            $this->logger->notice('[ACTIVITIES] Activity deleted', [
+                'activity' => $id,
+            ]);
         } catch (Exception $e) {
 
             return $this->json(

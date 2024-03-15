@@ -5,9 +5,9 @@ namespace App\Controller;
 use App\Mapper\DeliveryMapper;
 use App\Mapper\DeliveryProductMapper;
 use App\Repository\DeliveryRepository;
-use App\Repository\LogRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
+#[WithMonologChannel('actions')]
 class DeliveriesController extends AbstractController
 {
     private const DASHBOARD_WEEKS = 4;
@@ -25,7 +26,7 @@ class DeliveriesController extends AbstractController
         private DeliveryRepository $repo,
         private DeliveryMapper $mapper,
         private ValidatorInterface $validator,
-        private LogRepository $logRepo,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -41,19 +42,18 @@ class DeliveriesController extends AbstractController
             );
         }
 
-        if($this->isGranted('ROLE_SUPER_ADMIN')){
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             $deliveries = $this->repo->findAll();
-        }
-        else{
+        } else {
             $deliveries = $this->repo->findAllFiltered($user->getZones());
         }
 
         return $this->json($deliveries, Response::HTTP_OK, [], ['groups' => 'delivery-list']);
     }
-    
+
     #[Route('/deliveries/{fromDate}', methods: ['GET'], name: 'deliveries_dashboard')]
     public function dashboard(\DateTimeImmutable $fromDate): JsonResponse
-    {        
+    {
         /** @var User $user */
         $user = $this->getUser();
         if (null === $user) {
@@ -63,13 +63,12 @@ class DeliveriesController extends AbstractController
             );
         }
 
-        if($this->isGranted('ROLE_SUPER_ADMIN')){
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             $deliveries = $this->repo->findNext($fromDate, self::DASHBOARD_WEEKS);
-        }
-        else{
+        } else {
             $deliveries = $this->repo->findNext($fromDate, self::DASHBOARD_WEEKS, $user->getZones());
         }
-        
+
         return $this->json($deliveries, Response::HTTP_OK, [], ['groups' => 'delivery-dash']);
     }
 
@@ -88,6 +87,10 @@ class DeliveriesController extends AbstractController
             }
             try {
                 $this->repo->save($delivery);
+                $this->logger->notice('[DELIVERIES] Delivery created', [
+                    'delivery' => $delivery->getId(),
+                    'data' => $request->toArray(),
+                ]);
             } catch (Exception $e) {
 
                 return $this->json(
@@ -101,7 +104,7 @@ class DeliveriesController extends AbstractController
     }
 
     #[Route('/deliveries/move', methods: ['PUT'], name: 'delivery_move')]
-    public function move(Request $request, DeliveryProductMapper $mapper, EntityManagerInterface $em): JsonResponse
+    public function move(Request $request, DeliveryProductMapper $mapper): JsonResponse
     {
         $moves = $request->toArray();
         $baseDelivery = $this->repo->find($moves['delivery']);
@@ -112,25 +115,35 @@ class DeliveriesController extends AbstractController
                 Response::HTTP_NOT_FOUND,
             );
         }
+        $this->logger->notice('[DELIVERIES] Move deliveries', [
+            'data' => $moves,
+        ]);
+
         foreach ($moves['deliveries'] as $move) {
             $delivery = $this->repo->find($move['delivery']);
             if (null === $delivery) {
-                $productIds = array_map(fn($dp) => $dp['product']['id'], $move['deliveryProducts']);
+                $productIds = array_map(fn ($dp) => $dp['product']['id'], $move['deliveryProducts']);
                 $delivery = $this->repo->findFreeDeliveryInSameWeek($baseDelivery);
-                foreach($delivery->getDeliveryProducts() as $dp){
-                    if(in_array($dp->getProduct()?->getId(), $productIds)){
-                        $delivery->removeDeliveryProduct($dp);   
+                foreach ($delivery->getDeliveryProducts() as $dp) {
+                    if (in_array($dp->getProduct()?->getId(), $productIds)) {
+                        $delivery->removeDeliveryProduct($dp);
                     }
                 }
-                
-                foreach($mapper->map($move['deliveryProducts'], $delivery) as $product){
+
+                foreach ($mapper->map($move['deliveryProducts'], $delivery) as $product) {
                     $delivery->addDeliveryProduct($product);
                 }
-            }
-            else {
+            } else {
                 $delivery->setDeliveryProducts($mapper->map($move['deliveryProducts'], $delivery));
             }
+
+            $this->logger->notice('[DELIVERIES] Delivery moved', [
+                'delivery' => $delivery->getId(),
+                'products' => json_encode($delivery->getDeliveryProducts()->map(fn ($dp) => $dp->getProduct()->getId())->toArray()),
+            ]);
         }
+
+        
 
         $this->repo->flush();
 
@@ -159,9 +172,12 @@ class DeliveriesController extends AbstractController
             );
         }
         try {
-            $this->logRepo->prepareForEntity($delivery);
             $this->repo->save($delivery, true);
-            $this->logRepo->saveForEntity($delivery);
+
+            $this->logger->notice('[DELIVERIES] Delivery updated', [
+                'delivery' => $delivery->getId(),
+                'data' => $request->toArray()
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
@@ -190,13 +206,20 @@ class DeliveriesController extends AbstractController
             $delivery->setDeletedReason($request->toArray()['reason'] ?? '');
 
             $freeDelivery = $this->repo->findFreeDeliveryInSameWeek($delivery);
-            foreach($delivery->getDeliveryProducts() as $deliveryProduct){
+            $deliveryProducts = $delivery->getDeliveryProducts();
+            foreach ($deliveryProducts as $deliveryProduct) {
                 $freeDelivery->addDeliveryProduct($deliveryProduct);
             }
-            
+
             $delivery->setDeliveryProducts([]);
             $this->repo->save($delivery);
             $this->repo->save($freeDelivery, true);
+
+            $this->logger->notice('[DELIVERIES] Delivery deleted.', [
+                'delivery' => $id,
+                'freeDelivery' => $freeDelivery->getid(),
+                'products' => $deliveryProducts->map(fn ($dp) => $dp->getProduct()->getId())->toArray(),
+            ]);
         } catch (Exception $e) {
 
             return $this->json(
