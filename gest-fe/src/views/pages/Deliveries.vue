@@ -11,7 +11,6 @@ import type Sellable from '@/interfaces/product';
 import type InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import type { Delivery } from '@/interfaces/delivery';
-import Logger from '@/components/Logger.vue';
 import dayjs from 'dayjs';
 import DeliveryForm from '@/components/forms/DeliveryForm.vue';
 import type Zone from '@/interfaces/zone';
@@ -210,8 +209,6 @@ const deleteReason = ref('');
                         <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="() => deleteData(deleteReason)" />
                     </template>
                 </Dialog>
-
-                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
             </div>
         </div>
     </div>

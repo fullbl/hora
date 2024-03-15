@@ -2,7 +2,6 @@
 import userService from '@/service/UserService';
 import zoneService from '@/service/ZoneService';
 import { useDataView } from '../composables/dataView';
-import Logger from '@/components/Logger.vue';
 import { computed, onMounted, ref } from 'vue';
 import type Zone from '@/interfaces/zone';
 import Button from 'primevue/button';
@@ -254,8 +253,6 @@ const logEntity = ref(null);
                         <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteData()" />
                     </template>
                 </Dialog>
-
-                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
             </div>
         </div>
     </div>

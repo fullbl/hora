@@ -3,7 +3,6 @@ import productService from '@/service/ProductService';
 import zoneService from '@/service/ZoneService';
 import { useDataView } from '../composables/dataView';
 import { onMounted, ref } from 'vue';
-import Logger from '@/components/Logger.vue';
 import Extra from './products/Extra.vue';
 import Seed from './products/Seed.vue';
 import type { Step } from '@/interfaces/step';
@@ -164,8 +163,6 @@ const types = [
                         <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteData" />
                     </template>
                 </Dialog>
-
-                <Logger entity-name="App\Entity\Product" :entity-id="logEntity" @close="logEntity = null" />
             </div>
         </div>
     </div>
