@@ -81,7 +81,7 @@ onMounted(async () => {
 
                     <div class="field">
                         <label for="status" class="mb-3">Parent</label>
-                        <Dropdown showClear id="status" v-model="single.parent" :options="zones" optionLabel="label" optionValue="value" placeholder="Select a Status" :class="{ 'p-invalid': isInvalid('status') }"> </Dropdown>
+                        <Dropdown showClear id="status" v-model="single.parent" :options="zones.filter((x) => x.id !== single?.id && x.parent === null)" optionLabel="name" optionValue="value" placeholder="Select a Zone" :class="{ 'p-invalid': isInvalid('status') }"> </Dropdown>
                     </div>
 
                     <template #footer>
