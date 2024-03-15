@@ -6,7 +6,7 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/actions.log"
             level: debug
-            formatter: 'monolog.formatter.normalizer'
+            formatter: monolog.formatter.line
             channels: ["actions"]
 when@dev:
     monolog:
