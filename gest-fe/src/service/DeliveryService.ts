@@ -15,15 +15,15 @@ const service: DeliveryService = {
     },
     async getFrom(from: string) {
         return (await dataService.get<Delivery[]>(import.meta.env.VITE_API_URL + 'deliveries/' + from)).map((delivery: Delivery) => {
-            delivery.harvestDate = dayjs(delivery.harvestDate);
-            delivery.deliveryDate = dayjs(delivery.deliveryDate);
+            delivery.harvestDate = dayjs(delivery.harvestDate + ' 09:00');
+            delivery.deliveryDate = dayjs(delivery.deliveryDate + ' 09:00');
             return delivery;
         });
     },
     async getAll() {
         return (await dataService.get<Delivery[]>(import.meta.env.VITE_API_URL + 'deliveries')).map((delivery: Delivery) => {
-            delivery.harvestDate = dayjs(delivery.harvestDate);
-            delivery.deliveryDate = dayjs(delivery.deliveryDate);
+            delivery.harvestDate = dayjs(delivery.harvestDate + ' 09:00');
+            delivery.deliveryDate = dayjs(delivery.deliveryDate + ' 09:00');
             if(delivery.deletedAt){
                 delivery.deletedAt = dayjs(delivery.deletedAt);
             }
