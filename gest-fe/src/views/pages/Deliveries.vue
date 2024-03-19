@@ -14,9 +14,10 @@ import type { Delivery } from '@/interfaces/delivery';
 import dayjs from 'dayjs';
 import DeliveryForm from '@/components/forms/DeliveryForm.vue';
 import type Zone from '@/interfaces/zone';
+import { useToast } from 'primevue/usetoast';
 
 const { filters, data: _data, single, save, openNew: _openNew, editData: _editData, cloneData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(deliveryService);
-
+const toast = useToast();
 const customers = ref<Array<User>>([]);
 const products = ref<Array<Sellable>>([]);
 const logEntity = ref(null);
@@ -24,6 +25,7 @@ const nextOnly = ref(false);
 const activeOnly = ref(false);
 const today = dayjs();
 const expandedRowGroups = ref();
+const selectedDeliveries = ref([] as Array<Delivery>);
 
 const data = computed(() => {
     const rows = _data.value;
@@ -58,6 +60,22 @@ const preSave = function () {
     save();
 };
 
+const deleteMultiple = async () => {
+    const reason = prompt('Why are you doing this?');
+    if(reason) {
+        await deliveryService.deleteMultiple(
+            selectedDeliveries.value,
+            reason
+        );
+        _data.value = await deliveryService.getAll();
+        selectedDeliveries.value = [];
+        toast.add({ severity: 'success', summary: 'Delete', detail: 'Deliveries deleted', life: 3000 });
+    }
+    else{
+        toast.add({ severity: 'error', summary: 'Cancel', detail: 'Action cancelled', life: 3000 });
+    }
+};
+
 const deleteReason = ref('');
 </script>
 
@@ -70,6 +88,13 @@ const deleteReason = ref('');
                     <template v-slot:start>
                         <div class="my-2">
                             <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                            <Button
+                                :label="'Delete Selected ' + (selectedDeliveries?.length ? ' (' + selectedDeliveries?.length + ')' : '')"
+                                icon="pi pi-trash"
+                                class="p-button-danger"
+                                @click="deleteMultiple()"
+                                :disabled="!selectedDeliveries || !selectedDeliveries.length"
+                            />
                         </div>
                     </template>
                 </Toolbar>
@@ -77,12 +102,14 @@ const deleteReason = ref('');
                 <DataTable
                     :value="data"
                     dataKey="id"
+                    v-model:selection="selectedDeliveries"
                     v-model:expandedRowGroups="expandedRowGroups"
                     expandableRowGroups
                     rowGroupMode="subheader"
                     groupRowsBy="customer.fullName"
                     sortMode="single"
                     sortField="customer.fullName"
+                    selectionMode="multiple"
                     :paginator="false"
                     :rows="10"
                     :filters="filters"
@@ -153,14 +180,14 @@ const deleteReason = ref('');
                         <template #body="slotProps">
                             <span class="p-column-title">Zones</span>
                             {{
-                                slotProps.data.customer?.zones ?? []
+                                (slotProps.data.customer?.zones ?? [])
                                     .filter((zone: Zone) => null === zone.parent)
                                     .map((zone: Zone) => zone.name)
                                     .join(',')
                             }}
                             <br />
                             {{
-                                slotProps.data.customer?.zones ?? []
+                                (slotProps.data.customer?.zones ?? [])
                                     .filter((zone: Zone) => null !== zone.parent)
                                     .map((zone: Zone) => zone.name)
                                     .join(',')

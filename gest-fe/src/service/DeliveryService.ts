@@ -5,11 +5,19 @@ import type { Delivery } from '@/interfaces/delivery';
 import dayjs from 'dayjs';
 
 interface DeliveryService extends Service<Delivery> {
+    deleteMultiple(ids: Array<Delivery>, reason: string): Promise<Array<Delivery>>;
     getFrom(from: string): Promise<Array<Delivery>>;
     move(delivery: Delivery, deliveries: Array<{ delivery: number; deliveryProducts: Array<{ product: { id: number }, qty: number }> }>): Promise<Array<Delivery>>;
 }
 
 const service: DeliveryService = {
+    async deleteMultiple(deliveries, reason) {
+        const promises = [];
+        for (const delivery of deliveries) {
+            promises.push(this.delete(delivery, reason));
+        }
+        return promises.length ? await Promise.all(promises) : [];
+    },
     async delete(delivery, reason) {
         return await dataService.delete(import.meta.env.VITE_API_URL + 'deliveries/' + delivery.id, {reason});
     },
