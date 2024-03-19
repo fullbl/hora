@@ -36,13 +36,11 @@ services:
     environment:
       LOCATION: ${LOCATION}      
       SECOND_LEVEL_DOMAIN: ${SECOND_LEVEL_DOMAIN}
-      SENTRY_DSN: ${SENTRY_DSN}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
     volumes:
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-
 
   app:
     build: 
@@ -51,7 +49,7 @@ services:
       args:
         LOCATION: belluno
         SECOND_LEVEL_DOMAIN: horafarms.it
-        SENTRY_DSN: ${SENTRY_DSN}
+        SENTRY_DSN: ${SENTRY_DSN_FE}
     image: fullbl/hora-app:${TAG:-latest}
     restart: always
 
