@@ -84,6 +84,7 @@ const weekTotal = computed(function () {
                         {{ dp.product.name }}
                         <br />
                         <i v-if="'soaking' === dp.step.name"> {{ dp.step.minutes / 60 }} hours </i>
+                        <i v-else> {{ dp.step.minutes / 60 / 24 }} days </i>
                     </QtyHolder>
                     <ProgressHolder :dp="dp" />
                 </div>
