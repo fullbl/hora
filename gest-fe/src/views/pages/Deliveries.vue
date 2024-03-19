@@ -166,14 +166,17 @@ const deleteReason = ref('');
                     </Column>
                     <Column field="deliveryProducts" header="Products" sortable headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <span v-if="slotProps.data.deletedAt">Deleted on {{ slotProps.data.deletedAt.format('DD/MM/YYYY HH:mm:ss') }} because {{ slotProps.data.deletedReason }}</span>
-                            <span class="p-column-title" v-else>Products</span>
+                            <span class="p-column-title">Products</span>
+                            <span v-if="slotProps.data.deletedAt">Deleted on <b>{{ slotProps.data.deletedAt.format('DD/MM/YYYY HH:mm:ss') }}</b></span>
+                            <span v-if="slotProps.data.deletedReason"> because <b>{{ slotProps.data.deletedReason }}</b></span>
+                            <div>
                             {{
                                 slotProps.data.deliveryProducts
                                     .map((d: DeliveryProduct) => d.product.name + ': ' + d.qty)
                                     .sort()
                                     .join(', ')
                             }}
+                            </div>
                         </template>
                     </Column>
                     <Column field="customer.zones" header="Zones" sortable>
