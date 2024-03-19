@@ -153,14 +153,14 @@ const deleteReason = ref('');
                         <template #body="slotProps">
                             <span class="p-column-title">Zones</span>
                             {{
-                                slotProps.data.customer.zones
+                                slotProps.data.customer?.zones ?? []
                                     .filter((zone: Zone) => null === zone.parent)
                                     .map((zone: Zone) => zone.name)
                                     .join(',')
                             }}
                             <br />
                             {{
-                                slotProps.data.customer.zones
+                                slotProps.data.customer?.zones ?? []
                                     .filter((zone: Zone) => null !== zone.parent)
                                     .map((zone: Zone) => zone.name)
                                     .join(',')
