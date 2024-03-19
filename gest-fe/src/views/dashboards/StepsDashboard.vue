@@ -81,7 +81,6 @@ const weekTotal = computed(function () {
                 <div v-for="[name, dp] in Array.from(deliveryGroups.get(date.format('YYYMMDD')) ?? []).sort(([x, a], [y, b]) => a.product.name.localeCompare(b.product.name))">
                     <QtyHolder :qty="dp.qty">
                         <Icon :type="dp.step.name" />
-                        {{ dp.step.name }}
                         {{ dp.product.name }}
                         <br />
                         <i v-if="'soaking' === dp.step.name"> {{ dp.step.minutes / 60 }} hours </i>
