@@ -56,9 +56,9 @@ const deliveryGroups = computed(() => {
             }
 
             let hash = dp.product.name;
-            let inverseHash = delivery.customer?.fullName ?? '';
+            let inverseHash = delivery.customer?.fullName ?? 'EXTRA';
             if ('customer' === groupMode.value) {
-                hash = delivery.customer?.fullName ?? '';
+                hash = delivery.customer?.fullName ?? 'EXTRA';
                 inverseHash = dp.product.name;
             }
 
@@ -184,7 +184,7 @@ const groupNames = computed(function () {
                     <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
                     <b>Day total: {{ dayTotal(date.weekday()) }}</b>
                     <div class="flex flex-wrap justify-content-between">
-                        <Panel v-for="[groupName, products] in deliveryGroups.get(date.weekday())" :header="groupName"
+                        <Panel v-for="[groupName, products] in Array.from(deliveryGroups.get(date.weekday())).sort(([x, a],[y, b]) => x.localeCompare(y))" :header="groupName"
                             toggleable>
                             <template #header>
                                 {{ groupName }} {{ groupWeekTotal(date.weekday(), groupName) }}
