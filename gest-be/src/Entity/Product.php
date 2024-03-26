@@ -44,7 +44,7 @@ class Product
     #[Assert\NotNull]
     private ?string $name = null;
     
-    #[Groups(['product-list', 'product-edit', 'delivery-dash'])]
+    #[Groups(['delivery-list', 'product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(length: 15)]
     #[Assert\Choice(self::TYPES)]
     #[Assert\NotNull]

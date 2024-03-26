@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import productService from '@/service/ProductService';
 import type User from '@/interfaces/user';
 import type { Sellable } from '@/interfaces/product';
-import { ref, type PropType } from 'vue';
+import { ref, type PropType, watch, onMounted } from 'vue';
 import type DeliveryProduct from '@/interfaces/deliveryProduct';
 import Calendar from 'primevue/calendar';
 
@@ -63,6 +63,10 @@ const deliveryDatesModel = defineModel('deliveryDates', {
     set: (dates: Date[]) => setDates(dates, 'deliveryDates')
 });
 
+onMounted(() => {
+    props.single.deliveryProducts = props.single.deliveryProducts.sort((a, b) => a.product.name.localeCompare(b.product.name))
+});
+
 const addProduct = () => {
     if (undefined !== props.single) {
         props.single.deliveryProducts.push({ product: productService.getNew(), qty: 1 });
@@ -96,7 +100,7 @@ const removeProduct = (dp: DeliveryProduct) => {
             <label for="products">Products</label>
 
             <Button label="Add" icon="pi pi-plus" @click="addProduct" />
-            <DataTable :value="single.deliveryProducts.sort((a, b) => a.product.name.localeCompare(b.product.name))">
+            <DataTable :value="single.deliveryProducts">
                 <Column field="product.name" header="Product">
                     <template #body="slotProps">
                         <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id" :options="products" />
