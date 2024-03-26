@@ -198,33 +198,41 @@ const deleteDelivery = async function (delivery: Delivery) {
                 <b>Day total: {{ dayTotals[date.weekday()] }} ({{ dayTotalsWithoutExtra[date.weekday()] }})</b>
 
                 <div>
-                    <Panel v-for="[zoneName, zoneGroup] in deliveryGroups[date.weekday()]" :pt="{ header: { title: zoneName + ': ' + zoneGroup.total } }" :header="zoneName + ': ' + zoneGroup.total" toggleable collapsed>
+                    <Panel v-for="[zoneName, zoneGroup] in deliveryGroups[date.weekday()]" 
+                        :pt="{ 
+                            content: { class: 'p-0 mb-1' },
+                            header: { title: zoneName + ': ' + zoneGroup.total } }" 
+                        :header="zoneName + ': ' + zoneGroup.total" 
+                        toggleable collapsed>
                         <Panel v-for="[subZoneName, subZoneGroup] in zoneGroup.subZones" :pt="{ header: { title: subZoneName + ': ' + subZoneGroup.total } }" :header="subZoneName + ': ' + subZoneGroup.total" toggleable collapsed>
                             <p v-for="[productName, qty] in Array.from(subZoneGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                 <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
                             </p>
-                            <Panel
-                                v-for="[customerName, customerGroup] in Array.from(subZoneGroup.customers).sort(([x, a], [y, b]) => a.position - b.position)"
-                                :pt="{
-                                    header: {
-                                        class: getWarningClass(customerGroup.delivery),
-                                        title: customerName + ': ' + customerGroup.total
-                                    }
-                                }"
-                                toggleable
-                                collapsed
-                            >
-                                <template #header>
-                                    <CustomerMenu :change="() => changeDelivery(customerGroup.delivery)" :empty="() => emptyDelivery(customerGroup.delivery)" :remove="() => deleteDelivery(customerGroup.delivery)" />
-                                    <div>
-                                        <strong class="px-1">{{ customerName }}</strong>
-                                        <p class="block px-1" v-for="[customerGroupName, customerGroupTotal] in Array.from(customerGroup.totals)" >{{ customerGroupName ?? '' }}: {{ customerGroupTotal ?? 0 }}</p>
-                                    </div>
-                                </template>
-                                <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
-                                    <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
-                                </p>
-                            </Panel>
+
+                            <template #footer>
+                                <Panel
+                                    v-for="[customerName, customerGroup] in Array.from(subZoneGroup.customers).sort(([x, a], [y, b]) => a.position - b.position)"
+                                    :pt="{
+                                        header: {
+                                            class: getWarningClass(customerGroup.delivery),
+                                            title: customerName + ': ' + customerGroup.total
+                                        }
+                                    }"
+                                    toggleable
+                                    collapsed
+                                >
+                                    <template #header>
+                                        <CustomerMenu :change="() => changeDelivery(customerGroup.delivery)" :empty="() => emptyDelivery(customerGroup.delivery)" :remove="() => deleteDelivery(customerGroup.delivery)" />
+                                        <div>
+                                            <strong class="px-1">{{ customerName }}</strong>
+                                            <p class="block px-1" v-for="[customerGroupName, customerGroupTotal] in Array.from(customerGroup.totals)">{{ customerGroupName ?? '' }}: {{ customerGroupTotal ?? 0 }}</p>
+                                        </div>
+                                    </template>
+                                    <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
+                                        <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
+                                    </p>
+                                </Panel>
+                            </template>
                         </Panel>
                     </Panel>
                 </div>
