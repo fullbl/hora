@@ -29,7 +29,7 @@ class ZonesController extends AbstractController
             );
         }
         if($this->isGranted('ROLE_SUPER_ADMIN')){
-            $zones = $this->repo->findAll();
+            $zones = $this->repo->findBy([], ['name' => 'ASC']);
         }
         else{
             $zones = $user->getZones();
