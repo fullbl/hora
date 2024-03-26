@@ -53,7 +53,10 @@ const deliveryGroups = ref({
     4: new Map(),
     5: new Map(),
     6: new Map()
-} as Record<number, Map<string, { total: number; subZones: Map<string, { total: number; products: Map<string, number>; customers: Map<string, { total: number; products: Map<string, number>; delivery: Delivery, position: number }> }> }>>);
+} as Record<
+    number,
+    Map<string, { total: number; subZones: Map<string, { total: number; products: Map<string, number>; customers: Map<string, { total: number; totals: Map<string, number>; products: Map<string, number>; delivery: Delivery; position: number }> }> }>
+>);
 
 watchEffect(async () => {
     deliveries.value = await deliveryService.getFrom(getDate(year.value, week.value, 0).format('YYYY-MM-DD'));
@@ -98,7 +101,7 @@ watchEffect(async () => {
         }
         let customerGroup = subZoneGroup.customers.get(delivery.customer?.fullName ?? 'EXTRA');
         if (undefined === customerGroup) {
-            customerGroup = { total: 0, products: new Map(), delivery: delivery, position: delivery.customer?.position ?? 0 };
+            customerGroup = { total: 0, totals: new Map(), products: new Map(), delivery: delivery, position: delivery.customer?.position ?? 0 };
         }
 
         for (const dp of delivery.deliveryProducts) {
@@ -121,6 +124,7 @@ watchEffect(async () => {
             subZoneGroup.products.set(dp.product.name, product + dp.qty);
 
             customerGroup.total += dp.qty;
+            customerGroup.totals.set(dp.product.type, (customerGroup.totals.get(dp.product.type) ?? 0) + dp.qty);
             let customerProduct = customerGroup.products.get(dp.product.name);
             if (undefined === customerProduct) {
                 customerProduct = 0;
@@ -212,7 +216,10 @@ const deleteDelivery = async function (delivery: Delivery) {
                             >
                                 <template #header>
                                     <CustomerMenu :change="() => changeDelivery(customerGroup.delivery)" :empty="() => emptyDelivery(customerGroup.delivery)" :remove="() => deleteDelivery(customerGroup.delivery)" />
-                                    <p class="px-1">{{ customerName }}: {{ customerGroup.total }}</p>
+                                    <div>
+                                        <strong class="px-1">{{ customerName }}</strong>
+                                        <p class="block px-1" v-for="[customerGroupName, customerGroupTotal] in Array.from(customerGroup.totals)" >{{ customerGroupName ?? '' }}: {{ customerGroupTotal ?? 0 }}</p>
+                                    </div>
                                 </template>
                                 <p v-for="[productName, qty] in Array.from(customerGroup.products).sort(([x, a], [y, b]) => x.localeCompare(y))" class="m-0">
                                     <QtyHolder :qty="qty">{{ productName }}</QtyHolder>
