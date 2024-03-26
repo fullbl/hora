@@ -35,7 +35,7 @@ watchEffect(async () => {
 
 const weekDayTotal = function (day: Dayjs) {
     let totals = 0;
-    const group = deliveryGroups.value.get(day.format('YYYMMDD'));
+    const group = deliveryGroups.value.get(day.format('YYYYMMDD'));
     if (undefined === group) {
         return 0;
     }
@@ -78,7 +78,7 @@ const weekTotal = computed(function () {
             <div style="width: 14.28%" v-for="date of getWeekDates(year, week)">
                 <h5>{{ date.format('dddd DD/MM/YYYY') }}</h5>
 
-                <div v-for="[name, dp] in Array.from(deliveryGroups.get(date.format('YYYMMDD')) ?? []).sort(([x, a], [y, b]) => a.product.name.localeCompare(b.product.name))">
+                <div v-for="[name, dp] in Array.from(deliveryGroups.get(date.format('YYYYMMDD')) ?? []).sort(([x, a], [y, b]) => a.product.name.localeCompare(b.product.name))">
                     <QtyHolder :qty="dp.qty">
                         <Icon :type="dp.step.name" />
                         {{ dp.product.name }}

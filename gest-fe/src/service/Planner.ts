@@ -79,7 +79,7 @@ export default class Planner {
             if (undefined === p.date) {
                 return g;
             }
-            let dayHash = p.date.format('YYYMMDD');
+            let dayHash = p.date.format('YYYYMMDD');
             const products = g.get(dayHash) ?? new Map();
             const productHash = p.product.id + p.step.name;
             let qty = p.qty;
