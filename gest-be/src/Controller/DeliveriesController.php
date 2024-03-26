@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\DeliveryProduct;
 use App\Mapper\DeliveryMapper;
 use App\Mapper\DeliveryProductMapper;
 use App\Repository\DeliveryRepository;
@@ -139,7 +140,10 @@ class DeliveriesController extends AbstractController
 
             $this->logger->notice('[DELIVERIES] Delivery moved', [
                 'delivery' => $delivery->getId(),
-                'products' => json_encode($delivery->getDeliveryProducts()->map(fn ($dp) => $dp->getProduct()->getId())->toArray()),
+                'products' => json_encode($delivery->getDeliveryProducts()->map(fn (DeliveryProduct $dp) => [
+                    'id' => $dp->getProduct()->getId(),
+                    'qty' => $dp->getQty()
+                ])->toArray()),
             ]);
         }
 
