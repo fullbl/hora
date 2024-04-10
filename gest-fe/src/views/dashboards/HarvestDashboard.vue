@@ -74,7 +74,7 @@ const deliveryGroups = computed(() => {
             group.set(
                 inverseHash,
                 {
-                    qty: (group.get(dp.product.name)?.qty ?? 0) + dp.qty,
+                    qty: (group.get(inverseHash)?.qty ?? 0) + dp.qty,
                     done: activities.value
                         .filter(a =>
                             a.delivery?.id === delivery.id &&
