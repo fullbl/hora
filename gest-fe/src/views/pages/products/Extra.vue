@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type Extra from '@/interfaces/product';
+import type { Extra } from '@/interfaces/product';
 import { computed, type PropType } from 'vue';
 
 const props = defineProps({
@@ -23,12 +23,10 @@ const price = computed({
 });
 </script>
 <template>
-    <div class="formgrid grid" >
+    <div class="formgrid grid">
         <div class="field col-6">
             <label for="price">Price</label>
-            <InputNumber type="number" id="price" mode="currency" currency="EUR" 
-                buttonLayout="horizontal"
-                v-model="price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
+            <InputNumber type="number" id="price" mode="currency" currency="EUR" buttonLayout="horizontal" v-model="price" autofocus showButtons :class="{ 'p-invalid': isInvalid('price') }" />
         </div>
     </div>
 </template>

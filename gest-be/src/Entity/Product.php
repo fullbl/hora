@@ -15,6 +15,7 @@ class Product
 {
     public const TYPE_GROUND = 'ground';
     public const TYPE_SEED = 'seeds';
+    public const TYPE_MIX = 'mix';
     public const TYPE_SEEDS_BOX = 'seeds_box';
     public const TYPE_WATER_BOX = 'water_box';
     public const TYPE_BLACKOUT_BOX = 'blackout_box';
@@ -24,6 +25,7 @@ class Product
     public const TYPES = [
         self::TYPE_GROUND,
         self::TYPE_SEED,
+        self::TYPE_MIX,
         self::TYPE_SEEDS_BOX,
         self::TYPE_WATER_BOX,
         self::TYPE_BLACKOUT_BOX,
@@ -43,38 +45,38 @@ class Product
     #[Assert\Length(max: 100)]
     #[Assert\NotNull]
     private ?string $name = null;
-    
+
     #[Groups(['delivery-list', 'product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(length: 15)]
     #[Assert\Choice(self::TYPES)]
     #[Assert\NotNull]
     private ?string $type = null;
-    
+
     #[Groups(['product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull(groups: ['seeds'])]
     private ?int $decigrams = null;
-    
+
     #[Groups(['product-list', 'product-edit'])]
     #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[Assert\NotNull(groups: ['seeds'])]
     private ?int $days = null;
-    
+
     #[Groups(['delivery-list', 'product-list', 'product-edit'])]
     #[Assert\Positive]
     #[Assert\Type('integer')]
     #[ORM\Column(nullable: true)]
     private ?int $price = null;
-    
+
     #[Groups(['product-list', 'delivery-dash'])]
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Step::class, orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['sort' => 'ASC'])]
     private Collection $steps;
-    
+
     #[Groups(['delivery-list', 'product-list', 'product-edit', 'delivery-dash'])]
     #[ORM\Column(options: ['default' => false])]
     private bool $weight = false;
@@ -82,6 +84,11 @@ class Product
     #[Groups(['product-list', 'product-edit'])]
     #[ORM\ManyToMany(targetEntity: Zone::class)]
     private Collection $zones;
+    
+    #[Groups(['product-list', 'product-edit'])]
+    #[ORM\Column(nullable: true, type: Types::JSON)]
+    #[Assert\NotNull(groups: ['mix'])]
+    private array $products;
 
     public function __construct()
     {
@@ -168,10 +175,10 @@ class Product
     public function setSteps(array $steps): self
     {
         $this->steps = new ArrayCollection($steps);
-        
+
         return $this;
     }
-    
+
     public function addStep(Step $step): self
     {
         if (!$this->steps->contains($step)) {
@@ -225,6 +232,18 @@ class Product
     public function removeZone(Zone $zone): static
     {
         $this->zones->removeElement($zone);
+
+        return $this;
+    }
+
+    public function getProducts(): array
+    {
+        return $this->products;
+    }
+
+    public function setProducts(array $products): self
+    {
+        $this->products = $products;
 
         return $this;
     }

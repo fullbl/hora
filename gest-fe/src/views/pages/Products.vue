@@ -3,10 +3,12 @@ import productService from '@/service/ProductService';
 import zoneService from '@/service/ZoneService';
 import { useDataView } from '../composables/dataView';
 import { onMounted, ref } from 'vue';
-import Extra from './products/Extra.vue';
-import Seed from './products/Seed.vue';
+import ExtraView from './products/Extra.vue';
+import SeedView from './products/Seed.vue';
+import MixView from './products/Mix.vue';
 import type { Step } from '@/interfaces/step';
 import type Zone from '@/interfaces/zone';
+import type { Extra, Mix, Seed } from '@/interfaces/product';
 
 const { filters, data, single, save, openNew, editData, dialog, hideDialog, showDialog, deleteDialog, confirmDelete, deleteData, isInvalid } = useDataView(productService);
 
@@ -17,8 +19,9 @@ onMounted(async () => {
 const logEntity = ref(null);
 
 const types = [
+    { label: 'Seed', value: 'seeds' },
+    { label: 'Mix', value: 'mix' },
     { label: 'Ground', value: 'ground' },
-    { label: 'Seeds', value: 'seeds' },
     { label: 'Seeds box', value: 'seeds_box' },
     { label: 'Water box', value: 'water_box' },
     { label: 'Blackout box', value: 'blackout_box' },
@@ -141,8 +144,9 @@ const types = [
                         <Dropdown id="type" v-model="single.type" :options="types" optionLabel="label" optionValue="value" placeholder="Select a Type" :class="{ 'p-invalid': isInvalid('type') }" />
                     </div>
 
-                    <Seed v-if="'seeds' === single.type" :seed="single" :isInvalid="isInvalid" />
-                    <Extra v-if="'extra' === single.type" :extra="single" :isInvalid="isInvalid" />
+                    <SeedView v-if="'seeds' === single.type" :seed="single as Seed" :isInvalid="isInvalid" />
+                    <ExtraView v-if="'extra' === single.type" :extra="single as Extra" :isInvalid="isInvalid" />
+                    <MixView v-if="'mix' === single.type" :mix="single as Mix" :isInvalid="isInvalid" />
 
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />

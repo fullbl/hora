@@ -39,6 +39,17 @@ class ProductsController extends AbstractController
         ]);
     }
 
+    #[Route('/mixes', methods: ['GET'], name: 'mixes_list')]
+    public function mixes(): JsonResponse
+    {
+        return $this->json($this->repo->findBy(
+            ['type' => Product::TYPE_MIX],
+            ['name' => 'ASC']
+        ), Response::HTTP_OK, [], [
+            'groups' => 'product-list'
+        ]);
+    }
+
     #[Route('/seeds', methods: ['GET'], name: 'seeds_list')]
     public function seeds(): JsonResponse
     {
@@ -149,7 +160,7 @@ class ProductsController extends AbstractController
             );
         }
         $product = $this->mapper->fill($product, $request);
-        $errors = $this->validator->validate($product);
+        $errors = $this->validator->validate($product, null, [$request->toArray()['type']]);
         if ($errors->count() > 0) {
 
             return $this->json(

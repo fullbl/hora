@@ -21,6 +21,11 @@ export interface Seed extends Product {
     type: 'seed'
 }
 
+export interface Mix extends Product {
+    type: 'mix',
+    products: Product[]
+}
+
 export interface Extra extends Product {
     type: 'extra'
 }
@@ -28,5 +33,6 @@ export interface Extra extends Product {
 export interface Sellable extends Product {
     type: 'seed' | 'extra'
 }
+
 
 export default Product

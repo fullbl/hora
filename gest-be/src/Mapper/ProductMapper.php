@@ -50,7 +50,6 @@ class ProductMapper
             $newProduct->addZone($zone);
         }
 
-
         $steps = $newProduct->getSteps()->filter(function (Step $step) use ($data): bool {
             $stepKey = array_search($step->getId(), array_column($data['steps'], 'id'), true);
             if (false === $stepKey) {
