@@ -69,6 +69,7 @@ class ProductsController extends AbstractController
                 ['type' => [
                     Product::TYPE_SEED,
                     Product::TYPE_EXTRA,
+                    Product::TYPE_MIX,
                 ]],
                 ['name' => 'ASC']
             ),

@@ -103,7 +103,7 @@ const removeProduct = (dp: DeliveryProduct) => {
             <DataTable :value="single.deliveryProducts">
                 <Column field="product.name" header="Product">
                     <template #body="slotProps">
-                        <Dropdown v-model="slotProps.data.product" optionLabel="name" dataKey="id" :options="products" />
+                        <Dropdown v-model="slotProps.data.product" filter optionLabel="name" dataKey="id" :options="products" />
                     </template>
                 </Column>
                 <Column field="product.type" header="Type" />

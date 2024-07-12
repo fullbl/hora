@@ -3,6 +3,7 @@ import productService from '@/service/ProductService';
 import type { Mix, Seed } from '@/interfaces/product';
 import { onMounted, ref, type PropType } from 'vue';
 import MultiSelect from 'primevue/multiselect';
+import InputNumber from 'primevue/inputnumber';
 
 defineProps({
     mix: {
@@ -23,8 +24,12 @@ onMounted(async () => {
 <template>
     <div class="formgrid grid">
         <div class="field col">
-            <label for="weight">Products</label>
-            <MultiSelect filter v-model="mix.products" :options="products" display="chip" optionLabel="name" />
+            <label for="days">Days</label>
+            <InputNumber id="days" type="number" v-model="mix.days" :class="{'p-invalid': isInvalid('days')}" />
+        </div>
+        <div class="field col">
+            <label for="products">Products</label>
+            <MultiSelect id="products" filter v-model="mix.products" :options="products" display="chip" optionLabel="name" :class="{'p-invalid': isInvalid('products')}" />
         </div>
     </div>
 </template>
